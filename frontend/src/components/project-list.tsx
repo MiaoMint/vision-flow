@@ -1,30 +1,34 @@
-import { Plus } from "lucide-react"
+import { Plus } from "lucide-react";
 
 interface Project {
-  id: string
-  name: string
-  image: string
+  id: string;
+  name: string;
+  image: string;
 }
 
-export function ProjectList() {
+interface ProjectListProps {
+  onProjectClick: (project: Project) => void;
+}
+
+export function ProjectList({ onProjectClick }: ProjectListProps) {
   // 示例项目数据
   const projects: Project[] = [
     {
       id: "1",
       name: "示例项目 1",
-      image: "https://placehold.co/600x400"
+      image: "https://placehold.co/600x400",
     },
     {
       id: "2",
       name: "示例项目 2",
-      image: "https://placehold.co/600x400"
+      image: "https://placehold.co/600x400",
     },
     {
       id: "3",
       name: "示例项目 3",
-      image: "https://placehold.co/600x400"
-    }
-  ]
+      image: "https://placehold.co/600x400",
+    },
+  ];
 
   return (
     <div className="p-6">
@@ -45,10 +49,14 @@ export function ProjectList() {
 
         {/* 现有项目列表 */}
         {projects.map((project) => (
-          <div key={project.id} className="group cursor-pointer overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:border-primary/50">
+          <div
+            key={project.id}
+            className="group cursor-pointer overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:border-primary/50"
+            onClick={() => onProjectClick(project)}
+          >
             <div className="aspect-video overflow-hidden bg-muted">
-              <img 
-                src={project.image} 
+              <img
+                src={project.image}
                 alt={project.name}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
@@ -60,5 +68,5 @@ export function ProjectList() {
         ))}
       </div>
     </div>
-  )
+  );
 }
