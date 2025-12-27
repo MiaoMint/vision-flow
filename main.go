@@ -19,7 +19,7 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:     "firebringer",
-		Width:     1024,
+		Width:     1280,
 		Height:    768,
 		MinWidth:  800,
 		MinHeight: 600,

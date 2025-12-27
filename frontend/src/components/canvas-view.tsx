@@ -61,36 +61,36 @@ export function CanvasView({
   );
 
   return (
-    <div className="flex h-full flex-col relative">
-      {/* 顶部工具栏 */}
-      <div
-        className="flex items-center gap-4 border-b p-2 bg-background pl-24"
-        style={{ "--wails-draggable": "drag" } as React.CSSProperties}
-      >
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="max-w-md"
-          placeholder="项目名称"
-        />
-        <div className="ml-auto">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => setIsChatOpen(!isChatOpen)}
-          >
-            <MessageSquare className="h-5 w-5" />
+    <div className="flex h-full relative">
+      {/* 主要内容区域 - 全屏 */}
+      <div className="flex flex-1 relative overflow-hidden w-full h-full">
+        {/* 顶部工具栏 - 悬浮毛玻璃效果 */}
+        <div
+          className="absolute top-0 left-0 right-0 z-20 flex items-center gap-4 p-2 pl-24 backdrop-blur-md bg-background/80 border-b border-border/50"
+          style={{ "--wails-draggable": "drag" } as React.CSSProperties}
+        >
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="max-w-sm border-none bg-transparent px-2 focus-visible:ring-0 focus-visible:ring-offset-0 font-semibold"
+            placeholder="项目名称"
+          />
+          <div className="ml-auto">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setIsChatOpen(!isChatOpen)}
+            >
+              <MessageSquare className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* 主要内容区域 */}
-      <div className="flex flex-1 relative overflow-hidden">
         {/* 左侧悬浮工具栏 */}
-        <div className="absolute left-4 top-4 z-10 flex flex-col gap-2">
+        <div className="absolute left-4 top-20 z-10 flex flex-col gap-2">
           <Card className="p-2 shadow-lg">
             <div className="flex flex-col gap-2">
               <Button variant="ghost" size="icon" title="添加节点">
@@ -124,7 +124,7 @@ export function CanvasView({
 
         {/* 右侧 Chat 面板 */}
         {isChatOpen && (
-          <div className="w-96 bg-background border-l flex flex-col">
+          <div className="w-96 bg-background border-l flex flex-col pt-14">
             <div className="flex items-center justify-between border-b p-4">
               <h3 className="font-semibold">AI 助手</h3>
               <Button
