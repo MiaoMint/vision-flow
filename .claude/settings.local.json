@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx skills-installer:*)",
+      "Bash(tree:*)",
+      "Bash(wails version:*)",
+      "Bash(go version:*)",
+      "Bash(node:*)",
+      "Bash(go install:*)",
+      "Bash(npm install)",
+      "Bash(wails dev:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "检查文件头是否包含 Input/Output/Pos 注释规范。如果是 .ts/.tsx/.go 文件且前20行缺少这些注释，输出提醒。参考 .claude/CLAUDE.md 中的规范。检查 $ARGUMENTS 中 file_path 对应的文件。",
+            "model": "claude-3-5-haiku-20241022"
+          }
+        ]
+      }
+    ]
+  }
+}

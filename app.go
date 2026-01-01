@@ -1,3 +1,12 @@
+/**
+ * Input: Wails runtime context (在应用启动时注入)
+ * Output: App 实例，暴露给前端的方法（Greet 等）
+ * Pos: Wails 应用的核心结构体，桥接 Go 后端与前端 React
+ *
+ * 一旦本文件被更新，务必更新：
+ * 1. 本注释块
+ * 2. 根目录的 README.md
+ */
 package main
 
 import (

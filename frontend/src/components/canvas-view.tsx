@@ -1,3 +1,15 @@
+/**
+ * Input:
+ *   - ReactFlow 的 [Pos: 无限画布节点编辑库]
+ *   - UI 组件的 [Pos: shadcn/ui 组件库]
+ *   - projectId, projectName (来自 App 的 [Pos: 应用主组件])
+ * Output: 画布编辑器视图，包含节点画布和 AI 聊天侧栏
+ * Pos: 核心视图组件，承载无限画布编辑器和 AI 助手
+ *
+ * 一旦本文件被更新，务必更新：
+ * 1. 本注释块
+ * 2. frontend/src/components/README.md
+ */
 import { useState, useCallback } from "react";
 import {
   ReactFlow,

@@ -1,3 +1,12 @@
+/**
+ * Input: onProjectClick 回调函数 (来自 App 的 [Pos: 应用主组件])
+ * Output: 项目网格列表视图
+ * Pos: 项目列表视图组件，展示所有可用项目
+ *
+ * 一旦本文件被更新，务必更新：
+ * 1. 本注释块
+ * 2. frontend/src/components/README.md
+ */
 import { Plus } from "lucide-react";
 
 interface Project {

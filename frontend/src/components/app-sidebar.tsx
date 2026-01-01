@@ -1,3 +1,14 @@
+/**
+ * Input:
+ *   - Sidebar UI 组件的 [Pos: shadcn/ui 侧边栏组件]
+ *   - NavUser 的 [Pos: 用户信息展示组件]
+ * Output: 应用侧边栏导航组件
+ * Pos: 应用的主导航栏，包含菜单项和用户信息
+ *
+ * 一旦本文件被更新，务必更新：
+ * 1. 本注释块
+ * 2. frontend/src/components/README.md
+ */
 import {
   Sidebar,
   SidebarContent,

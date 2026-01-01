@@ -1,3 +1,16 @@
+/**
+ * Input:
+ *   - Avatar 的 [Pos: shadcn/ui 头像组件]
+ *   - DropdownMenu 的 [Pos: shadcn/ui 下拉菜单组件]
+ *   - SidebarMenu 的 [Pos: shadcn/ui 侧边栏菜单组件]
+ *   - user 对象 (来自 AppSidebar 的 [Pos: 应用侧边栏导航])
+ * Output: 用户头像和下拉菜单
+ * Pos: 侧边栏底部的用户信息展示和操作菜单
+ *
+ * 一旦本文件被更新，务必更新：
+ * 1. 本注释块
+ * 2. frontend/src/components/README.md
+ */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,

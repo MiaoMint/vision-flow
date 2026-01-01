@@ -1,3 +1,12 @@
+/**
+ * Input: 无（应用入口点）
+ * Output: 初始化并启动 Wails 桌面应用
+ * Pos: 应用的主入口，配置窗口参数并启动 Wails 运行时
+ *
+ * 一旦本文件被更新，务必更新：
+ * 1. 本注释块
+ * 2. 根目录的 README.md
+ */
 package main
 
 import (

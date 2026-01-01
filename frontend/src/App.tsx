@@ -1,3 +1,15 @@
+/**
+ * Input:
+ *   - AppSidebar 的 [Pos: 应用侧边栏导航]
+ *   - ProjectList 的 [Pos: 项目列表视图]
+ *   - CanvasView 的 [Pos: 画布编辑器视图]
+ * Output: 根路由组件，根据选中项目显示列表或画布
+ * Pos: 应用的主组件，管理全局项目选择状态
+ *
+ * 一旦本文件被更新，务必更新：
+ * 1. 本注释块
+ * 2. frontend/src/README.md
+ */
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ProjectList } from "@/components/project-list";
 import { CanvasView } from "@/components/canvas-view";
