@@ -16,11 +16,11 @@ interface SettingsDialogProps {
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-[800px] h-[600px] overflow-hidden p-0 gap-0">
+            <DialogContent className="min-w-200 h-150 overflow-hidden p-0 gap-0">
                 <DialogTitle className="hidden">Settings</DialogTitle>
                 <Tabs defaultValue="models" orientation="vertical" className="flex h-full w-full">
                     {/* Sidebar */}
-                    <div className="w-[240px] bg-muted/30 border-r h-full flex flex-col shrink-0">
+                    <div className="w-60 bg-muted/30 border-r h-full flex flex-col shrink-0">
                         <div className="p-6 pb-4">
                             <h2 className="text-lg font-semibold tracking-tight">设置</h2>
                             <p className="text-sm text-muted-foreground">Firebringer Preferences</p>
@@ -45,7 +45,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     </div>
 
                     {/* Content Area */}
-                    <div className="flex-1 h-[600px] bg-background flex flex-col ">
+                    <div className="flex-1 h-150 bg-background flex flex-col ">
 
                         {/* General Settings */}
                         <TabsContent value="general" className="h-full overflow-y-auto m-0">
