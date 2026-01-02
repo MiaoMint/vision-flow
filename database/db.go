@@ -1,3 +1,11 @@
+// Input: storage package for database path resolution (path management utilities)
+// Output: Global DB connection instance for use by other database layer files
+// Position: Database initialization - creates connection and schema
+//
+// ⚠️ WHEN THIS FILE IS UPDATED:
+// 1. Update this header comment
+// 2. Update the parent folder's AI_ARCHITECTURE.md
+
 package database
 
 import (

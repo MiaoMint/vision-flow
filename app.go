@@ -1,3 +1,11 @@
+// Input: Context from Wails runtime
+// Output: App instance with Greet method
+// Position: Application service struct - provides example business logic (to be refactored)
+//
+// ⚠️ WHEN THIS FILE IS UPDATED:
+// 1. Update this header comment
+// 2. Update the parent folder's AI_ARCHITECTURE.md
+
 package main
 
 import (

@@ -2,3 +2,9 @@ build/bin
 node_modules
 frontend/dist
 .DS_Store
+
+# AI-generated documentation (do not commit)
+AI_*.md
+
+# Claude Code configuration (do not commit)
+.claude/

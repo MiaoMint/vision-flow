@@ -1,3 +1,11 @@
+// Input: database package for data access (data access layer - provides database operations, data model definitions)
+// Output: Service struct with methods bound to frontend JavaScript via Wails
+// Position: Binding layer - exposes Go backend to frontend
+//
+// ⚠️ WHEN THIS FILE IS UPDATED:
+// 1. Update this header comment
+// 2. Update the parent folder's AI_ARCHITECTURE.md
+
 package database
 
 import (

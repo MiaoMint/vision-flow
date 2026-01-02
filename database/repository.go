@@ -1,3 +1,11 @@
+// Input: Global DB instance from db.go (database initialization), models from models.go (data model definitions)
+// Output: CRUD functions (GetConfig, SaveConfig, DeleteConfig, ListConfigs) for use by binding layer
+// Position: Data access layer - provides database operations
+//
+// ⚠️ WHEN THIS FILE IS UPDATED:
+// 1. Update this header comment
+// 2. Update the parent folder's AI_ARCHITECTURE.md
+
 package database
 
 import (

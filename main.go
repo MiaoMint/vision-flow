@@ -1,3 +1,11 @@
+// Input: Wails v2 framework, database package for initialization (database initialization), binding/database for service exposure (binding layer - exposes Go backend to frontend)
+// Output: Configured and running desktop application instance
+// Position: Application entry point - initializes database, creates Wails app, binds Go services to JavaScript
+//
+// ⚠️ WHEN THIS FILE IS UPDATED:
+// 1. Update this header comment
+// 2. Update the parent folder's AI_ARCHITECTURE.md
+
 package main
 
 import (

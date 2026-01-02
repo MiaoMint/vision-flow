@@ -1,3 +1,11 @@
+// Input: None (standard library only)
+// Output: GetAppConfigDir and GetDatabasePath functions for use by database initialization
+// Position: Path management - provides cross-platform file system paths
+//
+// ⚠️ WHEN THIS FILE IS UPDATED:
+// 1. Update this header comment
+// 2. Update the parent folder's AI_ARCHITECTURE.md
+
 package storage
 
 import (

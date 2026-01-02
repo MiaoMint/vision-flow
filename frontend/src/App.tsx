@@ -1,3 +1,11 @@
+// Input: UI components from components/ui (shadcn/ui base components), ProjectList (project list), CanvasView (canvas view), AppSidebar (sidebar navigation), SettingsDialog (settings dialog)
+// Output: Root application component with project selection and routing logic
+// Position: Root component - manages application state and layout
+//
+// ⚠️ WHEN THIS FILE IS UPDATED:
+// 1. Update this header comment
+// 2. Update the parent folder's AI_ARCHITECTURE.md
+
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ProjectList } from "@/components/project-list";
 import { CanvasView } from "@/components/canvas-view";
