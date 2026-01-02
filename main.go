@@ -2,6 +2,8 @@ package main
 
 import (
 	"embed"
+	bindingDB "firebringer/binding/database"
+	"firebringer/database"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -13,8 +15,14 @@ import (
 var assets embed.FS
 
 func main() {
+	// Initialize database
+	if err := database.InitDB(); err != nil {
+		println("Error initializing database:", err.Error())
+		return
+	}
+
 	// Create an instance of the app structure
-	app := NewApp()
+	dbService := bindingDB.NewService()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -27,9 +35,8 @@ func main() {
 			Assets: assets,
 		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
-		OnStartup:        app.startup,
 		Bind: []interface{}{
-			app,
+			dbService,
 		},
 		Mac: &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),
