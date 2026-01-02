@@ -9,5 +9,10 @@
   "author": {
     "name": "MiaoMint",
     "email": "44718819+MiaoMint@users.noreply.github.com"
+  },
+  "build": {
+    "environment": {
+      "CGO_ENABLED": "1"
+    }
   }
 }
