@@ -11,9 +11,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavUser } from "@/components/nav-user";
-import { Home, Image, Settings } from "lucide-react";
+import { Home, Image, Settings, Telescope } from "lucide-react";
 
-export function AppSidebar() {
+export function AppSidebar({ onSettingsClick }: { onSettingsClick: () => void }) {
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
@@ -39,8 +39,8 @@ export function AppSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton>
-                  <Settings />
-                  <span>设置</span>
+                  <Telescope />
+                  <span>浏览</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -48,13 +48,21 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={onSettingsClick}>
+              <Settings />
+              <span>设置</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        {/* <NavUser
           user={{
             name: "用户名",
             email: "user@example.com",
             avatar: "https://placehold.co/100x100/6366f1/ffffff?text=U",
           }}
-        />
+        /> */}
       </SidebarFooter>
     </Sidebar>
   );

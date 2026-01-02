@@ -2,6 +2,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ProjectList } from "@/components/project-list";
 import { CanvasView } from "@/components/canvas-view";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SettingsDialog } from "@/components/settings/settings-dialog";
 import { useState } from "react";
 
 interface Project {
@@ -12,6 +13,7 @@ interface Project {
 
 export default function App() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project);
@@ -40,11 +42,12 @@ export default function App() {
         style={{ "--wails-draggable": "drag" } as React.CSSProperties}
       ></div>
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar onSettingsClick={() => setIsSettingsOpen(true)} />
         <SidebarInset className="m-2 rounded-2xl z-10 border">
           <ProjectList onProjectClick={handleProjectClick} />
         </SidebarInset>
       </SidebarProvider>
+      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
     </div>
   );
 }
