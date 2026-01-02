@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -16,8 +16,9 @@ import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, MessageSquare, Plus, Square, Circle, X } from "lucide-react";
+import { ArrowLeft, MessageSquare, Plus, FileText, Image, Video, Music, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { TextNode, ImageNode, VideoNode, AudioNode, type NodeType } from "./nodes";
 
 interface CanvasViewProps {
   projectId: string;
@@ -25,24 +26,9 @@ interface CanvasViewProps {
   onBack: () => void;
 }
 
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "default",
-    data: { label: "开始节点" },
-    position: { x: 250, y: 100 },
-  },
-  {
-    id: "2",
-    type: "default",
-    data: { label: "处理节点" },
-    position: { x: 250, y: 250 },
-  },
-];
+const initialNodes: Node[] = [];
 
-const initialEdges: Edge[] = [
-  { id: "e1-2", source: "1", target: "2", animated: true },
-];
+const initialEdges: Edge[] = [];
 
 export function CanvasView({
   projectId,
@@ -54,10 +40,53 @@ export function CanvasView({
   const [chatMessage, setChatMessage] = useState("");
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodeIdCounter, setNodeIdCounter] = useState(1);
+
+  // Define custom node types
+  const nodeTypes = useMemo(
+    () => ({
+      text: TextNode,
+      image: ImageNode,
+      video: VideoNode,
+      audio: AudioNode,
+    }),
+    []
+  );
 
   const onConnect = useCallback(
-    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    (connection: Connection) => {
+      // Create animated edge with data flow
+      const newEdge = {
+        ...connection,
+        animated: true,
+        style: { stroke: '#3b82f6' },
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+      
+      // TODO: Trigger data processing from source to target node
+      // This would involve calling your AI model API
+    },
     [setEdges]
+  );
+
+  const addNode = useCallback(
+    (type: NodeType) => {
+      const newNode: Node = {
+        id: `node-${nodeIdCounter}`,
+        type: type,
+        position: { 
+          x: Math.random() * 400 + 100, 
+          y: Math.random() * 400 + 100 
+        },
+        data: {
+          label: `${type === 'text' ? '文本' : type === 'image' ? '图片' : type === 'video' ? '视频' : '音频'}节点 ${nodeIdCounter}`,
+          type: type,
+        },
+      };
+      setNodes((nds) => [...nds, newNode]);
+      setNodeIdCounter((c) => c + 1);
+    },
+    [nodeIdCounter, setNodes]
   );
 
   return (
@@ -93,14 +122,37 @@ export function CanvasView({
         <div className="absolute left-4 top-20 z-10 flex flex-col gap-2">
           <Card className="p-2 shadow-lg">
             <div className="flex flex-col gap-2">
-              <Button variant="ghost" size="icon" title="添加节点">
-                <Plus className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                title="文本节点"
+                onClick={() => addNode("text")}
+              >
+                <FileText className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" title="矩形">
-                <Square className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                title="图片节点"
+                onClick={() => addNode("image")}
+              >
+                <Image className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" title="圆形">
-                <Circle className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                title="视频节点"
+                onClick={() => addNode("video")}
+              >
+                <Video className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                title="音频节点"
+                onClick={() => addNode("audio")}
+              >
+                <Music className="h-4 w-4" />
               </Button>
             </div>
           </Card>
@@ -114,6 +166,7 @@ export function CanvasView({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            nodeTypes={nodeTypes}
             fitView
           >
             <Controls />

@@ -41,7 +41,7 @@ export default function App() {
       ></div>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="m-2 rounded-2xl shadow z-10 border border-border/10">
+        <SidebarInset className="m-2 rounded-2xl z-10 border">
           <ProjectList onProjectClick={handleProjectClick} />
         </SidebarInset>
       </SidebarProvider>
