@@ -14,20 +14,20 @@ func NewService() *Service {
 
 // GetAIConfig returns the configuration for a specific provider
 func (s *Service) GetAIConfig(provider string) (*db.AIConfig, error) {
-	return db.GetConfig(db.AIProvider(provider))
+	return db.GetAIConfig(db.AIProvider(provider))
 }
 
 // SaveAIConfig saves the configuration for a specific provider
 func (s *Service) SaveAIConfig(config db.AIConfig) error {
-	return db.SaveConfig(&config)
+	return db.SaveAIConfig(&config)
 }
 
 // DeleteAIConfig deletes the configuration for a specific provider
 func (s *Service) DeleteAIConfig(provider string) error {
-	return db.DeleteConfig(db.AIProvider(provider))
+	return db.DeleteAIConfig(db.AIProvider(provider))
 }
 
 // ListAIConfigs returns all AI configurations
 func (s *Service) ListAIConfigs() ([]db.AIConfig, error) {
-	return db.ListConfigs()
+	return db.ListAIConfigs()
 }
