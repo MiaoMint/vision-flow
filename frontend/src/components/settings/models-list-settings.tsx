@@ -53,7 +53,7 @@ export function ModelsListSettings() {
                 ) : (
                     <div className="flex flex-col gap-2">
                         {models.map((model, index) => (
-                            <div key={`${model.id}-${index}`} className="group px-3 py-2 border rounded-md hover:bg-accent/50 transition-colors bg-card flex flex-col justify-center min-w-[140px]">
+                            <div key={`${model.id}-${index}`} className="group px-3 py-2 border rounded-md hover:bg-accent/50 transition-colors bg-card flex flex-col justify-center min-w-35">
                                 <div className="font-mono text-xs font-medium truncate" title={model.id}>
                                     {model.id}
                                 </div>
