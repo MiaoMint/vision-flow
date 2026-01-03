@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func GetConfig(provider AIProvider) (*AIConfig, error) {
+func GetAIConfig(provider AIProvider) (*AIConfig, error) {
 	config := AIConfig{}
 	err := DB.Get(&config, "SELECT * FROM ai_configs WHERE provider = ?", provider)
 	if err != nil {
@@ -18,7 +18,7 @@ func GetConfig(provider AIProvider) (*AIConfig, error) {
 	return &config, nil
 }
 
-func SaveConfig(config *AIConfig) error {
+func SaveAIConfig(config *AIConfig) error {
 	log.Println("Saving config:", config)
 	if config.Provider == "" {
 		return fmt.Errorf("provider is required")
@@ -37,12 +37,12 @@ func SaveConfig(config *AIConfig) error {
 	return err
 }
 
-func DeleteConfig(provider AIProvider) error {
+func DeleteAIConfig(provider AIProvider) error {
 	_, err := DB.Exec("DELETE FROM ai_configs WHERE provider = ?", provider)
 	return err
 }
 
-func ListConfigs() ([]AIConfig, error) {
+func ListAIConfigs() ([]AIConfig, error) {
 	configs := []AIConfig{}
 	err := DB.Select(&configs, "SELECT * FROM ai_configs ORDER BY created_at DESC")
 	return configs, err
