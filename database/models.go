@@ -10,8 +10,11 @@ const (
 	ProviderClaude AIProvider = "claude"
 )
 
-type AIConfig struct {
-	Provider  AIProvider `db:"provider" json:"provider"`
+// ModelProvider represents an AI model provider configuration
+type ModelProvider struct {
+	ID        int        `db:"id" json:"id"`
+	Name      string     `db:"name" json:"name"`
+	Type      AIProvider `db:"type" json:"type"`
 	APIKey    string     `db:"api_key" json:"apiKey"`
 	BaseURL   string     `db:"base_url" json:"baseUrl"`
 	CreatedAt time.Time  `db:"created_at" json:"createdAt"`

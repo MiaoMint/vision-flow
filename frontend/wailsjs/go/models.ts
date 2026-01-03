@@ -19,6 +19,7 @@ export namespace ai {
 	export class AudioRequest {
 	    prompt: string;
 	    model: string;
+	    providerId: number;
 	    voice?: string;
 	    speed?: number;
 	    options?: Record<string, any>;
@@ -31,6 +32,7 @@ export namespace ai {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
 	        this.model = source["model"];
+	        this.providerId = source["providerId"];
 	        this.voice = source["voice"];
 	        this.speed = source["speed"];
 	        this.options = source["options"];
@@ -39,6 +41,7 @@ export namespace ai {
 	export class ImageRequest {
 	    prompt: string;
 	    model: string;
+	    providerId: number;
 	    size?: string;
 	    quality?: string;
 	    style?: string;
@@ -52,15 +55,43 @@ export namespace ai {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
 	        this.model = source["model"];
+	        this.providerId = source["providerId"];
 	        this.size = source["size"];
 	        this.quality = source["quality"];
 	        this.style = source["style"];
 	        this.options = source["options"];
 	    }
 	}
+	export class Model {
+	    id: string;
+	    owner?: string;
+	    created?: number;
+	    object?: string;
+	    provider_name?: string;
+	    provider_type?: string;
+	    input?: string[];
+	    output?: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Model(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.owner = source["owner"];
+	        this.created = source["created"];
+	        this.object = source["object"];
+	        this.provider_name = source["provider_name"];
+	        this.provider_type = source["provider_type"];
+	        this.input = source["input"];
+	        this.output = source["output"];
+	    }
+	}
 	export class TextRequest {
 	    prompt: string;
 	    model: string;
+	    providerId: number;
 	    temperature?: number;
 	    maxTokens?: number;
 	    options?: Record<string, any>;
@@ -73,6 +104,7 @@ export namespace ai {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
 	        this.model = source["model"];
+	        this.providerId = source["providerId"];
 	        this.temperature = source["temperature"];
 	        this.maxTokens = source["maxTokens"];
 	        this.options = source["options"];
@@ -81,6 +113,7 @@ export namespace ai {
 	export class VideoRequest {
 	    prompt: string;
 	    model: string;
+	    providerId: number;
 	    duration?: string;
 	    resolution?: string;
 	    options?: Record<string, any>;
@@ -93,6 +126,7 @@ export namespace ai {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
 	        this.model = source["model"];
+	        this.providerId = source["providerId"];
 	        this.duration = source["duration"];
 	        this.resolution = source["resolution"];
 	        this.options = source["options"];
@@ -103,8 +137,10 @@ export namespace ai {
 
 export namespace database {
 	
-	export class AIConfig {
-	    provider: string;
+	export class ModelProvider {
+	    id: number;
+	    name: string;
+	    type: string;
 	    apiKey: string;
 	    baseUrl: string;
 	    // Go type: time
@@ -113,12 +149,14 @@ export namespace database {
 	    updatedAt: any;
 	
 	    static createFrom(source: any = {}) {
-	        return new AIConfig(source);
+	        return new ModelProvider(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.provider = source["provider"];
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.type = source["type"];
 	        this.apiKey = source["apiKey"];
 	        this.baseUrl = source["baseUrl"];
 	        this.createdAt = this.convertValues(source["createdAt"], null);
