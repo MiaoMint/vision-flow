@@ -5,6 +5,7 @@ import (
 	bindingAI "firebringer/binding/ai"
 	bindingDB "firebringer/binding/database"
 	"firebringer/database"
+	serviceAI "firebringer/service/ai"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -20,6 +21,12 @@ func main() {
 	if err := database.InitDB(); err != nil {
 		println("Error initializing database:", err.Error())
 		return
+	}
+
+	// Initialize AI capabilities (model data)
+	if err := serviceAI.InitCapabilities(); err != nil {
+		println("Error initializing AI capabilities:", err.Error())
+		// We could return here, but maybe it's better to continue as it has fallback
 	}
 
 	// Create an instance of the app structure

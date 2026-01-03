@@ -5,11 +5,12 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AIModelSettings } from "./ai-model-settings";
+import { ModelProvidersSettings } from "./model-providers-settings";
+import { ModelsListSettings } from "./models-list-settings";
 import { GeneralSettings } from "./general-settings";
 import { AboutSettings } from "./about-settings";
 import { DebugSettings } from "./debug-settings";
-import { Settings, Sparkles, Info, Bug } from "lucide-react";
+import { Settings, Sparkles, Info, Bug, List } from "lucide-react";
 
 interface SettingsDialogProps {
     open: boolean;
@@ -18,7 +19,7 @@ interface SettingsDialogProps {
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     const isDev = import.meta.env.DEV;
-    
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="min-w-200 h-150 overflow-hidden p-0 gap-0">
@@ -44,7 +45,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                                 className="w-full justify-start px-3 py-2 h-9  data-[state=active]:bg-background data-[state=active]:shadow-sm  transition-all cursor-pointer"
                             >
                                 <Sparkles className="w-4 h-4 mr-2" />
-                                模型服务
+                                模型提供商
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="models-list"
+                                className="w-full justify-start px-3 py-2 h-9  data-[state=active]:bg-background data-[state=active]:shadow-sm  transition-all cursor-pointer"
+                            >
+                                <List className="w-4 h-4 mr-2" />
+                                可用模型
                             </TabsTrigger>
                             <TabsTrigger
                                 value="about"
@@ -75,7 +83,12 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
                         {/* Model Settings */}
                         <TabsContent value="models" className="h-full overflow-y-auto m-0">
-                            <AIModelSettings />
+                            <ModelProvidersSettings />
+                        </TabsContent>
+
+                        {/* Models List */}
+                        <TabsContent value="models-list" className="h-full overflow-y-auto m-0">
+                            <ModelsListSettings />
                         </TabsContent>
 
                         {/* About Settings */}

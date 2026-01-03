@@ -17,3 +17,7 @@ export function GenerateText(arg1) {
 export function GenerateVideo(arg1) {
   return window['go']['ai']['Service']['GenerateVideo'](arg1);
 }
+
+export function ListModels(arg1) {
+  return window['go']['ai']['Service']['ListModels'](arg1);
+}
