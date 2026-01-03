@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	bindingAI "firebringer/binding/ai"
 	bindingDB "firebringer/binding/database"
 	"firebringer/database"
 
@@ -23,6 +24,7 @@ func main() {
 
 	// Create an instance of the app structure
 	dbService := bindingDB.NewService()
+	aiService := bindingAI.NewService()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -37,7 +39,9 @@ func main() {
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		Bind: []interface{}{
 			dbService,
+			aiService,
 		},
+		OnStartup: aiService.SetContext,
 		Mac: &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),
 		},
