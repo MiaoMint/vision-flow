@@ -1,11 +1,12 @@
-import { Bug } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GenerateText,
   GenerateImage,
   GenerateVideo,
   GenerateAudio,
 } from "../../../wailsjs/go/ai/Service";
+import { ListModelProviders } from "../../../wailsjs/go/database/Service";
+import { database } from "../../../wailsjs/go/models";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
+// ... (EnvironmentInfo and SystemInfo functions restored below)
 function EnvironmentInfo() {
   const isDev = import.meta.env.DEV;
   const mode = import.meta.env.MODE;
@@ -77,34 +79,54 @@ function AIBindingTest() {
     "text" | "image" | "video" | "audio"
   >("text");
   const [selectedModel, setSelectedModel] = useState("gemini");
+  const [providers, setProviders] = useState<database.ModelProvider[]>([]);
+  const [selectedProviderId, setSelectedProviderId] = useState<string>("");
+
+  useEffect(() => {
+    ListModelProviders().then((res) => {
+      setProviders(res);
+      if (res.length > 0) {
+        setSelectedProviderId(res[0].id.toString());
+      }
+    });
+  }, []);
 
   const handleTestAI = async () => {
+    if (!selectedProviderId) {
+      setTestResult("Error: Please select a provider");
+      return;
+    }
     setTestLoading(true);
     try {
       let response;
+      const providerId = parseInt(selectedProviderId);
       switch (selectedType) {
         case "text":
           response = await GenerateText({
             prompt: testPrompt,
             model: selectedModel,
+            providerId: providerId,
           });
           break;
         case "image":
           response = await GenerateImage({
             prompt: testPrompt,
             model: selectedModel,
+            providerId: providerId,
           });
           break;
         case "video":
           response = await GenerateVideo({
             prompt: testPrompt,
             model: selectedModel,
+            providerId: providerId,
           });
           break;
         case "audio":
           response = await GenerateAudio({
             prompt: testPrompt,
             model: selectedModel,
+            providerId: providerId,
           });
           break;
       }
@@ -123,6 +145,26 @@ function AIBindingTest() {
       </p>
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
+          <div className="col-span-2">
+            <Label htmlFor="ai-provider" className="text-xs text-muted-foreground">
+              供应商
+            </Label>
+            <Select
+              value={selectedProviderId}
+              onValueChange={setSelectedProviderId}
+            >
+              <SelectTrigger id="ai-provider" className="w-full">
+                <SelectValue placeholder="选择供应商" />
+              </SelectTrigger>
+              <SelectContent>
+                {providers.map((p) => (
+                  <SelectItem key={p.id} value={p.id.toString()}>
+                    {p.name} ({p.type})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div>
             <Label htmlFor="ai-type" className="text-xs text-muted-foreground">
               生成类型

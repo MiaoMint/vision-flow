@@ -9,3 +9,5 @@ export function GenerateImage(arg1:ai.ImageRequest):Promise<ai.AIResponse>;
 export function GenerateText(arg1:ai.TextRequest):Promise<ai.AIResponse>;
 
 export function GenerateVideo(arg1:ai.VideoRequest):Promise<ai.AIResponse>;
+
+export function ListModels(arg1:any):Promise<Array<ai.Model>>;

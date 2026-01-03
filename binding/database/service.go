@@ -4,30 +4,28 @@ import (
 	db "firebringer/database"
 )
 
-// Service provides database methods for the frontend
 type Service struct{}
 
-// NewService creates a new Database Service
 func NewService() *Service {
 	return &Service{}
 }
 
-// GetAIConfig returns the configuration for a specific provider
-func (s *Service) GetAIConfig(provider string) (*db.AIConfig, error) {
-	return db.GetAIConfig(db.AIProvider(provider))
+// GetModelProvider retrieves a model provider configuration by ID
+func (s *Service) GetModelProvider(id int) (*db.ModelProvider, error) {
+	return db.GetModelProvider(id)
 }
 
-// SaveAIConfig saves the configuration for a specific provider
-func (s *Service) SaveAIConfig(config db.AIConfig) error {
-	return db.SaveAIConfig(&config)
+// SaveModelProvider saves or updates a model provider configuration
+func (s *Service) SaveModelProvider(config db.ModelProvider) error {
+	return db.SaveModelProvider(config)
 }
 
-// DeleteAIConfig deletes the configuration for a specific provider
-func (s *Service) DeleteAIConfig(provider string) error {
-	return db.DeleteAIConfig(db.AIProvider(provider))
+// DeleteModelProvider deletes a model provider configuration
+func (s *Service) DeleteModelProvider(id int) error {
+	return db.DeleteModelProvider(id)
 }
 
-// ListAIConfigs returns all AI configurations
-func (s *Service) ListAIConfigs() ([]db.AIConfig, error) {
-	return db.ListAIConfigs()
+// ListModelProviders lists all model provider configurations
+func (s *Service) ListModelProviders() ([]db.ModelProvider, error) {
+	return db.ListModelProviders()
 }

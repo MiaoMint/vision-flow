@@ -24,8 +24,10 @@ func InitDB() error {
 	}
 
 	schema := `
-	CREATE TABLE IF NOT EXISTS ai_configs (
-		provider TEXT PRIMARY KEY,
+	CREATE TABLE IF NOT EXISTS model_providers (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		type TEXT NOT NULL,
 		api_key TEXT NOT NULL,
 		base_url TEXT DEFAULT '',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
