@@ -1,5 +1,5 @@
-export { TextNode } from "./TextNode";
-export { ImageNode } from "./ImageNode";
-export { VideoNode } from "./VideoNode";
-export { AudioNode } from "./AudioNode";
+export { TextNode } from "./text-node";
+export { ImageNode } from "./image-node";
+export { VideoNode } from "./video-node";
+export { AudioNode } from "./audio-node";
 export * from "./types";
