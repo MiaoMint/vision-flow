@@ -11,14 +11,33 @@ import {
   type Connection,
   type Node,
   type Edge,
+  SelectionMode,
+  useOnSelectionChange,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, MessageSquare, Plus, FileText, Image, Video, Music, X } from "lucide-react";
+import {
+  ArrowLeft,
+  MessageSquare,
+  Plus,
+  FileText,
+  Image,
+  Video,
+  Music,
+  X,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { TextNode, ImageNode, VideoNode, AudioNode, type NodeType } from "./nodes";
+
+import {
+  TextNode,
+  ImageNode,
+  VideoNode,
+  AudioNode,
+  type NodeType,
+} from "./nodes";
 
 interface CanvasViewProps {
   projectId: string;
@@ -29,12 +48,7 @@ interface CanvasViewProps {
 const initialNodes: Node[] = [];
 
 const initialEdges: Edge[] = [];
-
-export function CanvasView({
-  projectId,
-  projectName,
-  onBack,
-}: CanvasViewProps) {
+function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
   const [name, setName] = useState(projectName);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
@@ -59,10 +73,10 @@ export function CanvasView({
       const newEdge = {
         ...connection,
         animated: true,
-        style: { stroke: '#3b82f6' },
+        style: { stroke: "#3b82f6" },
       };
       setEdges((eds) => addEdge(newEdge, eds));
-      
+
       // TODO: Trigger data processing from source to target node
       // This would involve calling your AI model API
     },
@@ -74,12 +88,19 @@ export function CanvasView({
       const newNode: Node = {
         id: `node-${nodeIdCounter}`,
         type: type,
-        position: { 
-          x: Math.random() * 400 + 100, 
-          y: Math.random() * 400 + 100 
+        position: {
+          x: Math.random() * 400 + 100,
+          y: Math.random() * 400 + 100,
         },
         data: {
-          label: `${type === 'text' ? '文本' : type === 'image' ? '图片' : type === 'video' ? '视频' : '音频'}节点 ${nodeIdCounter}`,
+          label: `${type === "text"
+            ? "文本"
+            : type === "image"
+              ? "图片"
+              : type === "video"
+                ? "视频"
+                : "音频"
+            }节点 ${nodeIdCounter}`,
           type: type,
         },
       };
@@ -108,8 +129,8 @@ export function CanvasView({
             placeholder="项目名称"
           />
           <div className="ml-auto">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={() => setIsChatOpen(!isChatOpen)}
             >
@@ -122,33 +143,33 @@ export function CanvasView({
         <div className="absolute left-4 top-20 z-10 flex flex-col gap-2">
           <Card className="p-2 shadow-lg">
             <div className="flex flex-col gap-2">
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 title="文本节点"
                 onClick={() => addNode("text")}
               >
                 <FileText className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 title="图片节点"
                 onClick={() => addNode("image")}
               >
                 <Image className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 title="视频节点"
                 onClick={() => addNode("video")}
               >
                 <Video className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 title="音频节点"
                 onClick={() => addNode("audio")}
               >
@@ -168,16 +189,19 @@ export function CanvasView({
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             fitView
+            panOnDrag={[1, 2]}
+            selectionOnDrag
+            selectionMode={SelectionMode.Partial}
           >
             <Controls />
             <MiniMap />
-            <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+            <Background variant={BackgroundVariant.Cross} gap={12} size={1} />
           </ReactFlow>
         </div>
 
         {/* 右侧 Chat 面板 */}
         {isChatOpen && (
-          <div className="w-96 bg-background border-l flex flex-col pt-14">
+          <div className="w-96 bg-background border-l flex flex-col pt-14 shadow-xl">
             <div className="flex items-center justify-between border-b p-4">
               <h3 className="font-semibold">AI 助手</h3>
               <Button
@@ -210,5 +234,13 @@ export function CanvasView({
         )}
       </div>
     </div>
+  );
+}
+
+export function CanvasView(props: CanvasViewProps) {
+  return (
+    <ReactFlowProvider>
+      <CanvasEditor {...props} />
+    </ReactFlowProvider>
   );
 }

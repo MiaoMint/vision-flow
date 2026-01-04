@@ -4,6 +4,8 @@ export type NodeType = "text" | "image" | "video" | "audio";
 export interface BaseNodeData {
   label: string;
   type: NodeType;
+  modelId?: string;
+  providerId?: number;
   input?: any;
   output?: any;
   processing?: boolean;
