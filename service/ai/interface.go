@@ -38,6 +38,7 @@ type ImageGenerateRequest struct {
 type ImageGenerateResponse struct {
 	URL           string `json:"url,omitempty"`
 	B64JSON       string `json:"b64_json,omitempty"`
+	Data          []byte `json:"data,omitempty"`
 	RevisedPrompt string `json:"revised_prompt,omitempty"`
 	Model         string `json:"model"`
 }

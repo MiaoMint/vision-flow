@@ -1,10 +1,15 @@
 package ai
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
+	"strconv"
+	"time"
 
 	"firebringer/database"
 
@@ -162,9 +167,149 @@ func (c *OpenAIClient) GenerateAudio(ctx context.Context, req AudioGenerateReque
 	}, nil
 }
 
-// GenerateVideo is not supported by OpenAI
+// GenerateVideo generates a video using OpenAI's video generation API (Sora)
 func (c *OpenAIClient) GenerateVideo(ctx context.Context, req VideoGenerateRequest) (*VideoGenerateResponse, error) {
-	return nil, errors.New("video generation is not supported by OpenAI")
+	if req.Model == "" {
+		req.Model = "sora-2" // Default to a known model if unspecified
+	}
+
+	payload := map[string]interface{}{
+		"model":  req.Model,
+		"prompt": req.Prompt,
+	}
+
+	if req.Resolution != "" {
+		payload["size"] = req.Resolution
+	}
+	// Parse duration if possible (expecting seconds as string or int)
+	if req.Duration != "" {
+		if seconds, err := strconv.Atoi(req.Duration); err == nil {
+			payload["seconds"] = seconds
+		}
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal video request: %w", err)
+	}
+
+	baseURL := "https://api.openai.com/v1"
+	if c.config.BaseURL != "" {
+		baseURL = c.config.BaseURL
+	}
+
+	// 1. Create Video Generation Job
+	reqURL := fmt.Sprintf("%s/videos", baseURL)
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	httpReq.Header.Set("Authorization", "Bearer "+c.config.APIKey)
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send video generation request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("video generation request failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var jobResp struct {
+		ID     string `json:"id"`
+		Status string `json:"status"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&jobResp); err != nil {
+		return nil, fmt.Errorf("failed to decode job response: %w", err)
+	}
+
+	// 2. Poll for Completion
+	ticker := time.NewTicker(2 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-ticker.C:
+			statusURL := fmt.Sprintf("%s/videos/%s", baseURL, jobResp.ID)
+			statusReq, err := http.NewRequestWithContext(ctx, "GET", statusURL, nil)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create status request: %w", err)
+			}
+			statusReq.Header.Set("Authorization", "Bearer "+c.config.APIKey)
+
+			statusResp, err := client.Do(statusReq)
+			if err != nil {
+				return nil, fmt.Errorf("failed to check video status: %w", err)
+			}
+
+			var statusObj struct {
+				Status string `json:"status"`
+				Error  *struct {
+					Message string `json:"message"`
+				} `json:"error"`
+			}
+
+			// Decode and close explicitly inside loop to avoid leak
+			body, _ := io.ReadAll(statusResp.Body)
+			statusResp.Body.Close()
+
+			if statusResp.StatusCode != http.StatusOK {
+				return nil, fmt.Errorf("status check failed: %d %s", statusResp.StatusCode, string(body))
+			}
+
+			if err := json.Unmarshal(body, &statusObj); err != nil {
+				return nil, fmt.Errorf("failed to decode status response: %w", err)
+			}
+
+			switch statusObj.Status {
+			case "completed":
+				goto Download
+			case "failed":
+				errMsg := "unknown error"
+				if statusObj.Error != nil {
+					errMsg = statusObj.Error.Message
+				}
+				return nil, fmt.Errorf("video generation failed: %s", errMsg)
+			}
+			// Continue polling if queued or in_progress
+		}
+	}
+
+Download:
+	// 3. Download Content
+	contentURL := fmt.Sprintf("%s/videos/%s/content", baseURL, jobResp.ID)
+	contentReq, err := http.NewRequestWithContext(ctx, "GET", contentURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create download request: %w", err)
+	}
+	contentReq.Header.Set("Authorization", "Bearer "+c.config.APIKey)
+
+	contentResp, err := client.Do(contentReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to download video content: %w", err)
+	}
+	defer contentResp.Body.Close()
+
+	if contentResp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("download failed with status %d", contentResp.StatusCode)
+	}
+
+	videoData, err := io.ReadAll(contentResp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read video data: %w", err)
+	}
+
+	return &VideoGenerateResponse{
+		Data:  videoData,
+		Model: req.Model,
+	}, nil
 }
 
 // ListModels lists available models from OpenAI
