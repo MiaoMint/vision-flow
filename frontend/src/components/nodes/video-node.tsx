@@ -54,7 +54,7 @@ export const VideoNode = memo(({ id, data, selected }: NodeProps) => {
       </div>
 
       <Card
-        className={`max-w-120 min-w-52 py-0! gap-0 ${selected ? "ring-2 ring-primary" : ""
+        className={`max-w-120 min-w-52 py-0! gap-0 ${nodeData.error ? "ring-2 ring-destructive" : selected ? "ring-2 ring-primary" : ""
           } ${nodeData.processing ? "opacity-70" : ""}`}
       >
         <Handle type="target" position={Position.Left} />
