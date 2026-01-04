@@ -35,7 +35,7 @@ export function NodeParametersPanel({
   };
 
   return (
-    <Card className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-175 shadow-lg z-50 flex flex-col py-0! overflow-hidden gap-0!">
+    <Card className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-175 shadow-lg z-50 flex flex-col py-0! overflow-hidden gap-0! nodrag">
       <div className="flex-1 flex flex-col min-h-40">
         <Textarea
           placeholder={promptPlaceholder}

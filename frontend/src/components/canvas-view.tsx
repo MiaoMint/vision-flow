@@ -193,7 +193,6 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
             panOnScroll
             zoomOnScroll={false}
           >
-            <Controls />
             <MiniMap />
             <Background variant={BackgroundVariant.Cross} gap={12} size={1} />
           </ReactFlow>
