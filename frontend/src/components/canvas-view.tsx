@@ -1,4 +1,3 @@
-import { useState, useCallback, useMemo } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -13,7 +12,9 @@ import {
   type Edge,
   SelectionMode,
   ReactFlowProvider,
+  useReactFlow,
 } from "@xyflow/react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,7 @@ import {
   ImageNode,
   VideoNode,
   AudioNode,
+  GroupNode,
   type NodeType,
 } from "./nodes";
 
@@ -54,6 +56,8 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeIdCounter, setNodeIdCounter] = useState(1);
 
+  const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
+
   // Define custom node types
   const nodeTypes = useMemo(
     () => ({
@@ -61,9 +65,63 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
       image: ImageNode,
       video: VideoNode,
       audio: AudioNode,
+      group: GroupNode,
     }),
     []
   );
+
+  const onSelectionChange = useCallback(({ nodes: selectedNodes }: { nodes: Node[] }) => {
+    if (selectedNodes.some((node) => node.type === "group")) {
+      return;
+    }
+    setSelectedNodes(selectedNodes.map((node) => node.id));
+  }, []);
+
+  const createGroup = useCallback(() => {
+    if (selectedNodes.length === 0) return;
+
+    const selectedNodeObjects = nodes.filter((n) => selectedNodes.includes(n.id) && n.type !== "group");
+    if (selectedNodeObjects.length === 0) return;
+
+    // Calculate bounding box
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    selectedNodeObjects.forEach((node) => {
+      minX = Math.min(minX, node.position.x);
+      minY = Math.min(minY, node.position.y);
+      // Rough sizing if width/height missing (which happens if not measured yet)
+      const width = node.measured?.width ?? 200;
+      const height = node.measured?.height ?? 200;
+      maxX = Math.max(maxX, node.position.x + width);
+      maxY = Math.max(maxY, node.position.y + height);
+    });
+
+    const padding = 50;
+    const groupNode: Node = {
+      id: `group-${nodeIdCounter}`,
+      type: "group",
+      position: {
+        x: minX - padding,
+        y: minY - padding,
+      },
+      style: {
+        width: maxX - minX + padding * 2,
+        height: maxY - minY + padding * 2,
+        zIndex: -1, // Ensure group is behind
+        border: "none",
+        background: "transparent",
+      },
+      selectable: false, // Prevent box selection
+      data: { label: "New Group" },
+    };
+
+    setNodes((nds) => [...nds, groupNode]);
+    setNodeIdCounter((c) => c + 1);
+    setSelectedNodes([]); // Clear selection/hide button
+  }, [selectedNodes, nodes, nodeIdCounter, setNodes]);
 
   const onConnect = useCallback(
     (connection: Connection) => {
@@ -74,9 +132,6 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
         style: { stroke: "#3b82f6" },
       };
       setEdges((eds) => addEdge(newEdge, eds));
-
-      // TODO: Trigger data processing from source to target node
-      // This would involve calling your AI model API
     },
     [setEdges]
   );
@@ -107,6 +162,69 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
     },
     [nodeIdCounter, setNodes]
   );
+
+  const { getIntersectingNodes } = useReactFlow();
+  const dragRef = useRef<{ id: string; position: { x: number; y: number } } | null>(null);
+
+  const onNodeDragStart = useCallback((_: React.MouseEvent, node: Node) => {
+    if (node.type === "group") {
+      dragRef.current = { id: node.id, position: { ...node.position } };
+    }
+  }, []);
+
+
+  // group 子节点跟随拖动
+  const onNodeDrag = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      if (node.type === "group" && dragRef.current && dragRef.current.id === node.id) {
+        const dx = node.position.x - dragRef.current.position.x;
+        const dy = node.position.y - dragRef.current.position.y;
+
+        // Update last position for next frame
+        dragRef.current.position = { ...node.position };
+
+        if (dx === 0 && dy === 0) return;
+
+        // Find intersecting nodes
+        // Note: We use the group node's current dimension (which React Flow tracks)
+        const intersectingNodes = getIntersectingNodes(node).filter(
+          (n) => n.type !== "group" && n.parentId !== node.id
+        );
+
+        if (intersectingNodes.length > 0) {
+          setNodes((nds) =>
+            nds.map((n: Node) => {
+              if (intersectingNodes.some((inNode: Node) => inNode.id === n.id)) {
+                return {
+                  ...n,
+                  position: {
+                    x: n.position.x + dx,
+                    y: n.position.y + dy,
+                  },
+                  // We must also update 'selected' to avoid weird selection artifacts?
+                  // No, usually just position is fine.
+                };
+              }
+              return n;
+            })
+          );
+        }
+      }
+    },
+    [getIntersectingNodes, setNodes]
+  );
+
+  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+    if (node.type === "group") {
+      // Manual selection toggle for group nodes since they are not selectable by box
+      setNodes((nds) => nds.map(n => {
+        if (n.id === node.id) {
+          return { ...n, selected: !n.selected };
+        }
+        return n;
+      }));
+    }
+  }, [setNodes]);
 
   return (
     <div className="flex h-full relative">
@@ -177,6 +295,18 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
           </Card>
         </div>
 
+        {/* Create Group Button - Show when nodes are selected */}
+        {selectedNodes.length > 1 && (
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-10">
+            <Button
+              onClick={createGroup}
+              className="shadow-lg animate-in fade-in zoom-in duration-200"
+            >
+              Create Group ({selectedNodes.length})
+            </Button>
+          </div>
+        )}
+
         {/* ReactFlow 画布 */}
         <div className="flex-1 h-full">
           <ReactFlow
@@ -186,12 +316,16 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             nodeTypes={nodeTypes}
+            onSelectionChange={onSelectionChange}
             fitView
             panOnDrag={[1, 2]}
             selectionOnDrag
             selectionMode={SelectionMode.Partial}
             panOnScroll
             zoomOnScroll={false}
+            onNodeDragStart={onNodeDragStart}
+            onNodeDrag={onNodeDrag}
+            onNodeClick={onNodeClick}
           >
             <MiniMap />
             <Background variant={BackgroundVariant.Cross} gap={12} size={1} />

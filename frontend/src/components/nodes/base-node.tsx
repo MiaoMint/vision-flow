@@ -48,26 +48,12 @@ export function BaseNode({
                     maxWidth={maxWidth}
                     maxHeight={maxHeight}
                     position="bottom-right"
-                    style={{ background: 'transparent', border: 'none' }}
+                    className="bg-transparent border-none"
                 >
-                    <div className="absolute bottom-1 right-1 p-1 rounded-br-md cursor-nwse-resize">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="text-muted-foreground opacity-50 hover:opacity-100 transition-opacity"
-                        >
-                            <path d="M21 15v6" />
-                            <path d="M21 21h-6" />
-                            <path d="M15 21l6-6" />
-                        </svg>
-                    </div>
+                    <div
+                        className="absolute bottom-0 right-0 p-4 rounded-br-2xl cursor-nwse-resize bg-transparent nodrag z-50 pointer-events-auto"
+                        style={{ cursor: 'nwse-resize' }}
+                    />
                 </NodeResizeControl>
             )}
 

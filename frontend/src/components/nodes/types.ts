@@ -1,5 +1,5 @@
 // Node types and data structures
-export type NodeType = "text" | "image" | "video" | "audio";
+export type NodeType = "text" | "image" | "video" | "audio" | "group";
 
 export interface BaseNodeData {
   label: string;
@@ -34,4 +34,8 @@ export interface AudioNodeData extends BaseNodeData {
   audioUrl?: string;
 }
 
-export type WorkflowNodeData = TextNodeData | ImageNodeData | VideoNodeData | AudioNodeData;
+export interface GroupNodeData extends BaseNodeData {
+  type: "group";
+}
+
+export type WorkflowNodeData = TextNodeData | ImageNodeData | VideoNodeData | AudioNodeData | GroupNodeData;
