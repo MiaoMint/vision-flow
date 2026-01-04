@@ -2,10 +2,14 @@ package main
 
 import (
 	"embed"
+	"fmt"
+	"net/http"
+
 	bindingAI "firebringer/binding/ai"
 	bindingDB "firebringer/binding/database"
 	"firebringer/database"
 	serviceAI "firebringer/service/ai"
+	"firebringer/storage"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -15,6 +19,37 @@ import (
 
 //go:embed all:frontend/dist
 var assets embed.FS
+
+// startFileServer starts a local HTTP server to serve generated files with CORS enabled.
+func startFileServer() {
+	genDir, err := storage.GetGeneratedDir()
+	if err != nil {
+		fmt.Println("Error getting generated dir for file server:", err)
+		return
+	}
+
+	fs := http.FileServer(http.Dir(genDir))
+
+	// CORS wrapper
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		fmt.Printf("[FileServer] Request: %s\n", r.URL.Path)
+		fs.ServeHTTP(w, r)
+	})
+
+	fmt.Println("Starting local file server on :34116 serving", genDir)
+	if err := http.ListenAndServe(":34116", handler); err != nil {
+		fmt.Println("Error starting file server:", err)
+	}
+}
 
 func main() {
 	// Initialize database
@@ -32,6 +67,9 @@ func main() {
 	// Create an instance of the app structure
 	dbService := bindingDB.NewService()
 	aiService := bindingAI.NewService()
+
+	// Start the local file server
+	go startFileServer()
 
 	// Create application with options
 	err := wails.Run(&options.App{

@@ -144,7 +144,7 @@ export function ModelSelector({
                                 placeholder="搜索模型..."
                                 className="h-9 border-b"
                             />
-                            <CommandList className="max-h-full flex-1 min-h-0">
+                            <CommandList className="max-h-full flex-1 min-h-0 w-[300px]">
                                 {loadingModels ? (
                                     <div className="flex justify-center p-8">
                                         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -166,15 +166,37 @@ export function ModelSelector({
                                                     onSelect={() => handleModelSelect(model.id)}
                                                     className="text-xs"
                                                 >
-                                                    <Check
-                                                        className={cn(
-                                                            "mr-2 h-4 w-4",
-                                                            modelId === model.id
-                                                                ? "opacity-100"
-                                                                : "opacity-0"
-                                                        )}
-                                                    />
-                                                    {model.id}
+                                                    <div className="flex flex-col gap-1 w-full">
+                                                        <div className="flex items-center">
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4 shrink-0",
+                                                                    modelId === model.id
+                                                                        ? "opacity-100"
+                                                                        : "opacity-0"
+                                                                )}
+                                                            />
+                                                            <span className="truncate">{model.id}</span>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-1 pl-6">
+                                                            {model.input?.map((i) => (
+                                                                <span
+                                                                    key={`in-${i}`}
+                                                                    className="px-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px]"
+                                                                >
+                                                                    In: {i}
+                                                                </span>
+                                                            ))}
+                                                            {model.output?.map((o) => (
+                                                                <span
+                                                                    key={`out-${o}`}
+                                                                    className="px-1 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-[10px]"
+                                                                >
+                                                                    Out: {o}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 </CommandItem>
                                             ))}
                                         </CommandGroup>

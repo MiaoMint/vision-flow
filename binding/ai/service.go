@@ -6,6 +6,7 @@ import (
 
 	"firebringer/database"
 	aiservice "firebringer/service/ai"
+	"firebringer/storage"
 )
 
 // Service provides AI methods for the frontend
@@ -135,9 +136,9 @@ func (s *Service) GenerateImage(req ImageRequest) (*AIResponse, error) {
 		return nil, err
 	}
 
-	content := resp.URL
-	if content == "" {
-		content = resp.B64JSON
+	content, err := s.processContent(resp.Data, resp.B64JSON, resp.URL, "image", ".png")
+	if err != nil {
+		return nil, err
 	}
 
 	return &AIResponse{
@@ -166,10 +167,9 @@ func (s *Service) GenerateVideo(req VideoRequest) (*AIResponse, error) {
 		return nil, err
 	}
 
-	content := resp.URL
-	if content == "" && len(resp.Data) > 0 {
-		content = "Video data (base64 or bytes)" // Improve this for frontend to handle bytes
-		// potentially convert bytes to base64 if it is bytes
+	content, err := s.processContent(resp.Data, "", resp.URL, "video", ".mp4")
+	if err != nil {
+		return nil, err
 	}
 
 	return &AIResponse{
@@ -201,11 +201,9 @@ func (s *Service) GenerateAudio(req AudioRequest) (*AIResponse, error) {
 	// Usually audio is returned as bytes.
 	// We might want to base64 encode it for the frontend or return a Blob URL if we could.
 	// For now, let's assume valid JSON marshalling or handle it in specific response type
-	content := ""
-	if len(resp.Data) > 0 {
-		// Simple indicator, actual data in Raw or handled by frontend from specific field?
-		// Actually AIResponse.Raw is interface{}, so it will marshal the []byte as base64 string automatically in JSON.
-		content = "Audio generated"
+	content, err := s.processContent(resp.Data, "", "", "audio", ".mp3")
+	if err != nil {
+		return nil, err
 	}
 
 	return &AIResponse{
@@ -253,4 +251,25 @@ func (s *Service) ListModels(providerId *int) ([]aiservice.Model, error) {
 	}
 
 	return client.ListModels(s.ctx)
+}
+
+func (s *Service) processContent(data []byte, b64 string, url string, prefix string, ext string) (string, error) {
+	var filename string
+	var err error
+
+	if len(data) > 0 {
+		filename, err = storage.SaveGeneratedContent(data, prefix, ext)
+	} else if b64 != "" {
+		filename, err = storage.SaveBase64Content(b64, prefix, ext)
+	} else if url != "" {
+		filename, err = storage.SaveURLContent(url, prefix, ext)
+	} else {
+		return "", nil
+	}
+
+	if err != nil {
+		return "", fmt.Errorf("failed to save %s: %w", prefix, err)
+	}
+
+	return fmt.Sprintf("http://localhost:34116/%s", filename), nil
 }
