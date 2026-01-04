@@ -1,15 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   GenerateText,
   GenerateImage,
   GenerateVideo,
   GenerateAudio,
 } from "../../../wailsjs/go/ai/Service";
-import { ListModelProviders } from "../../../wailsjs/go/database/Service";
-import { database } from "../../../wailsjs/go/models";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -18,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { ModelSelector } from "@/components/ai/model-selector";
 
 // ... (EnvironmentInfo and SystemInfo functions restored below)
 function EnvironmentInfo() {
@@ -78,18 +76,8 @@ function AIBindingTest() {
   const [selectedType, setSelectedType] = useState<
     "text" | "image" | "video" | "audio"
   >("text");
-  const [selectedModel, setSelectedModel] = useState("gemini");
-  const [providers, setProviders] = useState<database.ModelProvider[]>([]);
-  const [selectedProviderId, setSelectedProviderId] = useState<string>("");
-
-  useEffect(() => {
-    ListModelProviders().then((res) => {
-      setProviders(res);
-      if (res.length > 0) {
-        setSelectedProviderId(res[0].id.toString());
-      }
-    });
-  }, []);
+  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedProviderId, setSelectedProviderId] = useState<number>(0);
 
   const handleTestAI = async () => {
     if (!selectedProviderId) {
@@ -99,34 +87,33 @@ function AIBindingTest() {
     setTestLoading(true);
     try {
       let response;
-      const providerId = parseInt(selectedProviderId);
       switch (selectedType) {
         case "text":
           response = await GenerateText({
             prompt: testPrompt,
             model: selectedModel,
-            providerId: providerId,
+            providerId: selectedProviderId,
           });
           break;
         case "image":
           response = await GenerateImage({
             prompt: testPrompt,
             model: selectedModel,
-            providerId: providerId,
+            providerId: selectedProviderId,
           });
           break;
         case "video":
           response = await GenerateVideo({
             prompt: testPrompt,
             model: selectedModel,
-            providerId: providerId,
+            providerId: selectedProviderId,
           });
           break;
         case "audio":
           response = await GenerateAudio({
             prompt: testPrompt,
             model: selectedModel,
-            providerId: providerId,
+            providerId: selectedProviderId,
           });
           break;
       }
@@ -138,6 +125,11 @@ function AIBindingTest() {
     }
   };
 
+  const handleProviderChange = (id: number) => {
+    setSelectedProviderId(id);
+    setSelectedModel(""); // Reset model when provider changes
+  }
+
   return (
     <div className="p-4 rounded-lg border bg-muted/30">
       <p className="text-sm font-medium text-muted-foreground mb-4">
@@ -146,27 +138,18 @@ function AIBindingTest() {
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2">
-            <Label htmlFor="ai-provider" className="text-xs text-muted-foreground">
-              供应商
+            <Label className="text-xs text-muted-foreground block mb-2">
+              模型选择 (供应商 / 模型)
             </Label>
-            <Select
-              value={selectedProviderId}
-              onValueChange={setSelectedProviderId}
-            >
-              <SelectTrigger id="ai-provider" className="w-full">
-                <SelectValue placeholder="选择供应商" />
-              </SelectTrigger>
-              <SelectContent>
-                {providers.map((p) => (
-                  <SelectItem key={p.id} value={p.id.toString()}>
-                    {p.name} ({p.type})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ModelSelector
+              providerId={selectedProviderId || undefined}
+              modelId={selectedModel}
+              onProviderChange={handleProviderChange}
+              onModelChange={setSelectedModel}
+            />
           </div>
-          <div>
-            <Label htmlFor="ai-type" className="text-xs text-muted-foreground">
+          <div className="col-span-2">
+            <Label htmlFor="ai-type" className="text-xs text-muted-foreground block mb-2">
               生成类型
             </Label>
             <Select
@@ -185,21 +168,6 @@ function AIBindingTest() {
                 <SelectItem value="audio">音频</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div>
-            <Label
-              htmlFor="ai-model"
-              className="text-xs text-muted-foreground"
-            >
-              模型
-            </Label>
-            <Input
-              id="ai-model"
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              placeholder="输入模型名称，如: gemini"
-              className="w-full bg-background"
-            />
           </div>
         </div>
         <div>

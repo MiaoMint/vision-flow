@@ -93,15 +93,14 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
           y: Math.random() * 400 + 100,
         },
         data: {
-          label: `${
-            type === "text"
-              ? "文本"
-              : type === "image"
+          label: `${type === "text"
+            ? "文本"
+            : type === "image"
               ? "图片"
               : type === "video"
-              ? "视频"
-              : "音频"
-          }节点 ${nodeIdCounter}`,
+                ? "视频"
+                : "音频"
+            }节点 ${nodeIdCounter}`,
           type: type,
         },
       };
@@ -202,7 +201,7 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
 
         {/* 右侧 Chat 面板 */}
         {isChatOpen && (
-          <div className="w-96 bg-background border-l flex flex-col pt-14 z-20 shadow-xl">
+          <div className="w-96 bg-background border-l flex flex-col pt-14 shadow-xl">
             <div className="flex items-center justify-between border-b p-4">
               <h3 className="font-semibold">AI 助手</h3>
               <Button
