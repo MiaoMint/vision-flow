@@ -12,7 +12,6 @@ import {
   type Node,
   type Edge,
   SelectionMode,
-  useOnSelectionChange,
   ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -22,7 +21,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ArrowLeft,
   MessageSquare,
-  Plus,
   FileText,
   Image,
   Video,
@@ -192,6 +190,8 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
             panOnDrag={[1, 2]}
             selectionOnDrag
             selectionMode={SelectionMode.Partial}
+            panOnScroll
+            zoomOnScroll={false}
           >
             <Controls />
             <MiniMap />

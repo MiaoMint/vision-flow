@@ -8,6 +8,7 @@ import (
 	"firebringer/database"
 
 	"strings"
+	"time"
 
 	"google.golang.org/genai"
 )
@@ -116,8 +117,8 @@ func (c *GeminiClient) GenerateImage(ctx context.Context, req ImageGenerateReque
 	for _, part := range resp.Candidates[0].Content.Parts {
 		if part.InlineData != nil {
 			return &ImageGenerateResponse{
-				B64JSON: string(part.InlineData.Data), // Assuming Data is bytes
-				Model:   req.Model,
+				Data:  part.InlineData.Data,
+				Model: req.Model,
 			}, nil
 		}
 	}
@@ -133,28 +134,46 @@ func (c *GeminiClient) GenerateAudio(ctx context.Context, req AudioGenerateReque
 // GenerateVideo generates a video using Gemini's video generation capabilities
 func (c *GeminiClient) GenerateVideo(ctx context.Context, req VideoGenerateRequest) (*VideoGenerateResponse, error) {
 	if req.Model == "" {
-		req.Model = "veo-2.0-generate-001" // Example model name
+		req.Model = "veo-3.1-generate-preview"
 	}
 
-	resp, err := c.client.Models.GenerateContent(ctx, req.Model, genai.Text(req.Prompt), nil)
+	operation, err := c.client.Models.GenerateVideos(ctx, req.Model, req.Prompt, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Gemini video generation failed: %w", err)
+		return nil, fmt.Errorf("Gemini video generation initialization failed: %w", err)
 	}
 
-	if len(resp.Candidates) == 0 || len(resp.Candidates[0].Content.Parts) == 0 {
-		return nil, errors.New("no video generated from Gemini")
-	}
-
-	for _, part := range resp.Candidates[0].Content.Parts {
-		if part.InlineData != nil {
-			return &VideoGenerateResponse{
-				Data:  part.InlineData.Data, // Return raw bytes
-				Model: req.Model,
-			}, nil
+	// Poll the operation status until the video is ready.
+	for !operation.Done {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(5 * time.Second):
+			operation, err = c.client.Operations.GetVideosOperation(ctx, operation, nil)
+			if err != nil {
+				return nil, fmt.Errorf("failed to poll operation status: %w", err)
+			}
 		}
 	}
 
-	return nil, errors.New("no video data in Gemini response")
+	if operation.Response == nil || len(operation.Response.GeneratedVideos) == 0 {
+		return nil, errors.New("no videos generated in response")
+	}
+
+	// Download the generated video.
+	video := operation.Response.GeneratedVideos[0]
+	if video.Video == nil {
+		return nil, errors.New("generated video file info is missing")
+	}
+
+	_, err = c.client.Files.Download(ctx, video.Video, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to download video content: %w", err)
+	}
+
+	return &VideoGenerateResponse{
+		Data:  video.Video.VideoBytes,
+		Model: req.Model,
+	}, nil
 }
 
 // ListModels lists available models from Gemini
