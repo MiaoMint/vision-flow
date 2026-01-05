@@ -11,7 +11,7 @@ export interface BaseNodeData {
   processing?: boolean;
   error?: string;
   prompt?: string;
-
+  runTrigger?: string;
 }
 
 export interface TextNodeData extends BaseNodeData {

@@ -129,7 +129,7 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
       // Create animated edge with data flow
       const newEdge = {
         ...connection,
-        animated: true,
+        animated: false,
         style: { stroke: "#3b82f6" },
       };
       setEdges((eds) => addEdge(newEdge, eds));
@@ -257,7 +257,7 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
         </div>
 
         {/* 左侧悬浮工具栏 */}
-        <div className="absolute left-4 top-20 z-10 flex flex-col gap-2">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
           <Card className="p-2 shadow-lg">
             <div className="flex flex-col gap-2">
               <Button

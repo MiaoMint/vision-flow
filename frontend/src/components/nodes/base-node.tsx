@@ -5,6 +5,7 @@ import { NodeParametersPanel } from "./node-parameters-panel";
 import type { BaseNodeData } from "./types";
 import { type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 interface BaseNodeProps extends NodeProps {
     icon: LucideIcon;
@@ -33,11 +34,18 @@ export function BaseNode({
     maxHeight = 400,
 }: BaseNodeProps) {
     const nodeData = data as unknown as BaseNodeData;
-    const { updateNodeData, getNodes, } = useReactFlow();
+    const { updateNodeData, getNodes, updateNode } = useReactFlow();
 
     // Only show parameters panel when single node is selected
     const selectedNodesCount = getNodes().filter((node) => node.selected).length;
     const isSelected = selected && selectedNodesCount === 1;
+
+    useEffect(() => {
+        updateNode(id, {
+            width: minWidth,
+            height: minHeight
+        });
+    }, []);
 
     return (
         <>
