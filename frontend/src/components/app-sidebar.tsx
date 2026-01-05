@@ -12,8 +12,15 @@ import {
 } from "@/components/ui/sidebar";
 import { NavUser } from "@/components/nav-user";
 import { Home, Image, Settings, Telescope } from "lucide-react";
+import { toast } from "sonner"
+
 
 export function AppSidebar({ onSettingsClick }: { onSettingsClick: () => void }) {
+
+  function wip() {
+    toast("👷 Work in progress")
+  }
+
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
@@ -32,13 +39,13 @@ export function AppSidebar({ onSettingsClick }: { onSettingsClick: () => void })
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
+                <SidebarMenuButton onClick={() => wip()}>
                   <Image />
                   <span>素材库</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
+                <SidebarMenuButton onClick={() => wip()}>
                   <Telescope />
                   <span>浏览</span>
                 </SidebarMenuButton>
