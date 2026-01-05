@@ -113,6 +113,7 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
         zIndex: -1, // Ensure group is behind
         border: "none",
         background: "transparent",
+        padding: 0,
       },
       selectable: false, // Prevent box selection
       data: { label: "New Group" },

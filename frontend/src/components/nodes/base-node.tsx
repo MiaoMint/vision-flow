@@ -1,4 +1,4 @@
-import { Handle, Position, useReactFlow, type NodeProps, NodeResizeControl } from "@xyflow/react";
+import { Handle, Position, useReactFlow, type NodeProps, NodeResizeControl, NodeToolbar } from "@xyflow/react";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { NodeParametersPanel } from "./node-parameters-panel";
@@ -33,7 +33,7 @@ export function BaseNode({
     maxHeight = 400,
 }: BaseNodeProps) {
     const nodeData = data as unknown as BaseNodeData;
-    const { updateNodeData, getNodes } = useReactFlow();
+    const { updateNodeData, getNodes, } = useReactFlow();
 
     // Only show parameters panel when single node is selected
     const selectedNodesCount = getNodes().filter((node) => node.selected).length;
@@ -48,14 +48,11 @@ export function BaseNode({
                     maxWidth={maxWidth}
                     maxHeight={maxHeight}
                     position="bottom-right"
-                    className="bg-transparent border-none"
                 >
-                    <div
-                        className="absolute bottom-0 right-0 p-4 rounded-br-2xl cursor-nwse-resize bg-transparent nodrag z-50 pointer-events-auto"
-                        style={{ cursor: 'nwse-resize' }}
-                    />
+                    <div className="absolute bottom-0 right-0 p-4 rounded-br-2xl cursor-nwse-resize bg-transparent nodrag z-50 pointer-events-auto" style={{ cursor: 'nwse-resize' }}></div>
                 </NodeResizeControl>
             )}
+
 
             <div className="p-3 flex items-center gap-2 absolute -top-10 left-0 right-0 nodrag">
                 {nodeData.processing ? (
@@ -87,14 +84,19 @@ export function BaseNode({
                 {children}
             </Card>
 
-            {isSelected && (
+            <NodeToolbar
+                isVisible={isSelected}
+                position={Position.Bottom}
+                align="center"
+            >
                 <NodeParametersPanel
                     nodeId={id}
                     nodeData={nodeData}
                     promptPlaceholder={promptPlaceholder}
                     onRun={onRun}
                 />
-            )}
+            </NodeToolbar>
+
         </ >
     );
 }
