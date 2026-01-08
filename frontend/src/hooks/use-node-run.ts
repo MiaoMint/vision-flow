@@ -5,7 +5,15 @@ import { useEffect, useRef } from "react";
 interface UseNodeRunProps {
     id: string;
     nodeData: BaseNodeData;
-    apiFunction: (params: { prompt: string; model: string; providerId: number }) => Promise<any>;
+    apiFunction: (params: {
+        prompt: string;
+        model: string;
+        providerId: number;
+        images?: string[];
+        videos?: string[];
+        audios?: string[];
+        documents?: string[];
+    }) => Promise<any>;
     onSuccess: (response: any) => void;
     onStart?: () => void;
 }
@@ -32,10 +40,6 @@ export function useNodeRun({ id, nodeData, apiFunction, onSuccess, onStart }: Us
             updateNodeData(id, { error: "Please select a provider and model" });
             return;
         }
-        if (!nodeData.prompt) {
-            updateNodeData(id, { error: "Please enter a prompt" });
-            return;
-        }
 
         updateNodeData(id, { processing: true, error: undefined });
         setIncomingEdgesAnimation(true);
@@ -43,31 +47,45 @@ export function useNodeRun({ id, nodeData, apiFunction, onSuccess, onStart }: Us
 
         const edges = getEdges();
         const incomingEdges = edges.filter((edge) => edge.target === id);
-        const sourceContents = incomingEdges
-            .map((edge) => {
-                const sourceNode = getNode(edge.source);
-                if (!sourceNode) return null;
-                const data = sourceNode.data as any;
-                // Prioritize content (TextNode), then output, then specific media urls
-                const content = data.content || data.output || data.imageUrl || data.videoUrl || data.audioUrl;
 
-                if (content !== null && content !== undefined) {
-                    // const label = data.label || sourceNode.id;
-                    return `node: ${content}`;
-                }
-                return null;
-            })
-            .filter((content) => content !== null && content !== undefined);
+        const sourcePrompts: string[] = [];
+        const images: string[] = [];
+        const videos: string[] = [];
+        const audios: string[] = [];
+        const documents: string[] = [];
 
-        const mergedPrompt = `${sourceContents.join("\n\n")}\n\n${nodeData.prompt ?? ""}`;
+        incomingEdges.forEach((edge) => {
+            const sourceNode = getNode(edge.source);
+            if (!sourceNode) return;
+            const data = sourceNode.data as any;
+
+            // Collect explicit media types
+            if (data.imageUrl) images.push(data.imageUrl);
+            if (data.videoUrl) videos.push(data.videoUrl);
+            if (data.audioUrl) audios.push(data.audioUrl);
+            if (data.documentUrl) documents.push(data.documentUrl);
+
+            // Collect text content
+            if (data.content) {
+                sourcePrompts.push(data.content);
+            }
+
+        });
+
+        const mergedPrompt = `${sourcePrompts.join("\n\n")}\n\n${nodeData.prompt ?? ""}`.trim();
 
         console.log("--- Executing Node", id, "---");
+        console.log("Inputs:", { images, videos, audios, documents, mergedPrompt });
 
         try {
             const response = await apiFunction({
                 prompt: mergedPrompt,
                 model: nodeData.modelId,
                 providerId: nodeData.providerId,
+                images: images.length > 0 ? images : undefined,
+                videos: videos.length > 0 ? videos : undefined,
+                audios: audios.length > 0 ? audios : undefined,
+                documents: documents.length > 0 ? documents : undefined,
             });
             console.log("Node execution response:", response);
             updateNodeData(id, { processing: false });

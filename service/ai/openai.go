@@ -3,12 +3,16 @@ package ai
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"mime"
+	"mime/multipart"
 	"net/http"
-	"strconv"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"firebringer/database"
@@ -45,11 +49,52 @@ func (c *OpenAIClient) GenerateText(ctx context.Context, req TextGenerateRequest
 		req.Model = openai.GPT4o
 	}
 
-	messages := []openai.ChatCompletionMessage{
-		{
-			Role:    openai.ChatMessageRoleUser,
-			Content: req.Prompt,
-		},
+	var messages []openai.ChatCompletionMessage
+
+	if len(req.Images) > 0 {
+		parts := []openai.ChatMessagePart{
+			{
+				Type: openai.ChatMessagePartTypeText,
+				Text: req.Prompt,
+			},
+		}
+
+		for _, imgPath := range req.Images {
+			data, err := LoadContent(imgPath)
+			if err != nil {
+				return nil, err
+			}
+
+			ext := filepath.Ext(imgPath)
+			mimeType := mime.TypeByExtension(ext)
+			if mimeType == "" {
+				mimeType = http.DetectContentType(data)
+			}
+
+			b64Data := base64.StdEncoding.EncodeToString(data)
+			imgURL := fmt.Sprintf("data:%s;base64,%s", mimeType, b64Data)
+
+			parts = append(parts, openai.ChatMessagePart{
+				Type: openai.ChatMessagePartTypeImageURL,
+				ImageURL: &openai.ChatMessageImageURL{
+					URL: imgURL,
+				},
+			})
+		}
+
+		messages = []openai.ChatCompletionMessage{
+			{
+				Role:         openai.ChatMessageRoleUser,
+				MultiContent: parts,
+			},
+		}
+	} else {
+		messages = []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: req.Prompt,
+			},
+		}
 	}
 
 	chatReq := openai.ChatCompletionRequest{
@@ -173,24 +218,50 @@ func (c *OpenAIClient) GenerateVideo(ctx context.Context, req VideoGenerateReque
 		req.Model = "sora-2" // Default to a known model if unspecified
 	}
 
-	payload := map[string]interface{}{
-		"model":  req.Model,
-		"prompt": req.Prompt,
+	// Use multipart/form-data
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	// Add fields
+	if err := writer.WriteField("model", req.Model); err != nil {
+		return nil, fmt.Errorf("failed to write model field: %w", err)
+	}
+	if err := writer.WriteField("prompt", req.Prompt); err != nil {
+		return nil, fmt.Errorf("failed to write prompt field: %w", err)
 	}
 
 	if req.Resolution != "" {
-		payload["size"] = req.Resolution
-	}
-	// Parse duration if possible (expecting seconds as string or int)
-	if req.Duration != "" {
-		if seconds, err := strconv.Atoi(req.Duration); err == nil {
-			payload["seconds"] = seconds
+		if err := writer.WriteField("size", req.Resolution); err != nil {
+			return nil, fmt.Errorf("failed to write size field: %w", err)
 		}
 	}
 
-	jsonData, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal video request: %w", err)
+	if req.Duration != "" {
+		dur := strings.TrimSuffix(req.Duration, "s")
+		if err := writer.WriteField("seconds", dur); err != nil {
+			return nil, fmt.Errorf("failed to write seconds field: %w", err)
+		}
+	}
+
+	// Add input_reference file if exists
+	if len(req.Images) > 0 {
+		imagePath := req.Images[0]
+		data, err := LoadContent(imagePath)
+		if err != nil {
+			return nil, err
+		}
+
+		part, err := writer.CreateFormFile("input_reference", filepath.Base(imagePath))
+		if err != nil {
+			return nil, fmt.Errorf("failed to create form file: %w", err)
+		}
+		if _, err := io.Copy(part, bytes.NewReader(data)); err != nil {
+			return nil, fmt.Errorf("failed to copy file content: %w", err)
+		}
+	}
+
+	if err := writer.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close multipart writer: %w", err)
 	}
 
 	baseURL := "https://api.openai.com/v1"
@@ -200,13 +271,13 @@ func (c *OpenAIClient) GenerateVideo(ctx context.Context, req VideoGenerateReque
 
 	// 1. Create Video Generation Job
 	reqURL := fmt.Sprintf("%s/videos", baseURL)
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewBuffer(jsonData))
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", reqURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	httpReq.Header.Set("Authorization", "Bearer "+c.config.APIKey)
-	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Content-Type", writer.FormDataContentType())
 
 	client := &http.Client{}
 	resp, err := client.Do(httpReq)

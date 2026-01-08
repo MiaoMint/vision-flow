@@ -7,8 +7,10 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Play, Ungroup, Square } from "lucide-react";
 import { Spinner } from "../ui/spinner";
 import { toast } from "sonner";
+import type { BaseNodeData } from "./types";
 
-export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
+export const GroupNode = memo(({ id, data, selected, }: NodeProps) => {
+    const nodeData = data as unknown as BaseNodeData;
     const { updateNodeData, deleteElements, getNodes, getEdges, getNode, getIntersectingNodes } = useReactFlow();
     const abortRef = useRef(false);
 
@@ -184,8 +186,11 @@ export const GroupNode = memo(({ id, data, selected }: NodeProps) => {
 
 
             <div className="p-3 flex items-center gap-2 absolute -top-10 left-0 right-0 nodrag">
+                {nodeData.processing && (
+                    <Spinner className="h-4 w-4 mr-1" />
+                )}
                 <input
-                    value={data.label as string || "Group"}
+                    value={nodeData.label}
                     onChange={(evt) => updateNodeData(id, { label: evt.target.value })}
                     className="font-semibold text-sm bg-transparent border-none outline-none focus:ring-0 p-0 w-full"
                 />
