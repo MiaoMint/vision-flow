@@ -27,8 +27,11 @@ import {
   Video,
   Music,
   X,
+  Download,
+  Upload,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
 
 import {
   TextNode,
@@ -227,6 +230,58 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
     }
   }, [setNodes]);
 
+  const handleExport = useCallback(() => {
+    const data = {
+      nodes,
+      edges,
+    };
+    const jsonString = JSON.stringify(data, null, 2);
+    navigator.clipboard.writeText(jsonString)
+      .then(() => toast.success("Project JSON copied to clipboard"))
+      .catch((err) => {
+        console.error("Failed to copy:", err);
+        toast.error("Failed to copy project JSON");
+      });
+  }, [nodes, edges]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = JSON.parse(content);
+        if (data.nodes && data.edges) {
+          setNodes(data.nodes);
+          setEdges(data.edges);
+          // Update ID counter based on highest ID found to avoid collisions
+          let maxId = 0;
+          data.nodes.forEach((n: Node) => {
+            const idNum = parseInt(n.id.replace(/[^0-9]/g, ''));
+            if (!isNaN(idNum) && idNum > maxId) maxId = idNum;
+          });
+          setNodeIdCounter(maxId + 1);
+        } else {
+          alert("Invalid project file format");
+        }
+      } catch (err) {
+        console.error("Import failed:", err);
+        alert("Failed to parse project file");
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so same file can be selected again
+    event.target.value = "";
+  }, [setNodes, setEdges, setNodeIdCounter]);
+
   return (
     <div className="flex h-full relative">
       {/* 主要内容区域 - 全屏 */}
@@ -245,7 +300,30 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
             className="max-w-sm border-none bg-transparent px-2 focus-visible:ring-0 focus-visible:ring-offset-0 font-semibold"
             placeholder="项目名称"
           />
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".json"
+              onChange={handleFileChange}
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              title="Import JSON"
+              onClick={handleImportClick}
+            >
+              <Upload className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              title="Copy JSON"
+              onClick={handleExport}
+            >
+              <Download className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

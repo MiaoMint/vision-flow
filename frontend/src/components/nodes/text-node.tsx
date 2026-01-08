@@ -35,7 +35,7 @@ export const TextNode = memo((props: NodeProps) => {
       maxWidth={400}
       maxHeight={400}
     >
-      <div className="p-4 w-full flex-1">
+      <div className="p-4 w-full flex-1 overflow-auto">
         {nodeData.processing ? (
           <div className="w-full space-y-2">
             <Skeleton className="h-4 w-full" />
@@ -43,7 +43,7 @@ export const TextNode = memo((props: NodeProps) => {
             <Skeleton className="h-4 w-5/6" />
           </div>
         ) : nodeData.content ? (
-          <div className="text-sm whitespace-pre-wrap w-full">
+          <div className="text-sm whitespace-pre-wrap">
             {nodeData.content}
           </div>
         ) : (

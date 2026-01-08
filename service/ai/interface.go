@@ -9,6 +9,10 @@ import (
 // TextGenerateRequest defines the parameters for text generation
 type TextGenerateRequest struct {
 	Prompt      string                 `json:"prompt"`
+	Images      []string               `json:"images,omitempty"`
+	Videos      []string               `json:"videos,omitempty"`
+	Audios      []string               `json:"audios,omitempty"`
+	Documents   []string               `json:"documents,omitempty"`
 	Model       string                 `json:"model"`
 	Temperature *float64               `json:"temperature,omitempty"`
 	MaxTokens   *int                   `json:"maxTokens,omitempty"`
@@ -27,6 +31,9 @@ type TextGenerateResponse struct {
 // ImageGenerateRequest defines the parameters for image generation
 type ImageGenerateRequest struct {
 	Prompt  string                 `json:"prompt"`
+	Images  []string               `json:"images,omitempty"`
+	Videos  []string               `json:"videos,omitempty"`
+	Audios  []string               `json:"audios,omitempty"`
 	Model   string                 `json:"model"`
 	Size    string                 `json:"size,omitempty"`
 	Quality string                 `json:"quality,omitempty"`
@@ -46,6 +53,9 @@ type ImageGenerateResponse struct {
 // AudioGenerateRequest defines the parameters for audio generation
 type AudioGenerateRequest struct {
 	Prompt  string                 `json:"prompt"`
+	Images  []string               `json:"images,omitempty"`
+	Videos  []string               `json:"videos,omitempty"`
+	Audios  []string               `json:"audios,omitempty"`
 	Model   string                 `json:"model"`
 	Voice   string                 `json:"voice,omitempty"`
 	Speed   *float64               `json:"speed,omitempty"`
@@ -61,6 +71,9 @@ type AudioGenerateResponse struct {
 // VideoGenerateRequest defines the parameters for video generation
 type VideoGenerateRequest struct {
 	Prompt     string                 `json:"prompt"`
+	Images     []string               `json:"images,omitempty"`
+	Videos     []string               `json:"videos,omitempty"`
+	Audios     []string               `json:"audios,omitempty"`
 	Model      string                 `json:"model"`
 	Duration   string                 `json:"duration,omitempty"`
 	Resolution string                 `json:"resolution,omitempty"`

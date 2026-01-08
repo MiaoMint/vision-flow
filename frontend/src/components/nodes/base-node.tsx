@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { NodeParametersPanel } from "./node-parameters-panel";
 import type { BaseNodeData } from "./types";
-import { type LucideIcon } from "lucide-react";
+import { PlusCircle, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 
@@ -48,7 +48,7 @@ export function BaseNode({
     }, []);
 
     return (
-        <>
+        <div className="size-full group">
             {isSelected && (
                 <NodeResizeControl
                     minWidth={minWidth}
@@ -74,8 +74,8 @@ export function BaseNode({
                     className="font-semibold text-sm bg-transparent border-none outline-none focus:ring-0 p-0 w-full"
                 />
             </div>
-            <Handle type="target" position={Position.Left} />
-            <Handle type="source" position={Position.Right} />
+            <Handle type="target" className="opacity-0 group-hover:opacity-100 transition-all" position={Position.Left} />
+            <Handle type="source" className="opacity-0 group-hover:opacity-100 transition-all" position={Position.Right} />
             <Card
                 className={cn(
                     "py-0! gap-0 size-full",
@@ -105,6 +105,6 @@ export function BaseNode({
                 />
             </NodeToolbar>
 
-        </ >
+        </div >
     );
 }

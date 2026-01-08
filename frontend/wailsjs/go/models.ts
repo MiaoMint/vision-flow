@@ -18,6 +18,9 @@ export namespace ai {
 	}
 	export class AudioRequest {
 	    prompt: string;
+	    images?: string[];
+	    videos?: string[];
+	    audios?: string[];
 	    model: string;
 	    providerId: number;
 	    voice?: string;
@@ -31,6 +34,9 @@ export namespace ai {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
+	        this.images = source["images"];
+	        this.videos = source["videos"];
+	        this.audios = source["audios"];
 	        this.model = source["model"];
 	        this.providerId = source["providerId"];
 	        this.voice = source["voice"];
@@ -40,6 +46,9 @@ export namespace ai {
 	}
 	export class ImageRequest {
 	    prompt: string;
+	    images?: string[];
+	    videos?: string[];
+	    audios?: string[];
 	    model: string;
 	    providerId: number;
 	    size?: string;
@@ -54,6 +63,9 @@ export namespace ai {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
+	        this.images = source["images"];
+	        this.videos = source["videos"];
+	        this.audios = source["audios"];
 	        this.model = source["model"];
 	        this.providerId = source["providerId"];
 	        this.size = source["size"];
@@ -90,6 +102,10 @@ export namespace ai {
 	}
 	export class TextRequest {
 	    prompt: string;
+	    images?: string[];
+	    videos?: string[];
+	    audios?: string[];
+	    documents?: string[];
 	    model: string;
 	    providerId: number;
 	    temperature?: number;
@@ -103,6 +119,10 @@ export namespace ai {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
+	        this.images = source["images"];
+	        this.videos = source["videos"];
+	        this.audios = source["audios"];
+	        this.documents = source["documents"];
 	        this.model = source["model"];
 	        this.providerId = source["providerId"];
 	        this.temperature = source["temperature"];
@@ -112,6 +132,9 @@ export namespace ai {
 	}
 	export class VideoRequest {
 	    prompt: string;
+	    images?: string[];
+	    videos?: string[];
+	    audios?: string[];
 	    model: string;
 	    providerId: number;
 	    duration?: string;
@@ -125,6 +148,9 @@ export namespace ai {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
+	        this.images = source["images"];
+	        this.videos = source["videos"];
+	        this.audios = source["audios"];
 	        this.model = source["model"];
 	        this.providerId = source["providerId"];
 	        this.duration = source["duration"];
