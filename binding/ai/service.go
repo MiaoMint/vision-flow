@@ -27,6 +27,10 @@ func (s *Service) SetContext(ctx context.Context) {
 // TextRequest defines the parameters for text generation
 type TextRequest struct {
 	Prompt      string                 `json:"prompt"`
+	Images      []string               `json:"images,omitempty"`
+	Videos      []string               `json:"videos,omitempty"`
+	Audios      []string               `json:"audios,omitempty"`
+	Documents   []string               `json:"documents,omitempty"`
 	Model       string                 `json:"model"`
 	ProviderID  int                    `json:"providerId"`
 	Temperature *float64               `json:"temperature,omitempty"`
@@ -37,6 +41,9 @@ type TextRequest struct {
 // ImageRequest defines the parameters for image generation
 type ImageRequest struct {
 	Prompt     string                 `json:"prompt"`
+	Images     []string               `json:"images,omitempty"`
+	Videos     []string               `json:"videos,omitempty"`
+	Audios     []string               `json:"audios,omitempty"`
 	Model      string                 `json:"model"`
 	ProviderID int                    `json:"providerId"`
 	Size       string                 `json:"size,omitempty"`
@@ -48,6 +55,9 @@ type ImageRequest struct {
 // VideoRequest defines the parameters for video generation
 type VideoRequest struct {
 	Prompt     string                 `json:"prompt"`
+	Images     []string               `json:"images,omitempty"`
+	Videos     []string               `json:"videos,omitempty"`
+	Audios     []string               `json:"audios,omitempty"`
 	Model      string                 `json:"model"`
 	ProviderID int                    `json:"providerId"`
 	Duration   string                 `json:"duration,omitempty"`
@@ -58,6 +68,9 @@ type VideoRequest struct {
 // AudioRequest defines the parameters for audio generation
 type AudioRequest struct {
 	Prompt     string                 `json:"prompt"`
+	Images     []string               `json:"images,omitempty"`
+	Videos     []string               `json:"videos,omitempty"`
+	Audios     []string               `json:"audios,omitempty"`
 	Model      string                 `json:"model"`
 	ProviderID int                    `json:"providerId"`
 	Voice      string                 `json:"voice,omitempty"`
@@ -93,6 +106,10 @@ func (s *Service) GenerateText(req TextRequest) (*AIResponse, error) {
 
 	aiReq := aiservice.TextGenerateRequest{
 		Prompt:      req.Prompt,
+		Images:      req.Images,
+		Videos:      req.Videos,
+		Audios:      req.Audios,
+		Documents:   req.Documents,
 		Model:       req.Model,
 		Temperature: req.Temperature,
 		MaxTokens:   req.MaxTokens,
@@ -124,6 +141,9 @@ func (s *Service) GenerateImage(req ImageRequest) (*AIResponse, error) {
 
 	aiReq := aiservice.ImageGenerateRequest{
 		Prompt:  req.Prompt,
+		Images:  req.Images,
+		Videos:  req.Videos,
+		Audios:  req.Audios,
 		Model:   req.Model,
 		Size:    req.Size,
 		Quality: req.Quality,
@@ -156,6 +176,9 @@ func (s *Service) GenerateVideo(req VideoRequest) (*AIResponse, error) {
 
 	aiReq := aiservice.VideoGenerateRequest{
 		Prompt:     req.Prompt,
+		Images:     req.Images,
+		Videos:     req.Videos,
+		Audios:     req.Audios,
 		Model:      req.Model,
 		Duration:   req.Duration,
 		Resolution: req.Resolution,
@@ -187,6 +210,9 @@ func (s *Service) GenerateAudio(req AudioRequest) (*AIResponse, error) {
 
 	aiReq := aiservice.AudioGenerateRequest{
 		Prompt:  req.Prompt,
+		Images:  req.Images,
+		Videos:  req.Videos,
+		Audios:  req.Audios,
 		Model:   req.Model,
 		Voice:   req.Voice,
 		Speed:   req.Speed,

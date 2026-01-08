@@ -35,7 +35,7 @@ export function NodeParametersPanel({
   };
 
   return (
-    <Card className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-175 shadow-lg z-50 flex flex-col py-0! overflow-hidden gap-0! nodrag">
+    <Card className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-175 shadow-lg z-9999 flex flex-col py-0! overflow-hidden gap-0! nodrag">
       <div className="flex-1 flex flex-col min-h-40">
         <Textarea
           placeholder={promptPlaceholder}
@@ -44,37 +44,9 @@ export function NodeParametersPanel({
           onChange={handlePromptChange}
         />
 
-        {(nodeData.input || nodeData.output || nodeData.error) && (
-          <div className="border-t bg-muted/20 max-h-40 overflow-y-auto">
-            {nodeData.input && (
-              <div className="p-2 border-b last:border-0 opacity-80">
-                <label className="text-xs text-muted-foreground block mb-1">
-                  输入
-                </label>
-                <div className="text-xs font-mono text-muted-foreground truncate">
-                  {typeof nodeData.input === "string"
-                    ? nodeData.input
-                    : JSON.stringify(nodeData.input)}
-                </div>
-              </div>
-            )}
-            {nodeData.output && (
-              <div className="p-2 border-b last:border-0 opacity-80">
-                <label className="text-xs text-muted-foreground block mb-1">
-                  输出
-                </label>
-                <div className="text-xs font-mono text-muted-foreground truncate">
-                  {typeof nodeData.output === "string"
-                    ? nodeData.output
-                    : JSON.stringify(nodeData.output)}
-                </div>
-              </div>
-            )}
-            {nodeData.error && (
-              <div className="p-2 bg-destructive/10 text-destructive text-xs">
-                {nodeData.error}
-              </div>
-            )}
+        {nodeData.error && (
+          <div className="p-2 bg-destructive/10 text-destructive text-xs">
+            {nodeData.error}
           </div>
         )}
       </div>

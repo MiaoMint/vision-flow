@@ -6,8 +6,6 @@ export interface BaseNodeData {
   type: NodeType;
   modelId?: string;
   providerId?: number;
-  input?: any;
-  output?: any;
   processing?: boolean;
   error?: string;
   prompt?: string;

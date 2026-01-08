@@ -2,8 +2,12 @@ package ai
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"mime"
+	"net/http"
+	"path/filepath"
 
 	"firebringer/database"
 
@@ -51,11 +55,34 @@ func (c *ClaudeClient) GenerateText(ctx context.Context, req TextGenerateRequest
 		maxTokens = int64(*req.MaxTokens)
 	}
 
+	contentBlocks := []anthropic.ContentBlockParamUnion{
+		anthropic.NewTextBlock(req.Prompt),
+	}
+
+	for _, imgPath := range req.Images {
+		data, err := LoadContent(imgPath)
+		if err != nil {
+			return nil, err
+		}
+
+		ext := filepath.Ext(imgPath)
+		mimeType := mime.TypeByExtension(ext)
+		if mimeType == "" {
+			mimeType = http.DetectContentType(data)
+		}
+
+		b64Data := base64.StdEncoding.EncodeToString(data)
+
+		// Map mimeType to expected format string if necessary, generally just mime type works or specific enum
+		// The SDK usually takes media_type string and data string.
+		contentBlocks = append(contentBlocks, anthropic.NewImageBlockBase64(mimeType, b64Data))
+	}
+
 	messageReq := anthropic.MessageNewParams{
 		Model:     anthropic.Model(req.Model),
 		MaxTokens: maxTokens,
 		Messages: []anthropic.MessageParam{
-			anthropic.NewUserMessage(anthropic.NewTextBlock(req.Prompt)),
+			anthropic.NewUserMessage(contentBlocks...),
 		},
 	}
 

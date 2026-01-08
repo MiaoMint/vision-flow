@@ -7,6 +7,9 @@ import (
 
 	"firebringer/database"
 
+	"mime"
+	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -46,6 +49,64 @@ func NewGeminiClient(config database.ModelProvider) (*GeminiClient, error) {
 	}, nil
 }
 
+func (c *GeminiClient) processInputs(images, videos, audios, documents []string) ([]*genai.Part, error) {
+	var parts []*genai.Part
+
+	processFile := func(path string, mimePrefix string) error {
+		// handle if it is a URL just in case, but prioritize file path as requested
+		// The user explicitly said "should be local file path not url"
+		// So we assume it is a file path.
+
+		data, err := LoadContent(path)
+		if err != nil {
+			return err
+		}
+
+		ext := filepath.Ext(path)
+		mimeType := mime.TypeByExtension(ext)
+
+		if mimeType == "" {
+			// Fallback: detect from content
+			mimeType = http.DetectContentType(data)
+		}
+
+		if mimePrefix != "" && !strings.HasPrefix(mimeType, mimePrefix) {
+			return fmt.Errorf("file %s has MIME type %q, expected prefix %q", path, mimeType, mimePrefix)
+		}
+
+		parts = append(parts, &genai.Part{
+			InlineData: &genai.Blob{
+				Data:     data,
+				MIMEType: mimeType,
+			},
+		})
+		return nil
+	}
+
+	for _, path := range images {
+		if err := processFile(path, "image/"); err != nil {
+			return nil, err
+		}
+	}
+	for _, path := range videos {
+		if err := processFile(path, "video/"); err != nil {
+			return nil, err
+		}
+	}
+	for _, path := range audios {
+		if err := processFile(path, "audio/"); err != nil {
+			return nil, err
+		}
+	}
+	for _, path := range documents {
+		if err := processFile(path, "application/pdf"); err != nil {
+			return nil, err
+		}
+	}
+
+	return parts, nil
+}
+
 // GenerateText generates text using Gemini's generate content API
 func (c *GeminiClient) GenerateText(ctx context.Context, req TextGenerateRequest) (*TextGenerateResponse, error) {
 	if req.Model == "" {
@@ -62,8 +123,18 @@ func (c *GeminiClient) GenerateText(ctx context.Context, req TextGenerateRequest
 		genConfig.MaxOutputTokens = int32(*req.MaxTokens)
 	}
 
+	parts := []*genai.Part{{Text: req.Prompt}}
+
+	multimodalParts, err := c.processInputs(req.Images, req.Videos, req.Audios, req.Documents)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process multimodal inputs: %w", err)
+	}
+	parts = append(parts, multimodalParts...)
+
+	contents := []*genai.Content{{Parts: parts}}
+
 	// Call the API
-	resp, err := c.client.Models.GenerateContent(ctx, req.Model, genai.Text(req.Prompt), genConfig)
+	resp, err := c.client.Models.GenerateContent(ctx, req.Model, contents, genConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Gemini content generation failed: %w", err)
 	}
@@ -103,8 +174,18 @@ func (c *GeminiClient) GenerateImage(ctx context.Context, req ImageGenerateReque
 		req.Model = "imagen-3.0-generate-001"
 	}
 
+	parts := []*genai.Part{{Text: req.Prompt}}
+
+	multimodalParts, err := c.processInputs(req.Images, req.Videos, req.Audios, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process multimodal inputs: %w", err)
+	}
+	parts = append(parts, multimodalParts...)
+
+	contents := []*genai.Content{{Parts: parts}}
+
 	// Use GenerateContent for image generation
-	resp, err := c.client.Models.GenerateContent(ctx, req.Model, genai.Text(req.Prompt), nil)
+	resp, err := c.client.Models.GenerateContent(ctx, req.Model, contents, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Gemini image generation failed: %w", err)
 	}
@@ -137,7 +218,31 @@ func (c *GeminiClient) GenerateVideo(ctx context.Context, req VideoGenerateReque
 		req.Model = "veo-3.1-generate-preview"
 	}
 
-	operation, err := c.client.Models.GenerateVideos(ctx, req.Model, req.Prompt, nil, nil)
+	var referenceImages []*genai.VideoGenerationReferenceImage
+	for _, imagePath := range req.Images {
+		data, err := LoadContent(imagePath)
+		if err != nil {
+			return nil, err
+		}
+
+		// Detect MIME type
+		mimeType := http.DetectContentType(data)
+
+		refImg := &genai.VideoGenerationReferenceImage{
+			Image: &genai.Image{
+				ImageBytes: data,
+				MIMEType:   mimeType,
+			},
+			ReferenceType: genai.VideoGenerationReferenceTypeAsset,
+		}
+		referenceImages = append(referenceImages, refImg)
+	}
+
+	config := &genai.GenerateVideosConfig{
+		ReferenceImages: referenceImages,
+	}
+
+	operation, err := c.client.Models.GenerateVideos(ctx, req.Model, req.Prompt, nil, config)
 	if err != nil {
 		return nil, fmt.Errorf("Gemini video generation initialization failed: %w", err)
 	}
@@ -165,13 +270,13 @@ func (c *GeminiClient) GenerateVideo(ctx context.Context, req VideoGenerateReque
 		return nil, errors.New("generated video file info is missing")
 	}
 
-	_, err = c.client.Files.Download(ctx, video.Video, nil)
+	data, err := c.client.Files.Download(ctx, video.Video, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to download video content: %w", err)
 	}
 
 	return &VideoGenerateResponse{
-		Data:  video.Video.VideoBytes,
+		Data:  data,
 		Model: req.Model,
 	}, nil
 }
