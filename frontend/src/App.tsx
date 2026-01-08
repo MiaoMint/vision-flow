@@ -4,18 +4,15 @@ import { CanvasView } from "@/components/canvas-view";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SettingsDialog } from "@/components/settings/settings-dialog";
 import { useState } from "react";
-
-interface Project {
-  id: string;
-  name: string;
-  image: string;
-}
+import { database } from "../wailsjs/go/models";
 
 export default function App() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] = useState<database.Project | null>(
+    null
+  );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const handleProjectClick = (project: Project) => {
+  const handleProjectClick = (project: database.Project) => {
     setSelectedProject(project);
   };
 
@@ -27,8 +24,7 @@ export default function App() {
     return (
       <div className="h-screen">
         <CanvasView
-          projectId={selectedProject.id}
-          projectName={selectedProject.name}
+          project={selectedProject}
           onBack={handleBackToProjects}
         />
       </div>

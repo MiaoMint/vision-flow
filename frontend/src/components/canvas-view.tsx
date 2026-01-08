@@ -13,8 +13,12 @@ import {
   SelectionMode,
   ReactFlowProvider,
   useReactFlow,
+  getNodesBounds,
+  getViewportForBounds,
 } from "@xyflow/react";
-import { useState, useCallback, useMemo, useRef } from "react";
+import { toPng } from "html-to-image";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { SaveProject } from "../../wailsjs/go/database/Service";
 import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,23 +45,109 @@ import {
   GroupNode,
   type NodeType,
 } from "./nodes";
+import { database } from "../../wailsjs/go/models";
 
 interface CanvasViewProps {
-  projectId: string;
-  projectName: string;
+  project: database.Project;
   onBack: () => void;
 }
 
 const initialNodes: Node[] = [];
 
 const initialEdges: Edge[] = [];
-function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
-  const [name, setName] = useState(projectName);
+function CanvasEditor({ project, onBack }: CanvasViewProps) {
+  const [name, setName] = useState(project.name);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeIdCounter, setNodeIdCounter] = useState(1);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize from project
+  useEffect(() => {
+    if (project.workflow) {
+      try {
+        const flow = JSON.parse(project.workflow);
+        if (flow.nodes) setNodes(flow.nodes);
+        if (flow.edges) setEdges(flow.edges);
+
+        // Update ID counter based on highest ID found
+        let maxId = 0;
+        if (Array.isArray(flow.nodes)) {
+          flow.nodes.forEach((n: Node) => {
+            const idNum = parseInt(n.id.replace(/[^0-9]/g, ''));
+            if (!isNaN(idNum) && idNum > maxId) maxId = idNum;
+          });
+        }
+        setNodeIdCounter(maxId + 1);
+      } catch (err) {
+        console.error("Failed to parse project workflow:", err);
+      }
+    }
+    setIsInitialized(true);
+  }, []);
+
+  const isDragging = useRef(false);
+
+  const saveProject = useCallback(async () => {
+    if (!project.id) return;
+
+    const workflow = JSON.stringify({
+      nodes,
+      edges,
+    });
+
+    try {
+      await SaveProject(new database.Project({
+        ...project,
+        name: name,
+        workflow,
+      }));
+    } catch (err) {
+      console.error("Auto-save failed:", err);
+    }
+  }, [nodes, edges, name, project]);
+
+  // Auto-save
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const save = async () => {
+      const workflow = JSON.stringify({
+        nodes,
+        edges,
+      });
+
+      try {
+        await SaveProject(new database.Project({
+          ...project,
+          name: name,
+          workflow,
+        }));
+      } catch (err) {
+        console.error("Auto-save failed:", err);
+      }
+    };
+
+    save();
+  }, [nodes, edges, name, isInitialized, saveProject]);
+
+  // 拖拽开始 - 暂停自动保存
+  const onNodeDragStart = useCallback((_: React.MouseEvent, node: Node) => {
+    isDragging.current = true;
+    if (node.type === "group") {
+      dragRef.current = { id: node.id, position: { ...node.position } };
+    }
+  }, []);
+
+  // 拖拽结束 - 立即保存
+  const onNodeDragStop = useCallback((_: React.MouseEvent, node: Node) => {
+    isDragging.current = false;
+    saveProject();
+  }, [saveProject]);
+
+
 
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
 
@@ -170,11 +260,7 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
   const { getIntersectingNodes } = useReactFlow();
   const dragRef = useRef<{ id: string; position: { x: number; y: number } } | null>(null);
 
-  const onNodeDragStart = useCallback((_: React.MouseEvent, node: Node) => {
-    if (node.type === "group") {
-      dragRef.current = { id: node.id, position: { ...node.position } };
-    }
-  }, []);
+
 
 
   // group 子节点跟随拖动
@@ -229,6 +315,64 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
       }));
     }
   }, [setNodes]);
+
+  const { getNodes } = useReactFlow();
+
+  const handleBack = async () => {
+    // 1. Capture screenshot
+    try {
+      const nodesBounds = getNodesBounds(getNodes());
+      // Only capture if we have nodes
+      if (nodesBounds.width > 0 && nodesBounds.height > 0) {
+        const imageWidth = 800; // Efficient size for cover
+        const imageHeight = 450;
+        const viewport = getViewportForBounds(nodesBounds, imageWidth, imageHeight, 0.5, 2, 0);
+
+        const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
+        if (viewportElement) {
+          const dataUrl = await toPng(viewportElement, {
+            backgroundColor: 'transparent',
+            width: imageWidth,
+            height: imageHeight,
+            filter: (node) => {
+              // Exclude video elements to prevent SecurityError: The operation is insecure.
+              if (node.tagName === 'VIDEO') return false;
+              return true;
+            },
+            style: {
+              width: imageWidth.toString(),
+              height: imageHeight.toString(),
+              transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+            },
+          });
+
+          // 2. Update project
+          project.coverImage = dataUrl;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to capture cover image:", err);
+    }
+
+    // 3. Save Project (explicit save to ensure cover image is persisted)
+    try {
+      const workflow = JSON.stringify({
+        nodes,
+        edges,
+      });
+      await SaveProject(new database.Project({
+        ...project,
+        name: name,
+        workflow,
+        coverImage: project.coverImage // Ensure this is sent
+      }));
+    } catch (err) {
+      console.error("Failed to save project on exit:", err);
+    }
+
+    // 4. Navigate back
+    onBack();
+  };
 
   const handleExport = useCallback(() => {
     const data = {
@@ -291,7 +435,7 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
           className="absolute top-0 left-0 right-0 z-20 flex items-center gap-4 p-2 pl-24 backdrop-blur-md bg-background/80 border-b border-border/50"
           style={{ "--wails-draggable": "drag" } as React.CSSProperties}
         >
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <Input
@@ -401,9 +545,8 @@ function CanvasEditor({ projectId, projectName, onBack }: CanvasViewProps) {
             selectionOnDrag
             selectionMode={SelectionMode.Partial}
             panOnScroll
-            zoomOnScroll={false}
             onNodeDragStart={onNodeDragStart}
-            onNodeDrag={onNodeDrag}
+            onNodeDragStop={onNodeDragStop}
             onNodeClick={onNodeClick}
           >
             <MiniMap />

@@ -4,8 +4,16 @@ import {database} from '../models';
 
 export function DeleteModelProvider(arg1:number):Promise<void>;
 
+export function DeleteProject(arg1:number):Promise<void>;
+
 export function GetModelProvider(arg1:number):Promise<database.ModelProvider>;
+
+export function GetProject(arg1:number):Promise<database.Project>;
 
 export function ListModelProviders():Promise<Array<database.ModelProvider>>;
 
+export function ListProjects():Promise<Array<database.Project>>;
+
 export function SaveModelProvider(arg1:database.ModelProvider):Promise<void>;
+
+export function SaveProject(arg1:database.Project):Promise<database.Project>;

@@ -6,14 +6,30 @@ export function DeleteModelProvider(arg1) {
   return window['go']['database']['Service']['DeleteModelProvider'](arg1);
 }
 
+export function DeleteProject(arg1) {
+  return window['go']['database']['Service']['DeleteProject'](arg1);
+}
+
 export function GetModelProvider(arg1) {
   return window['go']['database']['Service']['GetModelProvider'](arg1);
+}
+
+export function GetProject(arg1) {
+  return window['go']['database']['Service']['GetProject'](arg1);
 }
 
 export function ListModelProviders() {
   return window['go']['database']['Service']['ListModelProviders']();
 }
 
+export function ListProjects() {
+  return window['go']['database']['Service']['ListProjects']();
+}
+
 export function SaveModelProvider(arg1) {
   return window['go']['database']['Service']['SaveModelProvider'](arg1);
+}
+
+export function SaveProject(arg1) {
+  return window['go']['database']['Service']['SaveProject'](arg1);
 }
