@@ -33,11 +33,26 @@ func InitDB() error {
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
+
+	CREATE TABLE IF NOT EXISTS projects (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		description TEXT DEFAULT '',
+		workflow TEXT DEFAULT '',
+		cover_image TEXT DEFAULT '',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
 	`
 	_, err = DB.Exec(schema)
 	if err != nil {
 		return err
 	}
+
+	// Auto-migrate for existing tables
+	// Ignore errors if columns already exist
+	DB.Exec("ALTER TABLE projects ADD COLUMN workflow TEXT DEFAULT ''")
+	DB.Exec("ALTER TABLE projects ADD COLUMN cover_image TEXT DEFAULT ''")
 
 	log.Println("Database initialized successfully")
 	return nil

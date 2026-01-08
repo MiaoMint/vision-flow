@@ -20,3 +20,14 @@ type ModelProvider struct {
 	CreatedAt time.Time  `db:"created_at" json:"createdAt"`
 	UpdatedAt time.Time  `db:"updated_at" json:"updatedAt"`
 }
+
+// Project represents a project entity
+type Project struct {
+	ID          int       `db:"id" json:"id"`
+	Name        string    `db:"name" json:"name"`
+	Description string    `db:"description" json:"description"`
+	Workflow    string    `db:"workflow" json:"workflow"`
+	CoverImage  string    `db:"cover_image" json:"coverImage"`
+	CreatedAt   time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updatedAt"`
+}
