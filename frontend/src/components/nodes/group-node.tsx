@@ -146,17 +146,19 @@ export const GroupNode = memo(({ id, data, selected, }: NodeProps) => {
     return (
         <div className={cn(["h-full w-full relative group border rounded-2xl bg-muted/20", selected && "border-primary bg-primary/5 "])}>
 
-            <NodeResizeControl
-                minWidth={100}
-                minHeight={100}
-                position="bottom-right"
-                className="bg-transparent border-none"
-            >
-                <div
-                    className="absolute bottom-0 right-0 p-4 rounded-br-2xl cursor-nwse-resize bg-transparent nodrag z-50 pointer-events-auto"
-                    style={{ cursor: 'nwse-resize' }}
-                />
-            </NodeResizeControl>
+            {isSelected && (
+                <NodeResizeControl
+                    minWidth={100}
+                    minHeight={100}
+                    position="bottom-right"
+                    className="bg-transparent border-none"
+                >
+                    <div
+                        className="absolute bottom-0 right-0 p-4 rounded-br-2xl cursor-nwse-resize bg-transparent nodrag z-50 pointer-events-auto"
+                        style={{ cursor: 'nwse-resize' }}
+                    />
+                </NodeResizeControl>
+            )}
 
             <NodeToolbar
                 isVisible={isSelected}

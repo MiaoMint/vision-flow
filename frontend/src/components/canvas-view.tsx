@@ -15,6 +15,7 @@ import {
   useReactFlow,
   getNodesBounds,
   getViewportForBounds,
+  ControlButton,
 } from "@xyflow/react";
 import { toPng } from "html-to-image";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
@@ -261,8 +262,6 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
   const dragRef = useRef<{ id: string; position: { x: number; y: number } } | null>(null);
 
 
-
-
   // group 子节点跟随拖动
   const onNodeDrag = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -278,7 +277,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
         // Find intersecting nodes
         // Note: We use the group node's current dimension (which React Flow tracks)
         const intersectingNodes = getIntersectingNodes(node).filter(
-          (n) => n.type !== "group" && n.parentId !== node.id
+          (n) => n.parentId !== node.id
         );
 
         if (intersectingNodes.length > 0) {
@@ -547,9 +546,13 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
             panOnScroll
             onNodeDragStart={onNodeDragStart}
             onNodeDragStop={onNodeDragStop}
+            onNodeDrag={onNodeDrag}
             onNodeClick={onNodeClick}
+            minZoom={0.1}
+            maxZoom={2}
+            proOptions={{ hideAttribution: true }}
           >
-            <MiniMap />
+            <MiniMap pannable />
             <Background variant={BackgroundVariant.Cross} gap={12} size={1} />
           </ReactFlow>
         </div>

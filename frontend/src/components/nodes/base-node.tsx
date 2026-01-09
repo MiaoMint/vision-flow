@@ -1,4 +1,4 @@
-import { Handle, Position, useReactFlow, type NodeProps, NodeResizeControl, NodeToolbar } from "@xyflow/react";
+import { Handle, Position, useReactFlow, type NodeProps, NodeResizeControl, NodeToolbar, EdgeText } from "@xyflow/react";
 import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { NodeParametersPanel } from "./node-parameters-panel";
@@ -30,8 +30,10 @@ export function BaseNode({
     promptPlaceholder,
     minWidth = 200,
     minHeight = 200,
-    maxWidth = 400,
-    maxHeight = 400,
+    maxWidth,
+    maxHeight,
+    width,
+    height,
 }: BaseNodeProps) {
     const nodeData = data as unknown as BaseNodeData;
     const { updateNodeData, getNodes, updateNode } = useReactFlow();
@@ -41,10 +43,12 @@ export function BaseNode({
     const isSelected = selected && selectedNodesCount === 1;
 
     useEffect(() => {
-        updateNode(id, {
-            width: minWidth,
-            height: minHeight
-        });
+        if (!width && !height) {
+            updateNode(id, {
+                width: minWidth,
+                height: minHeight
+            });
+        }
     }, []);
 
     return (
