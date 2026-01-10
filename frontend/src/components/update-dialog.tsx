@@ -45,8 +45,8 @@ export function UpdateDialog({ open, onOpenChange, info }: UpdateDialogProps) {
 
                 <div className="py-4">
                     <p className="text-sm font-medium mb-2">Release Notes:</p>
-                    <div className="bg-muted p-3 rounded-md max-h-[300px] overflow-y-auto">
-                        <pre className="text-xs whitespace-pre-wrap font-mono break-words">
+                    <div className="bg-muted p-3 rounded-md max-h-75 overflow-y-auto">
+                        <pre className="text-xs whitespace-pre-wrap font-mono wrap-break-word">
                             {info.releaseNotes || "No release notes available."}
                         </pre>
                     </div>
