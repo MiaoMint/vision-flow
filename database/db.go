@@ -3,7 +3,7 @@ package database
 import (
 	"log"
 
-	"firebringer/storage"
+	"visionflow/storage"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"

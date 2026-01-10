@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"firebringer/storage"
+	"visionflow/storage"
 )
 
 // GetModelProviderByType retrieves a model provider configuration by its type (e.g., openai, gemini)

@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"firebringer/database"
+	"visionflow/database"
 
 	"github.com/sashabaranov/go-openai"
 )

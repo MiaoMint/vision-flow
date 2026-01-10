@@ -1,7 +1,7 @@
-# Firebringer
+# VisioFlow
 
 <div align="center">
-  <img src="build/appicon.png" alt="Firebringer Logo" width="128" height="128">
+  <img src="build/appicon.png" alt="VisioFlow Logo" width="128" height="128">
   <p><strong>基于节点的可视化 AI 内容生成工作流编辑器</strong></p>
 </div>
 
@@ -48,8 +48,8 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/firebringer.git
-cd firebringer
+git clone https://github.com/yourusername/visionflow.git
+cd visionflow
 
 # 安装前端依赖
 cd frontend
@@ -119,16 +119,16 @@ wails build
 
 ### 存储位置
 
-- **数据库**：`~/Library/Application Support/firebringer/firebringer.db`
-- **生成的资源**：`~/Library/Application Support/firebringer/generated/`
-- **模型能力**：`~/Library/Application Support/firebringer/model_data.json`
+- **数据库**：`~/Library/Application Support/visionflow/visionflow.db`
+- **生成的资源**：`~/Library/Application Support/visionflow/generated/`
+- **模型能力**：`~/Library/Application Support/visionflow/model_data.json`
 
 ## 💻 开发指南
 
 ### 项目结构
 
 ```
-firebringer/
+visionflow/
 ├── main.go                 # 应用入口
 ├── binding/                # Wails 绑定（暴露给前端）
 │   ├── ai/                # AI 服务绑定
@@ -180,4 +180,4 @@ firebringer/
 
 ## 📞 支持
 
-问题和功能请求请使用 [GitHub Issues](https://github.com/miaomint/firebringer/issues) 页面。
+问题和功能请求请使用 [GitHub Issues](https://github.com/miaomint/visionflow/issues) 页面。

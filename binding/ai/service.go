@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"firebringer/database"
-	aiservice "firebringer/service/ai"
-	"firebringer/storage"
+	"visionflow/database"
+	aiservice "visionflow/service/ai"
+	"visionflow/storage"
 )
 
 // Service provides AI methods for the frontend

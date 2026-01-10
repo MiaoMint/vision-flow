@@ -29,7 +29,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <div className="w-60 bg-muted/30 border-r h-full flex flex-col shrink-0">
                         <div className="p-6 pb-4">
                             <h2 className="text-lg font-semibold tracking-tight">设置</h2>
-                            <p className="text-sm text-muted-foreground">Firebringer Preferences</p>
+                            <p className="text-sm text-muted-foreground">VisionFlow Preferences</p>
                         </div>
 
                         <TabsList className="flex flex-col w-full h-auto justify-start bg-transparent p-2 space-y-1">

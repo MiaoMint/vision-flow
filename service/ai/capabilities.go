@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	"firebringer/storage"
+	"visionflow/storage"
 )
 
 //go:embed model_data.json

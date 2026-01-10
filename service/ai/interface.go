@@ -2,8 +2,8 @@ package ai
 
 import (
 	"context"
-	"firebringer/database"
 	"fmt"
+	"visionflow/database"
 )
 
 // TextGenerateRequest defines the parameters for text generation
