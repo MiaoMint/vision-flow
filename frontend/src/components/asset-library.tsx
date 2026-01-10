@@ -88,7 +88,7 @@ export function AssetLibrary() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-6 w-6 hover:text-destructive hover:bg-destructive/10 bg-background/50 hover:bg-background/80 backdrop-blur-sm"
+                                        className="h-6 w-6 hover:text-destructive hover:bg-destructive/10 bg-background/50 backdrop-blur-sm"
                                         onClick={(e) => handleDelete(e, asset.id)}
                                     >
                                         <Trash2 className="h-4 w-4" />
@@ -114,7 +114,7 @@ export function AssetLibrary() {
                             {previewAsset?.type} - {previewAsset?.path}
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-muted/10 min-h-[300px]">
+                    <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-muted/10 min-h-75">
                         {previewAsset && (
                             <>
                                 {previewAsset.type === "image" && (
