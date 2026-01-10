@@ -49,3 +49,13 @@ func (s *Service) DeleteProject(id int) error {
 func (s *Service) ListProjects() ([]db.Project, error) {
 	return db.ListProjects()
 }
+
+// ListAssets lists all assets for a project
+func (s *Service) ListAssets(projectID int) ([]db.Asset, error) {
+	return db.ListAssets(projectID)
+}
+
+// DeleteAsset deletes an asset
+func (s *Service) DeleteAsset(id int) error {
+	return db.DeleteAsset(id)
+}

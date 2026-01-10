@@ -79,6 +79,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
                 processing: false,
                 error: undefined,
                 runTrigger: undefined,
+                projectId: project.id,
               },
             }))
           );
@@ -246,16 +247,16 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
           y: Math.random() * 400 + 100,
         },
         data: {
-          label: `${
-            type === "text"
-              ? "文本"
-              : type === "image"
+          label: `${type === "text"
+            ? "文本"
+            : type === "image"
               ? "图片"
               : type === "video"
-              ? "视频"
-              : "音频"
-          }节点 ${nodeIdCounter}`,
+                ? "视频"
+                : "音频"
+            }节点 ${nodeIdCounter}`,
           type: type,
+          projectId: project.id,
         },
       };
       setNodes((nds) => [...nds, newNode]);

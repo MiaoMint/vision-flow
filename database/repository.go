@@ -128,3 +128,50 @@ func ListProjects() ([]Project, error) {
 	}
 	return projects, nil
 }
+
+// CreateAsset creates a new asset
+func CreateAsset(asset Asset) (*Asset, error) {
+	// Insert
+	result, err := DB.NamedExec(`
+        INSERT INTO assets (project_id, type, path, created_at, updated_at)
+        VALUES (:project_id, :type, :path, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `, asset)
+	if err != nil {
+		return nil, err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	asset.ID = int(id)
+	return GetAsset(asset.ID)
+}
+
+// GetAsset retrieves an asset by ID
+func GetAsset(id int) (*Asset, error) {
+	var asset Asset
+	err := DB.Get(&asset, "SELECT * FROM assets WHERE id = ?", id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // Not found
+		}
+		return nil, err
+	}
+	return &asset, nil
+}
+
+// ListAssets lists all assets for a project
+func ListAssets(projectID int) ([]Asset, error) {
+	var assets []Asset
+	err := DB.Select(&assets, "SELECT * FROM assets WHERE project_id = ? ORDER BY created_at DESC", projectID)
+	if err != nil {
+		return nil, err
+	}
+	return assets, nil
+}
+
+// DeleteAsset deletes an asset
+func DeleteAsset(id int) error {
+	_, err := DB.Exec("DELETE FROM assets WHERE id = ?", id)
+	return err
+}

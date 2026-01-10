@@ -31,3 +31,21 @@ type Project struct {
 	CreatedAt   time.Time `db:"created_at" json:"createdAt"`
 	UpdatedAt   time.Time `db:"updated_at" json:"updatedAt"`
 }
+
+type AssetType string
+
+const (
+	AssetTypeImage AssetType = "image"
+	AssetTypeVideo AssetType = "video"
+	AssetTypeAudio AssetType = "audio"
+)
+
+// Asset represents a stored item (image/video/audio) associated with a project/workflow
+type Asset struct {
+	ID        int       `db:"id" json:"id"`
+	ProjectID int       `db:"project_id" json:"projectId"`
+	Type      AssetType `db:"type" json:"type"`
+	Path      string    `db:"path" json:"path"`
+	CreatedAt time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
+}
