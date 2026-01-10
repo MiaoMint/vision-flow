@@ -56,16 +56,26 @@ jobs:
           path: build/bin/*
       - name: archive application
         if: matrix.platform == 'macos-latest'
-        run: zip -r VisionFlow.app.zip build/bin/VisionFlow.app/
+        run: |
+          cd build/bin
+          zip -r ../../VisionFlow-macos.zip VisionFlow.app
       - name: upload artifacts windows
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: VisionFlow-windows
           path: build/bin/*
-      - name: Upload release
+      - name: Upload release macOS
+        if: matrix.platform == 'macos-latest'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: build/bin/*
+          artifacts: VisionFlow-macos.zip
+          allowUpdates: true
+          omitBody: true
+      - name: Upload release Windows
+        if: matrix.platform == 'windows-latest'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: build/bin/VisionFlow.exe
           allowUpdates: true
           omitBody: true
