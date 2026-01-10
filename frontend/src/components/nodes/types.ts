@@ -10,6 +10,7 @@ export interface BaseNodeData {
   error?: string;
   prompt?: string;
   runTrigger?: string;
+  projectId?: number;
 }
 
 export interface TextNodeData extends BaseNodeData {

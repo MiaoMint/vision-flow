@@ -13,6 +13,7 @@ interface UseNodeRunProps {
         videos?: string[];
         audios?: string[];
         documents?: string[];
+        projectId?: number;
     }) => Promise<any>;
     onSuccess: (response: any) => void;
     onStart?: () => void;
@@ -86,6 +87,7 @@ export function useNodeRun({ id, nodeData, apiFunction, onSuccess, onStart }: Us
                 videos: videos.length > 0 ? videos : undefined,
                 audios: audios.length > 0 ? audios : undefined,
                 documents: documents.length > 0 ? documents : undefined,
+                projectId: nodeData.projectId,
             });
             console.log("Node execution response:", response);
             updateNodeData(id, { processing: false });

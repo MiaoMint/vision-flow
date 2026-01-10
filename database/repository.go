@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"firebringer/storage"
 )
 
 // GetModelProviderByType retrieves a model provider configuration by its type (e.g., openai, gemini)
@@ -127,4 +128,72 @@ func ListProjects() ([]Project, error) {
 		return nil, err
 	}
 	return projects, nil
+}
+
+// CreateAsset creates a new asset
+func CreateAsset(asset Asset) (*Asset, error) {
+	// Insert
+	result, err := DB.NamedExec(`
+        INSERT INTO assets (project_id, type, path, created_at, updated_at)
+        VALUES (:project_id, :type, :path, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `, asset)
+	if err != nil {
+		return nil, err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	asset.ID = int(id)
+	return GetAsset(asset.ID)
+}
+
+// GetAsset retrieves an asset by ID
+func GetAsset(id int) (*Asset, error) {
+	var asset Asset
+	err := DB.Get(&asset, "SELECT * FROM assets WHERE id = ?", id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // Not found
+		}
+		return nil, err
+	}
+	return &asset, nil
+}
+
+// ListAssets lists all assets for a project. If projectID is 0, lists all assets.
+func ListAssets(projectID int) ([]Asset, error) {
+	var assets []Asset
+	var err error
+	if projectID == 0 {
+		err = DB.Select(&assets, "SELECT * FROM assets ORDER BY created_at DESC")
+	} else {
+		err = DB.Select(&assets, "SELECT * FROM assets WHERE project_id = ? ORDER BY created_at DESC", projectID)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return assets, nil
+}
+
+// DeleteAsset deletes an asset and its associated file
+func DeleteAsset(id int) error {
+	// First, get the asset to obtain the file path
+	asset, err := GetAsset(id)
+	if err != nil {
+		return err
+	}
+	if asset == nil {
+		return errors.New("asset not found")
+	}
+
+	// Delete the database record
+	_, err = DB.Exec("DELETE FROM assets WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	_ = storage.DeleteGeneratedContent(asset.Path)
+
+	return nil
 }

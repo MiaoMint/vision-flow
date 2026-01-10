@@ -2,6 +2,7 @@ package database
 
 import (
 	db "firebringer/database"
+	"fmt"
 )
 
 type Service struct{}
@@ -48,4 +49,21 @@ func (s *Service) DeleteProject(id int) error {
 // ListProjects lists all projects
 func (s *Service) ListProjects() ([]db.Project, error) {
 	return db.ListProjects()
+}
+
+// ListAssets lists all assets for a project (pass 0 for all)
+func (s *Service) ListAssets(projectID int) ([]db.Asset, error) {
+	assets, err := db.ListAssets(projectID)
+	if err != nil {
+		return nil, err
+	}
+	for i := range assets {
+		assets[i].URL = fmt.Sprintf("http://localhost:34116/%s", assets[i].Path)
+	}
+	return assets, nil
+}
+
+// DeleteAsset deletes an asset
+func (s *Service) DeleteAsset(id int) error {
+	return db.DeleteAsset(id)
 }

@@ -40,6 +40,7 @@ type TextRequest struct {
 
 // ImageRequest defines the parameters for image generation
 type ImageRequest struct {
+	ProjectID  int                    `json:"projectId,omitempty"`
 	Prompt     string                 `json:"prompt"`
 	Images     []string               `json:"images,omitempty"`
 	Videos     []string               `json:"videos,omitempty"`
@@ -54,6 +55,7 @@ type ImageRequest struct {
 
 // VideoRequest defines the parameters for video generation
 type VideoRequest struct {
+	ProjectID  int                    `json:"projectId,omitempty"`
 	Prompt     string                 `json:"prompt"`
 	Images     []string               `json:"images,omitempty"`
 	Videos     []string               `json:"videos,omitempty"`
@@ -67,6 +69,7 @@ type VideoRequest struct {
 
 // AudioRequest defines the parameters for audio generation
 type AudioRequest struct {
+	ProjectID  int                    `json:"projectId,omitempty"`
 	Prompt     string                 `json:"prompt"`
 	Images     []string               `json:"images,omitempty"`
 	Videos     []string               `json:"videos,omitempty"`
@@ -156,7 +159,7 @@ func (s *Service) GenerateImage(req ImageRequest) (*AIResponse, error) {
 		return nil, err
 	}
 
-	content, err := s.processContent(resp.Data, resp.B64JSON, resp.URL, "image", ".png")
+	content, err := s.processContent(req.ProjectID, resp.Data, resp.B64JSON, resp.URL, "image", ".png", database.AssetTypeImage)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +193,7 @@ func (s *Service) GenerateVideo(req VideoRequest) (*AIResponse, error) {
 		return nil, err
 	}
 
-	content, err := s.processContent(resp.Data, "", resp.URL, "video", ".mp4")
+	content, err := s.processContent(req.ProjectID, resp.Data, "", resp.URL, "video", ".mp4", database.AssetTypeVideo)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +230,7 @@ func (s *Service) GenerateAudio(req AudioRequest) (*AIResponse, error) {
 	// Usually audio is returned as bytes.
 	// We might want to base64 encode it for the frontend or return a Blob URL if we could.
 	// For now, let's assume valid JSON marshalling or handle it in specific response type
-	content, err := s.processContent(resp.Data, "", "", "audio", ".mp3")
+	content, err := s.processContent(req.ProjectID, resp.Data, "", "", "audio", ".mp3", database.AssetTypeAudio)
 	if err != nil {
 		return nil, err
 	}
@@ -279,7 +282,7 @@ func (s *Service) ListModels(providerId *int) ([]aiservice.Model, error) {
 	return client.ListModels(s.ctx)
 }
 
-func (s *Service) processContent(data []byte, b64 string, url string, prefix string, ext string) (string, error) {
+func (s *Service) processContent(projectID int, data []byte, b64 string, url string, prefix string, ext string, assetType database.AssetType) (string, error) {
 	var filename string
 	var err error
 
@@ -295,6 +298,22 @@ func (s *Service) processContent(data []byte, b64 string, url string, prefix str
 
 	if err != nil {
 		return "", fmt.Errorf("failed to save %s: %w", prefix, err)
+	}
+
+	// Create asset in database if projectID is provided
+	if projectID > 0 {
+		_, err = database.CreateAsset(database.Asset{
+			ProjectID: projectID,
+			Type:      assetType,
+			Path:      filename,
+		})
+		if err != nil {
+			// Log error but don't fail the request (or maybe we should?)
+			// For now, let's log to console and move on, or return error?
+			// Better to log and continue, or return error if strict.
+			// Let's print for now as we don't have a logger struct here.
+			fmt.Printf("failed to create asset for project %d: %v\n", projectID, err)
+		}
 	}
 
 	return fmt.Sprintf("http://localhost:34116/%s", filename), nil

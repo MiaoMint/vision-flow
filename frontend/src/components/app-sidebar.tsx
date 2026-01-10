@@ -14,8 +14,17 @@ import { NavUser } from "@/components/nav-user";
 import { Home, Image, Settings, Telescope } from "lucide-react";
 import { toast } from "sonner"
 
+export type AppView = "projects" | "assets";
 
-export function AppSidebar({ onSettingsClick }: { onSettingsClick: () => void }) {
+export function AppSidebar({
+  activeView,
+  onViewChange,
+  onSettingsClick,
+}: {
+  activeView: AppView;
+  onViewChange: (view: AppView) => void;
+  onSettingsClick: () => void;
+}) {
 
   function wip() {
     toast("👷 Work in progress")
@@ -33,13 +42,19 @@ export function AppSidebar({ onSettingsClick }: { onSettingsClick: () => void })
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton isActive>
+                <SidebarMenuButton
+                  isActive={activeView === "projects"}
+                  onClick={() => onViewChange("projects")}
+                >
                   <Home />
                   <span>项目</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => wip()}>
+                <SidebarMenuButton
+                  isActive={activeView === "assets"}
+                  onClick={() => onViewChange("assets")}
+                >
                   <Image />
                   <span>素材库</span>
                 </SidebarMenuButton>
