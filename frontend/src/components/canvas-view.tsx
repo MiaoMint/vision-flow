@@ -571,8 +571,13 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
             maxZoom={2}
             proOptions={{ hideAttribution: true }}
           >
-            <MiniMap pannable />
-            <Background variant={BackgroundVariant.Cross} gap={12} size={1} />
+            <MiniMap pannable zoomable />
+            <Background
+              className="dark:opacity-30"
+              variant={BackgroundVariant.Dots}
+              gap={12}
+              size={1}
+            />
           </ReactFlow>
         </div>
 

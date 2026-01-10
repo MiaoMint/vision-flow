@@ -59,7 +59,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
           className="group cursor-pointer overflow-hidden rounded-xl border-2 border-dashed transition-all hover:shadow-lg hover:border-primary/50"
           onClick={handleCreateProject}
         >
-          <div className="h-full flex items-center justify-center bg-linear-to-br from-muted to-muted/50 min-h-[200px]">
+          <div className="h-full flex items-center justify-center bg-linear-to-br from-muted to-muted/50 min-h-50">
             <div className="flex flex-col items-center justify-center gap-2">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 transition-all group-hover:bg-primary/20 group-hover:scale-110">
                 <Plus className="h-8 w-8 text-primary" />
