@@ -151,42 +151,42 @@ export function ModelProvidersSettings() {
                 </Button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mb-10">
                 {loading ? (
                     <div className="flex justify-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                     </div>
                 ) : (
                     providers.map((provider) => (
-                        <Card key={provider.id} className="relative group hover:shadow-md transition-shadow">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex justify-between items-center">
-                                    {provider.name}
-                                    <span className="text-xs font-normal text-muted-foreground px-2 py-1 bg-muted rounded-full">
+                        <Card key={provider.id} className="relative group hover:shadow-sm transition-all hover:border-primary/20 py-0">
+                            <div className="p-4 pb-3">
+                                <div className="flex justify-between items-center mb-2">
+                                    <h4 className="text-sm font-semibold">{provider.name}</h4>
+                                    <span className="text-xs font-medium text-muted-foreground px-2 py-0.5 bg-muted rounded-md">
                                         {provider.type}
                                     </span>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-sm text-muted-foreground truncate">
-                                    BaseURL: {provider.baseUrl || "Default"}
                                 </div>
-                                <div className="text-sm text-muted-foreground truncate">
-                                    API Key: ••••••••
+                                <div className="space-y-1 text-xs text-muted-foreground">
+                                    <div className="truncate">
+                                        <span className="font-medium">BaseURL:</span> {provider.baseUrl || "Default"}
+                                    </div>
+                                    <div className="truncate">
+                                        <span className="font-medium">API Key:</span> ••••••••
+                                    </div>
                                 </div>
 
-                                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-background/80 rounded-md">
-                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleListModels(provider.id)}>
-                                        <List className="h-4 w-4" />
+                                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
+                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleListModels(provider.id)}>
+                                        <List className="h-3.5 w-3.5" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenDialog(provider)}>
-                                        <Pencil className="h-4 w-4" />
+                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleOpenDialog(provider)}>
+                                        <Pencil className="h-3.5 w-3.5" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(provider.id)}>
-                                        <Trash2 className="h-4 w-4" />
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(provider.id)}>
+                                        <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
                                 </div>
-                            </CardContent>
+                            </div>
                         </Card>
                     ))
                 )}

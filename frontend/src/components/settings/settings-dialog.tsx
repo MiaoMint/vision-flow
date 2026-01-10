@@ -24,7 +24,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="min-w-200 h-150 overflow-hidden p-0 gap-0">
                 <DialogTitle className="hidden">Settings</DialogTitle>
-                <Tabs defaultValue="models" orientation="vertical" className="flex h-full w-full">
+                <Tabs defaultValue="general" orientation="vertical" className="flex h-full w-full">
                     {/* Sidebar */}
                     <div className="w-60 bg-muted/30 border-r h-full flex flex-col shrink-0">
                         <div className="p-6 pb-4">
