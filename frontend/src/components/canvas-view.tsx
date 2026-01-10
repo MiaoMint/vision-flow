@@ -70,14 +70,25 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
     if (project.workflow) {
       try {
         const flow = JSON.parse(project.workflow);
-        if (flow.nodes) setNodes(flow.nodes);
+        if (flow.nodes)
+          setNodes(
+            flow.nodes.map((n: any) => ({
+              ...n,
+              data: {
+                ...n.data,
+                processing: false,
+                error: undefined,
+                runTrigger: undefined,
+              },
+            }))
+          );
         if (flow.edges) setEdges(flow.edges);
 
         // Update ID counter based on highest ID found
         let maxId = 0;
         if (Array.isArray(flow.nodes)) {
           flow.nodes.forEach((n: Node) => {
-            const idNum = parseInt(n.id.replace(/[^0-9]/g, ''));
+            const idNum = parseInt(n.id.replace(/[^0-9]/g, ""));
             if (!isNaN(idNum) && idNum > maxId) maxId = idNum;
           });
         }
@@ -94,45 +105,33 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
   const saveProject = useCallback(async () => {
     if (!project.id) return;
 
+    const nodesToSave = nodes.map((n: any) => ({
+      ...n,
+      data: {
+        ...n.data,
+        processing: false,
+        error: undefined,
+        runTrigger: undefined,
+      },
+    }));
+
     const workflow = JSON.stringify({
-      nodes,
+      nodes: nodesToSave,
       edges,
     });
 
     try {
-      await SaveProject(new database.Project({
-        ...project,
-        name: name,
-        workflow,
-      }));
+      await SaveProject(
+        new database.Project({
+          ...project,
+          name: name,
+          workflow,
+        })
+      );
     } catch (err) {
       console.error("Auto-save failed:", err);
     }
   }, [nodes, edges, name, project]);
-
-  // Auto-save
-  useEffect(() => {
-    if (!isInitialized) return;
-
-    const save = async () => {
-      const workflow = JSON.stringify({
-        nodes,
-        edges,
-      });
-
-      try {
-        await SaveProject(new database.Project({
-          ...project,
-          name: name,
-          workflow,
-        }));
-      } catch (err) {
-        console.error("Auto-save failed:", err);
-      }
-    };
-
-    save();
-  }, [nodes, edges, name, isInitialized, saveProject]);
 
   // 拖拽开始 - 暂停自动保存
   const onNodeDragStart = useCallback((_: React.MouseEvent, node: Node) => {
@@ -143,12 +142,13 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
   }, []);
 
   // 拖拽结束 - 立即保存
-  const onNodeDragStop = useCallback((_: React.MouseEvent, node: Node) => {
-    isDragging.current = false;
-    saveProject();
-  }, [saveProject]);
-
-
+  const onNodeDragStop = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      isDragging.current = false;
+      saveProject();
+    },
+    [saveProject]
+  );
 
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
 
@@ -164,17 +164,22 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
     []
   );
 
-  const onSelectionChange = useCallback(({ nodes: selectedNodes }: { nodes: Node[] }) => {
-    if (selectedNodes.some((node) => node.type === "group")) {
-      return;
-    }
-    setSelectedNodes(selectedNodes.map((node) => node.id));
-  }, []);
+  const onSelectionChange = useCallback(
+    ({ nodes: selectedNodes }: { nodes: Node[] }) => {
+      if (selectedNodes.some((node) => node.type === "group")) {
+        return;
+      }
+      setSelectedNodes(selectedNodes.map((node) => node.id));
+    },
+    []
+  );
 
   const createGroup = useCallback(() => {
     if (selectedNodes.length === 0) return;
 
-    const selectedNodeObjects = nodes.filter((n) => selectedNodes.includes(n.id) && n.type !== "group");
+    const selectedNodeObjects = nodes.filter(
+      (n) => selectedNodes.includes(n.id) && n.type !== "group"
+    );
     if (selectedNodeObjects.length === 0) return;
 
     // Calculate bounding box
@@ -241,14 +246,15 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
           y: Math.random() * 400 + 100,
         },
         data: {
-          label: `${type === "text"
-            ? "文本"
-            : type === "image"
+          label: `${
+            type === "text"
+              ? "文本"
+              : type === "image"
               ? "图片"
               : type === "video"
-                ? "视频"
-                : "音频"
-            }节点 ${nodeIdCounter}`,
+              ? "视频"
+              : "音频"
+          }节点 ${nodeIdCounter}`,
           type: type,
         },
       };
@@ -259,13 +265,19 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
   );
 
   const { getIntersectingNodes } = useReactFlow();
-  const dragRef = useRef<{ id: string; position: { x: number; y: number } } | null>(null);
-
+  const dragRef = useRef<{
+    id: string;
+    position: { x: number; y: number };
+  } | null>(null);
 
   // group 子节点跟随拖动
   const onNodeDrag = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      if (node.type === "group" && dragRef.current && dragRef.current.id === node.id) {
+      if (
+        node.type === "group" &&
+        dragRef.current &&
+        dragRef.current.id === node.id
+      ) {
         const dx = node.position.x - dragRef.current.position.x;
         const dy = node.position.y - dragRef.current.position.y;
 
@@ -283,7 +295,9 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
         if (intersectingNodes.length > 0) {
           setNodes((nds) =>
             nds.map((n: Node) => {
-              if (intersectingNodes.some((inNode: Node) => inNode.id === n.id)) {
+              if (
+                intersectingNodes.some((inNode: Node) => inNode.id === n.id)
+              ) {
                 return {
                   ...n,
                   position: {
@@ -303,17 +317,22 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
     [getIntersectingNodes, setNodes]
   );
 
-  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
-    if (node.type === "group") {
-      // Manual selection toggle for group nodes since they are not selectable by box
-      setNodes((nds) => nds.map(n => {
-        if (n.id === node.id) {
-          return { ...n, selected: !n.selected };
-        }
-        return n;
-      }));
-    }
-  }, [setNodes]);
+  const onNodeClick = useCallback(
+    (_: React.MouseEvent, node: Node) => {
+      if (node.type === "group") {
+        // Manual selection toggle for group nodes since they are not selectable by box
+        setNodes((nds) =>
+          nds.map((n) => {
+            if (n.id === node.id) {
+              return { ...n, selected: !n.selected };
+            }
+            return n;
+          })
+        );
+      }
+    },
+    [setNodes]
+  );
 
   const { getNodes } = useReactFlow();
 
@@ -325,17 +344,26 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
       if (nodesBounds.width > 0 && nodesBounds.height > 0) {
         const imageWidth = 800; // Efficient size for cover
         const imageHeight = 450;
-        const viewport = getViewportForBounds(nodesBounds, imageWidth, imageHeight, 0.5, 2, 0);
+        const viewport = getViewportForBounds(
+          nodesBounds,
+          imageWidth,
+          imageHeight,
+          0.5,
+          2,
+          0
+        );
 
-        const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
+        const viewportElement = document.querySelector(
+          ".react-flow__viewport"
+        ) as HTMLElement;
         if (viewportElement) {
           const dataUrl = await toPng(viewportElement, {
-            backgroundColor: 'transparent',
+            backgroundColor: "transparent",
             width: imageWidth,
             height: imageHeight,
             filter: (node) => {
               // Exclude video elements to prevent SecurityError: The operation is insecure.
-              if (node.tagName === 'VIDEO') return false;
+              if (node.tagName === "VIDEO") return false;
               return true;
             },
             style: {
@@ -354,20 +382,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
     }
 
     // 3. Save Project (explicit save to ensure cover image is persisted)
-    try {
-      const workflow = JSON.stringify({
-        nodes,
-        edges,
-      });
-      await SaveProject(new database.Project({
-        ...project,
-        name: name,
-        workflow,
-        coverImage: project.coverImage // Ensure this is sent
-      }));
-    } catch (err) {
-      console.error("Failed to save project on exit:", err);
-    }
+    saveProject();
 
     // 4. Navigate back
     onBack();
@@ -379,7 +394,8 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
       edges,
     };
     const jsonString = JSON.stringify(data, null, 2);
-    navigator.clipboard.writeText(jsonString)
+    navigator.clipboard
+      .writeText(jsonString)
       .then(() => toast.success("Project JSON copied to clipboard"))
       .catch((err) => {
         console.error("Failed to copy:", err);
@@ -393,37 +409,40 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const data = JSON.parse(content);
-        if (data.nodes && data.edges) {
-          setNodes(data.nodes);
-          setEdges(data.edges);
-          // Update ID counter based on highest ID found to avoid collisions
-          let maxId = 0;
-          data.nodes.forEach((n: Node) => {
-            const idNum = parseInt(n.id.replace(/[^0-9]/g, ''));
-            if (!isNaN(idNum) && idNum > maxId) maxId = idNum;
-          });
-          setNodeIdCounter(maxId + 1);
-        } else {
-          alert("Invalid project file format");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const data = JSON.parse(content);
+          if (data.nodes && data.edges) {
+            setNodes(data.nodes);
+            setEdges(data.edges);
+            // Update ID counter based on highest ID found to avoid collisions
+            let maxId = 0;
+            data.nodes.forEach((n: Node) => {
+              const idNum = parseInt(n.id.replace(/[^0-9]/g, ""));
+              if (!isNaN(idNum) && idNum > maxId) maxId = idNum;
+            });
+            setNodeIdCounter(maxId + 1);
+          } else {
+            alert("Invalid project file format");
+          }
+        } catch (err) {
+          console.error("Import failed:", err);
+          alert("Failed to parse project file");
         }
-      } catch (err) {
-        console.error("Import failed:", err);
-        alert("Failed to parse project file");
-      }
-    };
-    reader.readAsText(file);
-    // Reset input so same file can be selected again
-    event.target.value = "";
-  }, [setNodes, setEdges, setNodeIdCounter]);
+      };
+      reader.readAsText(file);
+      // Reset input so same file can be selected again
+      event.target.value = "";
+    },
+    [setNodes, setEdges, setNodeIdCounter]
+  );
 
   return (
     <div className="flex h-full relative">
@@ -479,7 +498,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
 
         {/* 左侧悬浮工具栏 */}
         <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
-          <Card className="p-2 shadow-lg">
+          <Card className="p-2 shadow-lg rounded-full">
             <div className="flex flex-col gap-2">
               <Button
                 variant="ghost"
