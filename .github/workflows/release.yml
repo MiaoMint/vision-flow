@@ -1,12 +1,18 @@
 name: "release"
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   package:
     strategy:
       matrix:
-        platform: [windows-latest, macos-latest]
+        platform: [windows-latest, macos-latest, ubuntu-latest]
         go-version: [1.25]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -19,6 +25,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 22
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - name: Get Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
       - name: Build Wails app
