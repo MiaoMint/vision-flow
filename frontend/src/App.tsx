@@ -4,8 +4,10 @@ import { CanvasView } from "@/components/canvas-view";
 import { AssetLibrary } from "@/components/asset-library";
 import { AppSidebar, type AppView } from "@/components/app-sidebar";
 import { SettingsDialog } from "@/components/settings/settings-dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { database } from "../wailsjs/go/models";
+import { CheckUpdate } from "../wailsjs/go/app/Service";
+import { UpdateDialog } from "@/components/update-dialog";
 
 export default function App() {
   const [selectedProject, setSelectedProject] = useState<database.Project | null>(
@@ -13,6 +15,21 @@ export default function App() {
   );
   const [activeView, setActiveView] = useState<AppView>("projects");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<any>(null);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+
+  useEffect(() => {
+    CheckUpdate()
+      .then((info) => {
+        if (info.hasUpdate) {
+          setUpdateInfo(info);
+          setShowUpdateDialog(true);
+        }
+      })
+      .catch(() => {
+        // Silent fail for auto check
+      });
+  }, []);
 
   const handleProjectClick = (project: database.Project) => {
     setSelectedProject(project);
@@ -54,6 +71,12 @@ export default function App() {
         </SidebarInset>
       </SidebarProvider>
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+      <UpdateDialog
+        open={showUpdateDialog}
+        onOpenChange={setShowUpdateDialog}
+        info={updateInfo}
+      />
     </div>
   );
 }
+

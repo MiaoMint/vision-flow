@@ -167,6 +167,33 @@ export namespace ai {
 
 }
 
+export namespace app {
+	
+	export class UpdateInfo {
+	    hasUpdate: boolean;
+	    latestVersion: string;
+	    currentVersion: string;
+	    releaseURL: string;
+	    releaseNotes: string;
+	    error?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UpdateInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hasUpdate = source["hasUpdate"];
+	        this.latestVersion = source["latestVersion"];
+	        this.currentVersion = source["currentVersion"];
+	        this.releaseURL = source["releaseURL"];
+	        this.releaseNotes = source["releaseNotes"];
+	        this.error = source["error"];
+	    }
+	}
+
+}
+
 export namespace database {
 	
 	export class Asset {
