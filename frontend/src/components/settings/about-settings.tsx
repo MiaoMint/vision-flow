@@ -6,7 +6,7 @@ export function AboutSettings() {
       <div className="flex-1 space-y-8">
         <div className="flex flex-col items-center justify-center py-10 space-y-4">
           <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center">
-            <Sparkles className="w-10 h-10 text-primary" />
+            <img src="/appicon.png" alt="logo" />
           </div>
           <div className="text-center">
             <h3 className="text-2xl font-bold">Firebringer</h3>
