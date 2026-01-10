@@ -180,4 +180,4 @@ visionflow/
 
 ## 📞 支持
 
-问题和功能请求请使用 [GitHub Issues](https://github.com/miaomint/visionflow/issues) 页面。
+问题和功能请求请使用 [GitHub Issues](https://github.com/miaomint/vision-flow/issues) 页面。
