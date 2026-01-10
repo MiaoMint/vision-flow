@@ -46,6 +46,7 @@ type Asset struct {
 	ProjectID int       `db:"project_id" json:"projectId"`
 	Type      AssetType `db:"type" json:"type"`
 	Path      string    `db:"path" json:"path"`
+	URL       string    `db:"-" json:"url"`
 	CreatedAt time.Time `db:"created_at" json:"createdAt"`
 	UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
 }

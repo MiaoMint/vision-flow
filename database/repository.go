@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"firebringer/storage"
 )
 
 // GetModelProviderByType retrieves a model provider configuration by its type (e.g., openai, gemini)
@@ -160,18 +161,39 @@ func GetAsset(id int) (*Asset, error) {
 	return &asset, nil
 }
 
-// ListAssets lists all assets for a project
+// ListAssets lists all assets for a project. If projectID is 0, lists all assets.
 func ListAssets(projectID int) ([]Asset, error) {
 	var assets []Asset
-	err := DB.Select(&assets, "SELECT * FROM assets WHERE project_id = ? ORDER BY created_at DESC", projectID)
+	var err error
+	if projectID == 0 {
+		err = DB.Select(&assets, "SELECT * FROM assets ORDER BY created_at DESC")
+	} else {
+		err = DB.Select(&assets, "SELECT * FROM assets WHERE project_id = ? ORDER BY created_at DESC", projectID)
+	}
 	if err != nil {
 		return nil, err
 	}
 	return assets, nil
 }
 
-// DeleteAsset deletes an asset
+// DeleteAsset deletes an asset and its associated file
 func DeleteAsset(id int) error {
-	_, err := DB.Exec("DELETE FROM assets WHERE id = ?", id)
-	return err
+	// First, get the asset to obtain the file path
+	asset, err := GetAsset(id)
+	if err != nil {
+		return err
+	}
+	if asset == nil {
+		return errors.New("asset not found")
+	}
+
+	// Delete the database record
+	_, err = DB.Exec("DELETE FROM assets WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	_ = storage.DeleteGeneratedContent(asset.Path)
+
+	return nil
 }

@@ -1,7 +1,8 @@
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ProjectList } from "@/components/project-list";
 import { CanvasView } from "@/components/canvas-view";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AssetLibrary } from "@/components/asset-library";
+import { AppSidebar, type AppView } from "@/components/app-sidebar";
 import { SettingsDialog } from "@/components/settings/settings-dialog";
 import { useState } from "react";
 import { database } from "../wailsjs/go/models";
@@ -10,6 +11,7 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState<database.Project | null>(
     null
   );
+  const [activeView, setActiveView] = useState<AppView>("projects");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleProjectClick = (project: database.Project) => {
@@ -38,9 +40,17 @@ export default function App() {
         style={{ "--wails-draggable": "drag" } as React.CSSProperties}
       ></div>
       <SidebarProvider>
-        <AppSidebar onSettingsClick={() => setIsSettingsOpen(true)} />
-        <SidebarInset className="m-2 rounded-2xl z-10 border">
-          <ProjectList onProjectClick={handleProjectClick} />
+        <AppSidebar
+          onSettingsClick={() => setIsSettingsOpen(true)}
+          activeView={activeView}
+          onViewChange={setActiveView}
+        />
+        <SidebarInset className="m-2 rounded-2xl z-10 border bg-background overflow-hidden relative">
+          {activeView === "projects" ? (
+            <ProjectList onProjectClick={handleProjectClick} />
+          ) : (
+            <AssetLibrary />
+          )}
         </SidebarInset>
       </SidebarProvider>
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />

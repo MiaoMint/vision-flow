@@ -91,3 +91,21 @@ func SaveURLContent(url string, prefix string, ext string) (string, error) {
 
 	return SaveGeneratedContent(data, prefix, ext)
 }
+
+// DeleteGeneratedContent deletes a file from the generated directory.
+// filename should be just the filename, not a full path.
+func DeleteGeneratedContent(filename string) error {
+	genDir, err := GetGeneratedDir()
+	if err != nil {
+		return err
+	}
+
+	fullPath := filepath.Join(genDir, filename)
+
+	// Check if file exists
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		return fmt.Errorf("file does not exist: %s", filename)
+	}
+
+	return os.Remove(fullPath)
+}

@@ -562,7 +562,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
             fitView
             panOnDrag={[1, 2]}
             selectionOnDrag
-            selectionMode={SelectionMode.Partial}
+            selectionMode={SelectionMode.Full}
             panOnScroll
             onNodeDragStart={onNodeDragStart}
             onNodeDragStop={onNodeDragStop}

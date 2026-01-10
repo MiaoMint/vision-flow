@@ -174,6 +174,7 @@ export namespace database {
 	    projectId: number;
 	    type: string;
 	    path: string;
+	    url: string;
 	    // Go type: time
 	    createdAt: any;
 	    // Go type: time
@@ -189,6 +190,7 @@ export namespace database {
 	        this.projectId = source["projectId"];
 	        this.type = source["type"];
 	        this.path = source["path"];
+	        this.url = source["url"];
 	        this.createdAt = this.convertValues(source["createdAt"], null);
 	        this.updatedAt = this.convertValues(source["updatedAt"], null);
 	    }
