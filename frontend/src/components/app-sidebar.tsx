@@ -34,7 +34,7 @@ export function AppSidebar({
     <Sidebar className="border-none">
       <SidebarHeader>
         <div className="px-2 mt-10">
-          <h2 className="text-xl font-bold">Firebringer</h2>
+          <h2 className="text-xl font-bold">VisionFlow</h2>
         </div>
       </SidebarHeader>
       <SidebarContent>

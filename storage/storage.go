@@ -11,15 +11,15 @@ import (
 )
 
 // GetAppConfigDir returns the application configuration directory.
-// On macOS: ~/Library/Application Support/firebringer
-// On Windows: %APPDATA%\firebringer
+// On macOS: ~/Library/Application Support/visionflow
+// On Windows: %APPDATA%\visionflow
 func GetAppConfigDir() (string, error) {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		return "", err
 	}
 
-	appDir := filepath.Join(configDir, "firebringer")
+	appDir := filepath.Join(configDir, "visionflow")
 	if err := os.MkdirAll(appDir, 0755); err != nil {
 		return "", err
 	}
@@ -33,7 +33,7 @@ func GetDatabasePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(appDir, "firebringer.db"), nil
+	return filepath.Join(appDir, "visionflow.db"), nil
 }
 
 // GetGeneratedDir returns the directory where generated content is saved.

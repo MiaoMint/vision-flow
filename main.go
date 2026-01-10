@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	bindingAI "firebringer/binding/ai"
-	bindingDB "firebringer/binding/database"
-	"firebringer/database"
-	serviceAI "firebringer/service/ai"
-	"firebringer/storage"
+	bindingAI "visionflow/binding/ai"
+	bindingApp "visionflow/binding/app"
+	bindingDB "visionflow/binding/database"
+	"visionflow/database"
+	serviceAI "visionflow/service/ai"
+	"visionflow/storage"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -19,6 +20,9 @@ import (
 
 //go:embed all:frontend/dist
 var assets embed.FS
+
+//go:embed wails.json
+var wailsJSON string
 
 // startFileServer starts a local HTTP server to serve generated files with CORS enabled.
 func startFileServer() {
@@ -67,13 +71,14 @@ func main() {
 	// Create an instance of the app structure
 	dbService := bindingDB.NewService()
 	aiService := bindingAI.NewService()
+	appService := bindingApp.NewService(wailsJSON)
 
 	// Start the local file server
 	go startFileServer()
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "firebringer",
+		Title:     "VisionFlow",
 		Width:     1280,
 		Height:    768,
 		MinWidth:  800,
@@ -85,6 +90,7 @@ func main() {
 		Bind: []interface{}{
 			dbService,
 			aiService,
+			appService,
 		},
 		OnStartup: aiService.SetContext,
 		Mac: &mac.Options{

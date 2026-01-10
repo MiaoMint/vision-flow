@@ -1,8 +1,8 @@
 package database
 
 import (
-	db "firebringer/database"
 	"fmt"
+	db "visionflow/database"
 )
 
 type Service struct{}
