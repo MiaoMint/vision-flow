@@ -38,11 +38,11 @@ jobs:
         if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: wails-binaries-macos
+          name: VisionFlow-macos
           path: build/bin/*
       - name: upload artifacts windows
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: wails-binaries-windows
+          name: VisionFlow-windows
           path: build/bin/*
