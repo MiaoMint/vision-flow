@@ -1,0 +1,44 @@
+name: "prbuild"
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        platform: [windows-latest, macos-26]
+        go-version: [1.25]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Get Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - name: Build Wails app
+        run: |
+          wails build
+      - name: upload artifacts macOS
+        if: matrix.platform == 'macos-26'
+        uses: actions/upload-artifact@v4
+        with:
+          name: VisionFlow-macos
+          path: build/bin/*
+      - name: upload artifacts windows
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: VisionFlow-windows
+          path: build/bin/*

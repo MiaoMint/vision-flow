@@ -1,9 +1,6 @@
 name: "release"
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
   push:
     tags:
       - 'v*'
@@ -26,7 +23,7 @@ jobs:
   package:
     strategy:
       matrix:
-        platform: [windows-latest, macos-latest]
+        platform: [windows-latest, macos-26]
         go-version: [1.25]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -49,13 +46,13 @@ jobs:
         run: |
           wails build
       - name: upload artifacts macOS
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == 'macos-26'
         uses: actions/upload-artifact@v4
         with:
           name: VisionFlow-macos
           path: build/bin/*
       - name: archive application
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == 'macos-26'
         run: |
           cd build/bin
           zip -r ../../VisionFlow-macos.zip VisionFlow.app
@@ -66,7 +63,7 @@ jobs:
           name: VisionFlow-windows
           path: build/bin/*
       - name: Upload release macOS
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == 'macos-26'
         uses: ncipollo/release-action@v1
         with:
           artifacts: VisionFlow-macos.zip
