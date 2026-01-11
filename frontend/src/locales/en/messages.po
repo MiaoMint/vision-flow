@@ -1,0 +1,483 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-01-11 23:20+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/app-sidebar.tsx:34
+msgid "👷 Work in progress"
+msgstr "👷 Work in progress"
+
+#. placeholder {0}: info.latestVersion
+#. placeholder {1}: info.currentVersion
+#: src/components/update-dialog.tsx:45
+msgid "A new version {0} is available. Current version: {1}"
+msgstr "A new version {0} is available. Current version: {1}"
+
+#: src/components/settings/settings-dialog.tsx:63
+msgid "About"
+msgstr "About"
+
+#: src/components/settings/model-providers-settings.tsx:161
+msgid "Add Provider"
+msgstr "Add Provider"
+
+#: src/components/settings/model-providers-settings.tsx:232
+msgid "Add Service"
+msgstr "Add Service"
+
+#: src/components/canvas-view.tsx:591
+msgid "AI Assistant"
+msgstr "AI Assistant"
+
+#: src/components/settings/debug-settings.tsx:140
+msgid "AI Binding Test"
+msgstr "AI Binding Test"
+
+#: src/components/asset-library.tsx:46
+msgid "Asset deleted"
+msgstr "Asset deleted"
+
+#: src/components/asset-library.tsx:116
+msgid "Asset Preview"
+msgstr "Asset Preview"
+
+#: src/components/app-sidebar.tsx:66
+#: src/components/asset-library.tsx:61
+msgid "Assets"
+msgstr "Assets"
+
+#: src/components/canvas-view.tsx:248
+#: src/components/settings/debug-settings.tsx:172
+msgid "Audio"
+msgstr "Audio"
+
+#: src/components/canvas-view.tsx:533
+msgid "Audio Node"
+msgstr "Audio Node"
+
+#: src/components/settings/model-providers-settings.tsx:333
+msgid "Available Model List"
+msgstr "Available Model List"
+
+#: src/components/settings/models-list-settings.tsx:36
+#: src/components/settings/settings-dialog.tsx:56
+msgid "Available Models"
+msgstr "Available Models"
+
+#: src/components/settings/model-providers-settings.tsx:320
+#: src/components/settings/model-providers-settings.tsx:379
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/components/settings/about-settings.tsx:68
+msgid "Check for Updates"
+msgstr "Check for Updates"
+
+#: src/components/language-switcher.tsx:31
+msgid "Choose the display language of the application"
+msgstr "Choose the display language of the application"
+
+#: src/components/mode-toggle.tsx:26
+msgid "Choose the theme appearance of the application"
+msgstr "Choose the theme appearance of the application"
+
+#: src/components/nodes/group-node.tsx:87
+msgid "Circular dependency detected, executing remaining nodes individually"
+msgstr "Circular dependency detected, executing remaining nodes individually"
+
+#: src/components/asset-library.tsx:156
+msgid "Close"
+msgstr "Close"
+
+#: src/components/settings/model-providers-settings.tsx:156
+msgid "Configure AI model providers."
+msgstr "Configure AI model providers."
+
+#: src/components/settings/general-settings.tsx:10
+msgid "Configure general options for the application."
+msgstr "Configure general options for the application."
+
+#: src/components/settings/model-providers-settings.tsx:368
+msgid "Confirm Delete?"
+msgstr "Confirm Delete?"
+
+#: src/components/mode-toggle.tsx:21
+msgid "Dark"
+msgstr "Dark"
+
+#: src/components/settings/settings-dialog.tsx:71
+msgid "Debug"
+msgstr "Debug"
+
+#: src/components/settings/debug-settings.tsx:216
+msgid "Debug Information"
+msgstr "Debug Information"
+
+#: src/components/settings/debug-settings.tsx:218
+msgid "Debugging tools and information for development environments only. This page is only visible in development environments."
+msgstr "Debugging tools and information for development environments only. This page is only visible in development environments."
+
+#: src/components/asset-library.tsx:161
+#: src/components/project-list.tsx:100
+#: src/components/settings/model-providers-settings.tsx:385
+msgid "Delete"
+msgstr "Delete"
+
+#: src/components/settings/debug-settings.tsx:39
+msgid "Development Environment:"
+msgstr "Development Environment:"
+
+#: src/components/update-dialog.tsx:63
+msgid "Download Update"
+msgstr "Download Update"
+
+#: src/components/settings/model-providers-settings.tsx:230
+msgid "Edit Service"
+msgstr "Edit Service"
+
+#: src/components/nodes/text-node.tsx:36
+msgid "Enter AI processing prompt..."
+msgstr "Enter AI processing prompt..."
+
+#: src/components/nodes/audio-node.tsx:37
+msgid "Enter audio processing prompt..."
+msgstr "Enter audio processing prompt..."
+
+#: src/components/nodes/image-node.tsx:37
+msgid "Enter image processing prompt..."
+msgstr "Enter image processing prompt..."
+
+#: src/components/canvas-view.tsx:610
+msgid "Enter message..."
+msgstr "Enter message..."
+
+#: src/components/settings/debug-settings.tsx:184
+msgid "Enter test prompt..."
+msgstr "Enter test prompt..."
+
+#: src/components/nodes/video-node.tsx:56
+msgid "Enter video processing prompt..."
+msgstr "Enter video processing prompt..."
+
+#: src/components/settings/debug-settings.tsx:31
+msgid "Environment Info"
+msgstr "Environment Info"
+
+#: src/components/app-sidebar.tsx:74
+msgid "Explore"
+msgstr "Explore"
+
+#: src/components/settings/about-settings.tsx:32
+#: src/components/settings/about-settings.tsx:40
+msgid "Failed to check for updates"
+msgstr "Failed to check for updates"
+
+#: src/components/canvas-view.tsx:405
+msgid "Failed to copy project JSON"
+msgstr "Failed to copy project JSON"
+
+#: src/components/asset-library.tsx:52
+msgid "Failed to delete"
+msgstr "Failed to delete"
+
+#: src/components/asset-library.tsx:31
+msgid "Failed to load assets"
+msgstr "Failed to load assets"
+
+#: src/components/settings/settings-dialog.tsx:42
+msgid "General"
+msgstr "General"
+
+#: src/components/settings/general-settings.tsx:9
+msgid "General Settings"
+msgstr "General Settings"
+
+#: src/components/settings/debug-settings.tsx:157
+msgid "Generation Type"
+msgstr "Generation Type"
+
+#: src/components/canvas-view.tsx:249
+msgid "Group"
+msgstr "Group"
+
+#: src/components/nodes/group-node.tsx:130
+msgid "Group execution failed"
+msgstr "Group execution failed"
+
+#: src/components/settings/debug-settings.tsx:65
+msgid "Hardware Concurrency:"
+msgstr "Hardware Concurrency:"
+
+#: src/components/canvas-view.tsx:246
+#: src/components/settings/debug-settings.tsx:170
+msgid "Image"
+msgstr "Image"
+
+#: src/components/canvas-view.tsx:517
+msgid "Image Node"
+msgstr "Image Node"
+
+#: src/components/language-switcher.tsx:17
+msgid "Language"
+msgstr "Language"
+
+#: src/components/settings/debug-settings.tsx:61
+msgid "Language:"
+msgstr "Language:"
+
+#: src/components/update-dialog.tsx:60
+msgid "Later"
+msgstr "Later"
+
+#: src/components/mode-toggle.tsx:20
+msgid "Light"
+msgstr "Light"
+
+#: src/components/settings/models-list-settings.tsx:49
+msgid "Loading model list..."
+msgstr "Loading model list..."
+
+#: src/components/project-list.tsx:57
+msgid "Manage and access all your projects"
+msgstr "Manage and access all your projects"
+
+#: src/components/settings/debug-settings.tsx:35
+msgid "Mode:"
+msgstr "Mode:"
+
+#: src/components/ai/model-selector.tsx:158
+#: src/components/settings/models-list-settings.tsx:54
+msgid "Model not found"
+msgstr "Model not found"
+
+#: src/components/settings/model-providers-settings.tsx:153
+#: src/components/settings/settings-dialog.tsx:49
+msgid "Model Providers"
+msgstr "Model Providers"
+
+#: src/components/settings/debug-settings.tsx:146
+msgid "Model Selection (Provider / Model)"
+msgstr "Model Selection (Provider / Model)"
+
+#: src/components/ai/model-selector.tsx:162
+msgid "Models"
+msgstr "Models"
+
+#: src/components/settings/model-providers-settings.tsx:266
+msgid "Name"
+msgstr "Name"
+
+#: src/components/project-list.tsx:72
+msgid "New Project"
+msgstr "New Project"
+
+#: src/components/update-dialog.tsx:43
+msgid "New Version Available"
+msgstr "New Version Available"
+
+#: src/components/asset-library.tsx:79
+msgid "No assets yet. Generated content in workflows will appear here"
+msgstr "No assets yet. Generated content in workflows will appear here"
+
+#: src/components/nodes/audio-node.tsx:49
+msgid "No audio yet"
+msgstr "No audio yet"
+
+#: src/components/nodes/text-node.tsx:54
+msgid "No content yet"
+msgstr "No content yet"
+
+#: src/components/project-list.tsx:115
+msgid "No Cover"
+msgstr "No Cover"
+
+#: src/components/nodes/image-node.tsx:54
+msgid "No image yet"
+msgstr "No image yet"
+
+#: src/components/settings/model-providers-settings.tsx:343
+msgid "No models found or failed to load"
+msgstr "No models found or failed to load"
+
+#: src/components/update-dialog.tsx:53
+msgid "No release notes available."
+msgstr "No release notes available."
+
+#: src/components/nodes/video-node.tsx:93
+msgid "No video yet"
+msgstr "No video yet"
+
+#: src/components/canvas-view.tsx:259
+msgid "Node"
+msgstr "Node"
+
+#: src/components/settings/model-providers-settings.tsx:301
+msgid "Optional"
+msgstr "Optional"
+
+#: src/components/settings/models-list-settings.tsx:55
+msgid "Please configure API Key in \"Model Providers\" first"
+msgstr "Please configure API Key in \"Model Providers\" first"
+
+#: src/components/ai/model-selector.tsx:163
+msgid "Please select a provider first"
+msgstr "Please select a provider first"
+
+#: src/components/canvas-view.tsx:402
+msgid "Project JSON copied to clipboard"
+msgstr "Project JSON copied to clipboard"
+
+#: src/components/canvas-view.tsx:466
+msgid "Project name"
+msgstr "Project name"
+
+#: src/components/app-sidebar.tsx:55
+#: src/components/project-list.tsx:56
+msgid "Projects"
+msgstr "Projects"
+
+#: src/components/ai/model-selector.tsx:116
+msgid "Provider"
+msgstr "Provider"
+
+#: src/components/settings/model-providers-settings.tsx:239
+msgid "Provider Type"
+msgstr "Provider Type"
+
+#: src/components/settings/models-list-settings.tsx:41
+msgid "Refresh"
+msgstr "Refresh"
+
+#: src/components/update-dialog.tsx:50
+msgid "Release Notes:"
+msgstr "Release Notes:"
+
+#: src/components/settings/debug-settings.tsx:199
+msgid "Result"
+msgstr "Result"
+
+#: src/components/settings/model-providers-settings.tsx:323
+msgid "Save"
+msgstr "Save"
+
+#: src/components/ai/model-selector.tsx:148
+msgid "Search models..."
+msgstr "Search models..."
+
+#: src/components/language-switcher.tsx:20
+msgid "Select language"
+msgstr "Select language"
+
+#: src/components/ai/model-selector.tsx:106
+msgid "Select model..."
+msgstr "Select model..."
+
+#: src/components/mode-toggle.tsx:17
+msgid "Select theme"
+msgstr "Select theme"
+
+#: src/components/settings/debug-settings.tsx:166
+msgid "Select type"
+msgstr "Select type"
+
+#: src/components/app-sidebar.tsx:88
+#: src/components/settings/settings-dialog.tsx:32
+msgid "Settings"
+msgstr "Settings"
+
+#: src/components/nodes/group-node.tsx:48
+msgid "Some nodes are already running, skipping execution"
+msgstr "Some nodes are already running, skipping execution"
+
+#: src/components/mode-toggle.tsx:22
+msgid "System"
+msgstr "System"
+
+#: src/components/settings/debug-settings.tsx:57
+msgid "System Info"
+msgstr "System Info"
+
+#: src/components/settings/debug-settings.tsx:194
+msgid "Test AI Generation"
+msgstr "Test AI Generation"
+
+#: src/components/settings/debug-settings.tsx:179
+msgid "Test Prompt"
+msgstr "Test Prompt"
+
+#: src/components/settings/debug-settings.tsx:194
+msgid "Testing..."
+msgstr "Testing..."
+
+#: src/components/canvas-view.tsx:245
+#: src/components/settings/debug-settings.tsx:169
+msgid "Text"
+msgstr "Text"
+
+#: src/components/canvas-view.tsx:509
+msgid "Text Node"
+msgstr "Text Node"
+
+#: src/components/mode-toggle.tsx:14
+msgid "Theme"
+msgstr "Theme"
+
+#: src/components/settings/model-providers-settings.tsx:371
+msgid "This action cannot be undone. This will permanently delete the model provider configuration."
+msgstr "This action cannot be undone. This will permanently delete the model provider configuration."
+
+#: src/components/canvas-view.tsx:602
+msgid "This is the AI chat interface..."
+msgstr "This is the AI chat interface..."
+
+#. placeholder {0}: assets.length
+#: src/components/asset-library.tsx:63
+msgid "Total {0} assets"
+msgstr "Total {0} assets"
+
+#: src/components/project-list.tsx:42
+msgid "Untitled Project"
+msgstr "Untitled Project"
+
+#: src/components/project-list.tsx:127
+msgid "Updated on"
+msgstr "Updated on"
+
+#: src/components/canvas-view.tsx:247
+#: src/components/settings/debug-settings.tsx:171
+msgid "Video"
+msgstr "Video"
+
+#: src/components/canvas-view.tsx:525
+msgid "Video Node"
+msgstr "Video Node"
+
+#: src/components/settings/models-list-settings.tsx:37
+msgid "View AI models from all configured providers."
+msgstr "View AI models from all configured providers."
+
+#: src/components/settings/about-settings.tsx:60
+msgid "VisionFlow is a visual workflow orchestration tool that enables you to easily design and manage AI-driven intelligent workflows through an intuitive node-based interface."
+msgstr "VisionFlow is a visual workflow orchestration tool that enables you to easily design and manage AI-driven intelligent workflows through an intuitive node-based interface."
+
+#: src/components/nodes/group-node.tsx:107
+msgid "Workflow stopped"
+msgstr "Workflow stopped"
+
+#: src/components/nodes/group-node.tsx:123
+msgid "Workflow stopped due to node error"
+msgstr "Workflow stopped due to node error"
+
+#: src/components/settings/about-settings.tsx:37
+msgid "You are on the latest version."
+msgstr "You are on the latest version."

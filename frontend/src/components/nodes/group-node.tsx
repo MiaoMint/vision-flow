@@ -7,9 +7,12 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Play, Ungroup, Square } from "lucide-react";
 import { Spinner } from "../ui/spinner";
 import { toast } from "sonner";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import type { BaseNodeData } from "./types";
 
 export const GroupNode = memo(({ id, data, selected, }: NodeProps) => {
+    const { _ } = useLingui();
     const nodeData = data as unknown as BaseNodeData;
     const { updateNodeData, deleteElements, getNodes, getEdges, getNode, getIntersectingNodes } = useReactFlow();
     const abortRef = useRef(false);
@@ -42,7 +45,7 @@ export const GroupNode = memo(({ id, data, selected, }: NodeProps) => {
 
         const isAnyRunning = intersectingNodes.some(n => n.data.processing);
         if (isAnyRunning) {
-            toast.warning("Some nodes are already running, skipping execution");
+            toast.warning(_(msg`Some nodes are already running, skipping execution`));
             return;
         }
 
@@ -81,7 +84,7 @@ export const GroupNode = memo(({ id, data, selected, }: NodeProps) => {
                 if (abortRef.current) break;
 
                 if (currentLayer.length === 0) {
-                    toast.error("Circular dependency detected, executing remaining nodes individually");
+                    toast.error(_(msg`Circular dependency detected, executing remaining nodes individually`));
                     intersectingNodes.filter(n => !processed.has(n.id)).forEach(n => currentLayer.push(n.id));
                 }
 
@@ -101,7 +104,7 @@ export const GroupNode = memo(({ id, data, selected, }: NodeProps) => {
 
             for (const layer of layers) {
                 if (abortRef.current) {
-                    toast.info("Workflow stopped");
+                    toast.info(_(msg`Workflow stopped`));
                     break;
                 }
 
@@ -117,14 +120,14 @@ export const GroupNode = memo(({ id, data, selected, }: NodeProps) => {
                 const layerNodes = getNodes().filter(n => layer.includes(n.id));
                 const hasError = layerNodes.some(n => n.data.error);
                 if (hasError) {
-                    toast.error("Workflow stopped due to node error");
+                    toast.error(_(msg`Workflow stopped due to node error`));
                     break;
                 }
             }
 
         } catch (error) {
             console.error("Group execution failed", error);
-            toast.error("Group execution failed");
+            toast.error(_(msg`Group execution failed`));
         } finally {
             updateNodeData(id, { processing: false });
         }

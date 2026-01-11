@@ -6,11 +6,15 @@ import { GenerateImage } from "../../../wailsjs/go/ai/Service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BaseNode } from "./base-node";
 import { useNodeRun } from "../../hooks/use-node-run";
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 export const ImageNode = memo((props: NodeProps) => {
   const { id, data } = props;
   const nodeData = data as unknown as ImageNodeData;
   const { updateNodeData } = useReactFlow();
+  const { _ } = useLingui();
 
   const { handleRun } = useNodeRun({
     id,
@@ -30,7 +34,7 @@ export const ImageNode = memo((props: NodeProps) => {
       icon={ImageIcon}
       iconColorClass="text-blue-500"
       onRun={handleRun}
-      promptPlaceholder="输入图片处理提示词..."
+      promptPlaceholder={_(msg`Enter image processing prompt...`)}
       minWidth={200}
       minHeight={200}
     >
@@ -47,7 +51,7 @@ export const ImageNode = memo((props: NodeProps) => {
           />
         ) : (
           <div className="text-xs text-muted-foreground italic p-4">
-            暂无图片
+            <Trans>No image yet</Trans>
           </div>
         )}
       </div>

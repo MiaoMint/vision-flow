@@ -6,11 +6,15 @@ import { GenerateAudio } from "../../../wailsjs/go/ai/Service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BaseNode } from "./base-node";
 import { useNodeRun } from "../../hooks/use-node-run";
+import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
 
 export const AudioNode = memo((props: NodeProps) => {
   const { id, data } = props;
   const nodeData = data as unknown as AudioNodeData;
   const { updateNodeData } = useReactFlow();
+  const { _ } = useLingui();
 
   const { handleRun } = useNodeRun({
     id,
@@ -30,7 +34,7 @@ export const AudioNode = memo((props: NodeProps) => {
       icon={Music}
       iconColorClass="text-green-500"
       onRun={handleRun}
-      promptPlaceholder="输入音频处理提示词..."
+      promptPlaceholder={_(msg`Enter audio processing prompt...`)}
       minWidth={200}
       minHeight={75}
     >
@@ -42,7 +46,7 @@ export const AudioNode = memo((props: NodeProps) => {
         ) : nodeData.audioUrl ? (
           <audio src={nodeData.audioUrl} controls className="size-full" />
         ) : (
-          <div className="text-xs text-muted-foreground italic">暂无音频</div>
+          <div className="text-xs text-muted-foreground italic"><Trans>No audio yet</Trans></div>
         )}
       </div>
     </BaseNode>
