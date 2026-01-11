@@ -45,12 +45,104 @@ jobs:
       - name: Build Wails app
         run: |
           wails build
+      
+      # macOS signing and notarization
+      - name: Import Code Signing Certificate
+        if: matrix.platform == 'macos-26'
+        env:
+          CERTIFICATE_P12: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          
+          # Import certificate from secrets
+          echo -n "$CERTIFICATE_P12" | base64 --decode -o $CERTIFICATE_PATH
+          
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+          
+          # Allow codesign to access the keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+      
+      - name: Code Sign Application
+        if: matrix.platform == 'macos-26'
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # Sign the application
+          codesign --deep --force --verify --verbose --sign "Developer ID Application: Mint Miao ($APPLE_TEAM_ID)" \
+            --options runtime \
+            --entitlements build/darwin/entitlements.plist \
+            build/bin/VisionFlow.app
+          
+          # Verify signature
+          codesign --verify --deep --strict --verbose=2 build/bin/VisionFlow.app
+      
+      - name: Create DMG
+        if: matrix.platform == 'macos-26'
+        run: |
+          # Install create-dmg
+          brew install create-dmg
+          
+          # Create DMG
+          create-dmg \
+            --volname "VisionFlow" \
+            --volicon "build/appicon.png" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --icon "VisionFlow.app" 200 190 \
+            --hide-extension "VisionFlow.app" \
+            --app-drop-link 600 185 \
+            "VisionFlow.dmg" \
+            "build/bin/VisionFlow.app"
+      
+      - name: Code Sign DMG
+        if: matrix.platform == 'macos-26'
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          codesign --force --sign "Developer ID Application: Mint Miao ($APPLE_TEAM_ID)" VisionFlow.dmg
+          codesign --verify --verbose=2 VisionFlow.dmg
+      
+      - name: Notarize Application
+        if: matrix.platform == 'macos-26'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # Submit for notarization
+          xcrun notarytool submit VisionFlow.dmg \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+          
+          # Staple the notarization ticket
+          xcrun stapler staple VisionFlow.dmg
+          
+          # Verify notarization
+          xcrun stapler validate VisionFlow.dmg
+      
       - name: upload artifacts macOS
         if: matrix.platform == 'macos-26'
         uses: actions/upload-artifact@v4
         with:
           name: VisionFlow-macos
-          path: build/bin/*
+          path: |
+            build/bin/*
+            VisionFlow.dmg
+      
       - name: archive application
         if: matrix.platform == 'macos-26'
         run: |
@@ -66,7 +158,9 @@ jobs:
         if: matrix.platform == 'macos-26'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: VisionFlow-macos.zip
+          artifacts: |
+            VisionFlow-macos.zip
+            VisionFlow.dmg
           allowUpdates: true
           omitBody: true
       - name: Upload release Windows
