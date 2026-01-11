@@ -7,6 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { BaseNode } from "./base-node";
 import { useNodeRun } from "../../hooks/use-node-run";
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 export const VideoNode = memo((props: NodeProps) => {
   const { id, data } = props;
@@ -14,6 +17,7 @@ export const VideoNode = memo((props: NodeProps) => {
   const { updateNodeData } = useReactFlow();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { _ } = useLingui();
 
   const { handleRun } = useNodeRun({
     id,
@@ -49,7 +53,7 @@ export const VideoNode = memo((props: NodeProps) => {
       icon={Video}
       iconColorClass="text-purple-500"
       onRun={handleRun}
-      promptPlaceholder="输入视频处理提示词..."
+      promptPlaceholder={_(msg`Enter video processing prompt...`)}
       minWidth={200}
       minHeight={200}
     >
@@ -86,7 +90,7 @@ export const VideoNode = memo((props: NodeProps) => {
             </div>
           </>
         ) : (
-          <div className="text-xs text-muted-foreground italic p-4">暂无视频</div>
+          <div className="text-xs text-muted-foreground italic p-4"><Trans>No video yet</Trans></div>
         )}
       </div>
     </BaseNode>

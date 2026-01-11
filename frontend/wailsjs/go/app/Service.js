@@ -6,6 +6,14 @@ export function CheckUpdate() {
   return window['go']['app']['Service']['CheckUpdate']();
 }
 
+export function GetUserPreference(arg1) {
+  return window['go']['app']['Service']['GetUserPreference'](arg1);
+}
+
 export function GetWailsJSON() {
   return window['go']['app']['Service']['GetWailsJSON']();
+}
+
+export function SetUserPreference(arg1, arg2) {
+  return window['go']['app']['Service']['SetUserPreference'](arg1, arg2);
 }

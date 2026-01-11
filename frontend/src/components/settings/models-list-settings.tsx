@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ListModels } from "../../../wailsjs/go/ai/Service";
 import { ai } from "../../../wailsjs/go/models";
+import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
 
 export function ModelsListSettings() {
+    const { _ } = useLingui();
     const [models, setModels] = useState<ai.Model[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -29,12 +33,12 @@ export function ModelsListSettings() {
         <div className="p-8 max-w-4xl h-full flex flex-col">
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h3 className="text-lg font-medium">可用模型</h3>
-                    <p className="text-sm text-muted-foreground">查看所有已配置提供商的 AI 模型。</p>
+                    <h3 className="text-lg font-medium"><Trans>Available Models</Trans></h3>
+                    <p className="text-sm text-muted-foreground"><Trans>View AI models from all configured providers.</Trans></p>
                 </div>
                 <Button variant="outline" size="sm" onClick={loadModels} disabled={loading}>
                     <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                    刷新
+                    <Trans>Refresh</Trans>
                 </Button>
             </div>
 
@@ -42,13 +46,13 @@ export function ModelsListSettings() {
                 {loading && models.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
                         <Loader2 className="h-8 w-8 animate-spin mb-4" />
-                        <p>正在加载模型列表...</p>
+                        <p><Trans>Loading model list...</Trans></p>
                     </div>
                 ) : models.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-64 text-muted-foreground border-2 border-dashed rounded-lg">
                         <Box className="h-10 w-10 mb-4 opacity-50" />
-                        <p className="text-lg font-medium">未找到模型</p>
-                        <p className="text-sm mt-1">请先在"模型提供商"中配置 API Key</p>
+                        <p className="text-lg font-medium"><Trans>Model not found</Trans></p>
+                        <p className="text-sm mt-1"><Trans>Please configure API Key in "Model Providers" first</Trans></p>
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">

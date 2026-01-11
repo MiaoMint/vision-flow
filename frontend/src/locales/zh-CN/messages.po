@@ -1,0 +1,483 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-01-11 23:20+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: zh-CN\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/components/app-sidebar.tsx:34
+msgid "👷 Work in progress"
+msgstr "👷 工作中"
+
+#. placeholder {0}: info.latestVersion
+#. placeholder {1}: info.currentVersion
+#: src/components/update-dialog.tsx:45
+msgid "A new version {0} is available. Current version: {1}"
+msgstr "新版本 {0} 可用。当前版本：{1}"
+
+#: src/components/settings/settings-dialog.tsx:63
+msgid "About"
+msgstr "关于"
+
+#: src/components/settings/model-providers-settings.tsx:161
+msgid "Add Provider"
+msgstr "添加供应商"
+
+#: src/components/settings/model-providers-settings.tsx:232
+msgid "Add Service"
+msgstr "添加服务"
+
+#: src/components/canvas-view.tsx:591
+msgid "AI Assistant"
+msgstr "AI 助手"
+
+#: src/components/settings/debug-settings.tsx:140
+msgid "AI Binding Test"
+msgstr "AI Binding 测试"
+
+#: src/components/asset-library.tsx:46
+msgid "Asset deleted"
+msgstr "素材已删除"
+
+#: src/components/asset-library.tsx:116
+msgid "Asset Preview"
+msgstr "素材预览"
+
+#: src/components/app-sidebar.tsx:66
+#: src/components/asset-library.tsx:61
+msgid "Assets"
+msgstr "素材库"
+
+#: src/components/canvas-view.tsx:248
+#: src/components/settings/debug-settings.tsx:172
+msgid "Audio"
+msgstr "音频"
+
+#: src/components/canvas-view.tsx:533
+msgid "Audio Node"
+msgstr "音频节点"
+
+#: src/components/settings/model-providers-settings.tsx:333
+msgid "Available Model List"
+msgstr "可用模型列表"
+
+#: src/components/settings/models-list-settings.tsx:36
+#: src/components/settings/settings-dialog.tsx:56
+msgid "Available Models"
+msgstr "可用模型"
+
+#: src/components/settings/model-providers-settings.tsx:320
+#: src/components/settings/model-providers-settings.tsx:379
+msgid "Cancel"
+msgstr "取消"
+
+#: src/components/settings/about-settings.tsx:68
+msgid "Check for Updates"
+msgstr "检查更新"
+
+#: src/components/language-switcher.tsx:31
+msgid "Choose the display language of the application"
+msgstr "选择应用程序的显示语言"
+
+#: src/components/mode-toggle.tsx:26
+msgid "Choose the theme appearance of the application"
+msgstr "选择应用程序的主题外观"
+
+#: src/components/nodes/group-node.tsx:87
+msgid "Circular dependency detected, executing remaining nodes individually"
+msgstr "检测到循环依赖，单独执行剩余节点"
+
+#: src/components/asset-library.tsx:156
+msgid "Close"
+msgstr "关闭"
+
+#: src/components/settings/model-providers-settings.tsx:156
+msgid "Configure AI model providers."
+msgstr "配置 AI 模型提供商。"
+
+#: src/components/settings/general-settings.tsx:10
+msgid "Configure general options for the application."
+msgstr "配置应用程序的通用选项。"
+
+#: src/components/settings/model-providers-settings.tsx:368
+msgid "Confirm Delete?"
+msgstr "确认删除?"
+
+#: src/components/mode-toggle.tsx:21
+msgid "Dark"
+msgstr "深色"
+
+#: src/components/settings/settings-dialog.tsx:71
+msgid "Debug"
+msgstr "调试"
+
+#: src/components/settings/debug-settings.tsx:216
+msgid "Debug Information"
+msgstr "调试信息"
+
+#: src/components/settings/debug-settings.tsx:218
+msgid "Debugging tools and information for development environments only. This page is only visible in development environments."
+msgstr "开发环境专用的调试工具和信息，此页面仅在开发环境中可见。"
+
+#: src/components/asset-library.tsx:161
+#: src/components/project-list.tsx:100
+#: src/components/settings/model-providers-settings.tsx:385
+msgid "Delete"
+msgstr "删除"
+
+#: src/components/settings/debug-settings.tsx:39
+msgid "Development Environment:"
+msgstr "开发环境:"
+
+#: src/components/update-dialog.tsx:63
+msgid "Download Update"
+msgstr "下载更新"
+
+#: src/components/settings/model-providers-settings.tsx:230
+msgid "Edit Service"
+msgstr "编辑服务"
+
+#: src/components/nodes/text-node.tsx:36
+msgid "Enter AI processing prompt..."
+msgstr "输入 AI 处理提示词..."
+
+#: src/components/nodes/audio-node.tsx:37
+msgid "Enter audio processing prompt..."
+msgstr "输入音频处理提示词..."
+
+#: src/components/nodes/image-node.tsx:37
+msgid "Enter image processing prompt..."
+msgstr "输入图片处理提示词..."
+
+#: src/components/canvas-view.tsx:610
+msgid "Enter message..."
+msgstr "输入消息..."
+
+#: src/components/settings/debug-settings.tsx:184
+msgid "Enter test prompt..."
+msgstr "输入测试提示词..."
+
+#: src/components/nodes/video-node.tsx:56
+msgid "Enter video processing prompt..."
+msgstr "输入视频处理提示词..."
+
+#: src/components/settings/debug-settings.tsx:31
+msgid "Environment Info"
+msgstr "环境信息"
+
+#: src/components/app-sidebar.tsx:74
+msgid "Explore"
+msgstr "浏览"
+
+#: src/components/settings/about-settings.tsx:32
+#: src/components/settings/about-settings.tsx:40
+msgid "Failed to check for updates"
+msgstr "检查更新失败"
+
+#: src/components/canvas-view.tsx:405
+msgid "Failed to copy project JSON"
+msgstr "复制项目 JSON 失败"
+
+#: src/components/asset-library.tsx:52
+msgid "Failed to delete"
+msgstr "删除失败"
+
+#: src/components/asset-library.tsx:31
+msgid "Failed to load assets"
+msgstr "加载素材失败"
+
+#: src/components/settings/settings-dialog.tsx:42
+msgid "General"
+msgstr "通用"
+
+#: src/components/settings/general-settings.tsx:9
+msgid "General Settings"
+msgstr "通用设置"
+
+#: src/components/settings/debug-settings.tsx:157
+msgid "Generation Type"
+msgstr "生成类型"
+
+#: src/components/canvas-view.tsx:249
+msgid "Group"
+msgstr "分组"
+
+#: src/components/nodes/group-node.tsx:130
+msgid "Group execution failed"
+msgstr "组执行失败"
+
+#: src/components/settings/debug-settings.tsx:65
+msgid "Hardware Concurrency:"
+msgstr "硬件并发:"
+
+#: src/components/canvas-view.tsx:246
+#: src/components/settings/debug-settings.tsx:170
+msgid "Image"
+msgstr "图像"
+
+#: src/components/canvas-view.tsx:517
+msgid "Image Node"
+msgstr "图片节点"
+
+#: src/components/language-switcher.tsx:17
+msgid "Language"
+msgstr "语言"
+
+#: src/components/settings/debug-settings.tsx:61
+msgid "Language:"
+msgstr "语言:"
+
+#: src/components/update-dialog.tsx:60
+msgid "Later"
+msgstr "稍后"
+
+#: src/components/mode-toggle.tsx:20
+msgid "Light"
+msgstr "浅色"
+
+#: src/components/settings/models-list-settings.tsx:49
+msgid "Loading model list..."
+msgstr "正在加载模型列表..."
+
+#: src/components/project-list.tsx:57
+msgid "Manage and access all your projects"
+msgstr "管理和访问您的所有项目"
+
+#: src/components/settings/debug-settings.tsx:35
+msgid "Mode:"
+msgstr "模式:"
+
+#: src/components/ai/model-selector.tsx:158
+#: src/components/settings/models-list-settings.tsx:54
+msgid "Model not found"
+msgstr "未找到模型"
+
+#: src/components/settings/model-providers-settings.tsx:153
+#: src/components/settings/settings-dialog.tsx:49
+msgid "Model Providers"
+msgstr "模型提供商"
+
+#: src/components/settings/debug-settings.tsx:146
+msgid "Model Selection (Provider / Model)"
+msgstr "模型选择 (供应商 / 模型)"
+
+#: src/components/ai/model-selector.tsx:162
+msgid "Models"
+msgstr "模型"
+
+#: src/components/settings/model-providers-settings.tsx:266
+msgid "Name"
+msgstr "名称"
+
+#: src/components/project-list.tsx:72
+msgid "New Project"
+msgstr "新建项目"
+
+#: src/components/update-dialog.tsx:43
+msgid "New Version Available"
+msgstr "发现新版本"
+
+#: src/components/asset-library.tsx:79
+msgid "No assets yet. Generated content in workflows will appear here"
+msgstr "暂无素材，在工作流中生成内容后会显示在这里"
+
+#: src/components/nodes/audio-node.tsx:49
+msgid "No audio yet"
+msgstr "暂无音频"
+
+#: src/components/nodes/text-node.tsx:54
+msgid "No content yet"
+msgstr "暂无内容"
+
+#: src/components/project-list.tsx:115
+msgid "No Cover"
+msgstr "无封面"
+
+#: src/components/nodes/image-node.tsx:54
+msgid "No image yet"
+msgstr "暂无图片"
+
+#: src/components/settings/model-providers-settings.tsx:343
+msgid "No models found or failed to load"
+msgstr "未找到模型或加载失败"
+
+#: src/components/update-dialog.tsx:53
+msgid "No release notes available."
+msgstr "没有更新日志"
+
+#: src/components/nodes/video-node.tsx:93
+msgid "No video yet"
+msgstr "暂无视频"
+
+#: src/components/canvas-view.tsx:259
+msgid "Node"
+msgstr "节点"
+
+#: src/components/settings/model-providers-settings.tsx:301
+msgid "Optional"
+msgstr "可选"
+
+#: src/components/settings/models-list-settings.tsx:55
+msgid "Please configure API Key in \"Model Providers\" first"
+msgstr "请先在\"模型提供商\"中配置 API Key"
+
+#: src/components/ai/model-selector.tsx:163
+msgid "Please select a provider first"
+msgstr "请先选择提供商"
+
+#: src/components/canvas-view.tsx:402
+msgid "Project JSON copied to clipboard"
+msgstr "项目 JSON 已复制到剪贴板"
+
+#: src/components/canvas-view.tsx:466
+msgid "Project name"
+msgstr "项目名称"
+
+#: src/components/app-sidebar.tsx:55
+#: src/components/project-list.tsx:56
+msgid "Projects"
+msgstr "项目"
+
+#: src/components/ai/model-selector.tsx:116
+msgid "Provider"
+msgstr "提供商"
+
+#: src/components/settings/model-providers-settings.tsx:239
+msgid "Provider Type"
+msgstr "提供商类型"
+
+#: src/components/settings/models-list-settings.tsx:41
+msgid "Refresh"
+msgstr "刷新"
+
+#: src/components/update-dialog.tsx:50
+msgid "Release Notes:"
+msgstr "更新日志："
+
+#: src/components/settings/debug-settings.tsx:199
+msgid "Result"
+msgstr "返回结果"
+
+#: src/components/settings/model-providers-settings.tsx:323
+msgid "Save"
+msgstr "保存"
+
+#: src/components/ai/model-selector.tsx:148
+msgid "Search models..."
+msgstr "搜索模型..."
+
+#: src/components/language-switcher.tsx:20
+msgid "Select language"
+msgstr "选择语言"
+
+#: src/components/ai/model-selector.tsx:106
+msgid "Select model..."
+msgstr "选择模型..."
+
+#: src/components/mode-toggle.tsx:17
+msgid "Select theme"
+msgstr "选择主题"
+
+#: src/components/settings/debug-settings.tsx:166
+msgid "Select type"
+msgstr "选择类型"
+
+#: src/components/app-sidebar.tsx:88
+#: src/components/settings/settings-dialog.tsx:32
+msgid "Settings"
+msgstr "设置"
+
+#: src/components/nodes/group-node.tsx:48
+msgid "Some nodes are already running, skipping execution"
+msgstr "有节点正在运行，跳过执行"
+
+#: src/components/mode-toggle.tsx:22
+msgid "System"
+msgstr "跟随系统"
+
+#: src/components/settings/debug-settings.tsx:57
+msgid "System Info"
+msgstr "系统信息"
+
+#: src/components/settings/debug-settings.tsx:194
+msgid "Test AI Generation"
+msgstr "测试 AI 生成"
+
+#: src/components/settings/debug-settings.tsx:179
+msgid "Test Prompt"
+msgstr "测试提示词"
+
+#: src/components/settings/debug-settings.tsx:194
+msgid "Testing..."
+msgstr "测试中..."
+
+#: src/components/canvas-view.tsx:245
+#: src/components/settings/debug-settings.tsx:169
+msgid "Text"
+msgstr "文本"
+
+#: src/components/canvas-view.tsx:509
+msgid "Text Node"
+msgstr "文本节点"
+
+#: src/components/mode-toggle.tsx:14
+msgid "Theme"
+msgstr "主题"
+
+#: src/components/settings/model-providers-settings.tsx:371
+msgid "This action cannot be undone. This will permanently delete the model provider configuration."
+msgstr "此操作无法撤销。这将永久删除该模型提供商配置。"
+
+#: src/components/canvas-view.tsx:602
+msgid "This is the AI chat interface..."
+msgstr "这里是 AI 聊天界面..."
+
+#. placeholder {0}: assets.length
+#: src/components/asset-library.tsx:63
+msgid "Total {0} assets"
+msgstr "共 {0} 个素材"
+
+#: src/components/project-list.tsx:42
+msgid "Untitled Project"
+msgstr "未命名项目"
+
+#: src/components/project-list.tsx:127
+msgid "Updated on"
+msgstr "更新于"
+
+#: src/components/canvas-view.tsx:247
+#: src/components/settings/debug-settings.tsx:171
+msgid "Video"
+msgstr "视频"
+
+#: src/components/canvas-view.tsx:525
+msgid "Video Node"
+msgstr "视频节点"
+
+#: src/components/settings/models-list-settings.tsx:37
+msgid "View AI models from all configured providers."
+msgstr "查看所有已配置提供商的 AI 模型。"
+
+#: src/components/settings/about-settings.tsx:60
+msgid "VisionFlow is a visual workflow orchestration tool that enables you to easily design and manage AI-driven intelligent workflows through an intuitive node-based interface."
+msgstr "VisionFlow 是一个可视化工作流编排工具，通过直观的节点式界面， 让你轻松设计和管理 AI 驱动的智能工作流。"
+
+#: src/components/nodes/group-node.tsx:107
+msgid "Workflow stopped"
+msgstr "工作流已停止"
+
+#: src/components/nodes/group-node.tsx:123
+msgid "Workflow stopped due to node error"
+msgstr "由于节点错误工作流已停止"
+
+#: src/components/settings/about-settings.tsx:37
+msgid "You are on the latest version."
+msgstr "您已是最新版本。"

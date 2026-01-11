@@ -1,37 +1,30 @@
-import { Moon, Sun } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useTheme } from "@/components/theme-provider"
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTheme } from "@/components/theme-provider";
+import { Trans } from "@lingui/react/macro";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 
 export function ModeToggle() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
+  const { _ } = useLingui();
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+    <div className="space-y-2">
+      <Label htmlFor="theme"><Trans>Theme</Trans></Label>
+      <Select value={theme} onValueChange={setTheme}>
+        <SelectTrigger id="theme" className="w-50">
+          <SelectValue placeholder={_(msg`Select theme`)} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="light"><Trans>Light</Trans></SelectItem>
+          <SelectItem value="dark"><Trans>Dark</Trans></SelectItem>
+          <SelectItem value="system"><Trans>System</Trans></SelectItem>
+        </SelectContent>
+      </Select>
+      <p className="text-sm text-muted-foreground">
+        <Trans>Choose the theme appearance of the application</Trans>
+      </p>
+    </div>
+  );
 }

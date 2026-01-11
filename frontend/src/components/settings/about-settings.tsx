@@ -5,8 +5,12 @@ import { BrowserOpenURL } from "../../../wailsjs/runtime/runtime";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { UpdateDialog } from "@/components/update-dialog";
+import { Trans } from "@lingui/react/macro";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 
 export function AboutSettings() {
+  const { _ } = useLingui();
   const [wailsJson, setWailsJson] = useState<any>(null);
   const [checking, setChecking] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<any>(null);
@@ -25,15 +29,15 @@ export function AboutSettings() {
     try {
       const info = await CheckUpdate();
       if (info.error) {
-        toast.error("Check update failed: " + info.error);
+        toast.error(_(msg`Failed to check for updates`) + ": " + info.error);
       } else if (info.hasUpdate) {
         setUpdateInfo(info);
         setShowUpdateDialog(true);
       } else {
-        toast.success("You are on the latest version.");
+        toast.success(_(msg`You are on the latest version.`));
       }
     } catch (e: any) {
-      toast.error("Failed to check update: " + e.message);
+      toast.error(_(msg`Failed to check for updates`) + ": " + e.message);
     } finally {
       setChecking(false);
     }
@@ -53,8 +57,7 @@ export function AboutSettings() {
             </p>
           </div>
           <p className="text-sm leading-relaxed text-center">
-            VisionFlow 是一个可视化工作流编排工具，通过直观的节点式界面，
-            让你轻松设计和管理 AI 驱动的智能工作流。
+            <Trans>VisionFlow is a visual workflow orchestration tool that enables you to easily design and manage AI-driven intelligent workflows through an intuitive node-based interface.</Trans>
           </p>
           <Button
             variant="outline"
@@ -62,7 +65,7 @@ export function AboutSettings() {
             disabled={checking}
           >
             {checking && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            检查更新
+            <Trans>Check for Updates</Trans>
           </Button>
         </div>
       </div>

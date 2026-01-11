@@ -12,7 +12,10 @@ import {
 } from "@/components/ui/sidebar";
 import { NavUser } from "@/components/nav-user";
 import { Home, Image, Settings, Telescope } from "lucide-react";
-import { toast } from "sonner"
+import { toast } from "sonner";
+import { Trans } from "@lingui/react/macro";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 
 export type AppView = "projects" | "assets";
 
@@ -25,9 +28,10 @@ export function AppSidebar({
   onViewChange: (view: AppView) => void;
   onSettingsClick: () => void;
 }) {
-
+  const { _ } = useLingui();
+  
   function wip() {
-    toast("👷 Work in progress")
+    toast(_(msg`👷 Work in progress`));
   }
 
   return (
@@ -47,7 +51,9 @@ export function AppSidebar({
                   onClick={() => onViewChange("projects")}
                 >
                   <Home />
-                  <span>项目</span>
+                  <span>
+                    <Trans>Projects</Trans>
+                  </span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -56,13 +62,17 @@ export function AppSidebar({
                   onClick={() => onViewChange("assets")}
                 >
                   <Image />
-                  <span>素材库</span>
+                  <span>
+                    <Trans>Assets</Trans>
+                  </span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={() => wip()}>
                   <Telescope />
-                  <span>浏览</span>
+                  <span>
+                    <Trans>Explore</Trans>
+                  </span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -74,13 +84,15 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton onClick={onSettingsClick}>
               <Settings />
-              <span>设置</span>
+              <span>
+                <Trans>Settings</Trans>
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
         {/* <NavUser
           user={{
-            name: "用户名",
+            name: _(msg`Username`),
             email: "user@example.com",
             avatar: "https://placehold.co/100x100/6366f1/ffffff?text=U",
           }}

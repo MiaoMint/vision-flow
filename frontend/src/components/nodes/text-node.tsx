@@ -6,11 +6,15 @@ import { GenerateText } from "../../../wailsjs/go/ai/Service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BaseNode } from "./base-node";
 import { useNodeRun } from "../../hooks/use-node-run";
+import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
 
 export const TextNode = memo((props: NodeProps) => {
   const { id, data } = props;
   const nodeData = data as unknown as TextNodeData;
   const { updateNodeData } = useReactFlow();
+  const { _ } = useLingui();
 
   const { handleRun } = useNodeRun({
     id,
@@ -29,7 +33,7 @@ export const TextNode = memo((props: NodeProps) => {
       {...props}
       icon={FileText}
       onRun={handleRun}
-      promptPlaceholder="输入 AI 处理提示词..."
+      promptPlaceholder={_(msg`Enter AI processing prompt...`)}
       minWidth={200}
       minHeight={200}
       maxWidth={400}
@@ -47,7 +51,7 @@ export const TextNode = memo((props: NodeProps) => {
             {nodeData.content}
           </div>
         ) : (
-          <div className="text-xs text-muted-foreground italic">暂无内容</div>
+          <div className="text-xs text-muted-foreground italic"><Trans>No content yet</Trans></div>
         )}
       </div>
     </BaseNode>

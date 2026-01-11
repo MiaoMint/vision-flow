@@ -5,6 +5,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import { Trans } from "@lingui/react/macro";
 import {
     Command,
     CommandEmpty,
@@ -18,6 +19,8 @@ import { ListModels } from "../../../wailsjs/go/ai/Service";
 import { database, ai } from "../../../wailsjs/go/models";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLingui } from "@lingui/react";
+import { msg } from "@lingui/core/macro";
 
 interface ModelSelectorProps {
     providerId?: number;
@@ -32,6 +35,7 @@ export function ModelSelector({
     onProviderChange,
     onModelChange,
 }: ModelSelectorProps) {
+    const { _ } = useLingui();
     const [providers, setProviders] = useState<database.ModelProvider[]>([]);
     const [models, setModels] = useState<ai.Model[]>([]);
     const [loadingProviders, setLoadingProviders] = useState(false);
@@ -99,7 +103,7 @@ export function ModelSelector({
                     <div className="w-full text-ellipsis justify-start flex items-center gap-2 overflow-hidden">
                         {selectedProvider && modelId
                             ? `${selectedProvider.name} / ${modelId}`
-                            : "选择模型..."}
+                            : <Trans>Select model...</Trans>}
                     </div>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -109,7 +113,7 @@ export function ModelSelector({
                     {/* Providers Column */}
                     <div className="w-1/3 border-r overflow-y-auto bg-muted/30 p-1">
                         <div className="text-xs font-semibold text-muted-foreground px-2 py-1.5 mb-1">
-                            提供商
+                            <Trans>Provider</Trans>
                         </div>
                         {loadingProviders ? (
                             <div className="flex justify-center p-4">
@@ -141,22 +145,22 @@ export function ModelSelector({
                     <div className="flex-1 flex flex-col">
                         <Command className="h-full border-0">
                             <CommandInput
-                                placeholder="搜索模型..."
+                                placeholder={_(msg`Search models...`)}
                                 className="h-9 border-b"
                             />
-                            <CommandList className="max-h-full flex-1 min-h-0 w-[300px]">
+                            <CommandList className="max-h-full flex-1 min-h-0 w-75">
                                 {loadingModels ? (
                                     <div className="flex justify-center p-8">
                                         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                                     </div>
                                 ) : (
                                     <>
-                                        <CommandEmpty>未找到模型</CommandEmpty>
+                                        <CommandEmpty><Trans>Model not found</Trans></CommandEmpty>
                                         <CommandGroup
                                             heading={
                                                 selectedProvider
-                                                    ? `${selectedProvider.name} 模型`
-                                                    : "请先选择提供商"
+                                                    ? `${selectedProvider.name} ${_(msg`Models`)}`
+                                                    : _(msg`Please select a provider first`)
                                             }
                                         >
                                             {models.map((model) => (

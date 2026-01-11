@@ -37,6 +37,9 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 
 import {
   TextNode,
@@ -57,13 +60,13 @@ const initialNodes: Node[] = [];
 
 const initialEdges: Edge[] = [];
 function CanvasEditor({ project, onBack }: CanvasViewProps) {
+  const { _ } = useLingui();
   const [name, setName] = useState(project.name);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeIdCounter, setNodeIdCounter] = useState(1);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize from project
   useEffect(() => {
@@ -98,7 +101,6 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
         console.error("Failed to parse project workflow:", err);
       }
     }
-    setIsInitialized(true);
   }, []);
 
   const isDragging = useRef(false);
@@ -239,6 +241,13 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
 
   const addNode = useCallback(
     (type: NodeType) => {
+      const typeLabels: Record<NodeType, string> = {
+        text: _(msg`Text`),
+        image: _(msg`Image`),
+        video: _(msg`Video`),
+        audio: _(msg`Audio`),
+        group: _(msg`Group`)
+      };
       const newNode: Node = {
         id: `node-${nodeIdCounter}`,
         type: type,
@@ -247,14 +256,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
           y: Math.random() * 400 + 100,
         },
         data: {
-          label: `${type === "text"
-            ? "文本"
-            : type === "image"
-              ? "图片"
-              : type === "video"
-                ? "视频"
-                : "音频"
-            }节点 ${nodeIdCounter}`,
+          label: `${typeLabels[type]} ${_(msg`Node`)} ${nodeIdCounter}`,
           type: type,
           projectId: project.id,
         },
@@ -262,7 +264,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
       setNodes((nds) => [...nds, newNode]);
       setNodeIdCounter((c) => c + 1);
     },
-    [nodeIdCounter, setNodes]
+    [nodeIdCounter, setNodes, _]
   );
 
   const { getIntersectingNodes } = useReactFlow();
@@ -397,10 +399,10 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
     const jsonString = JSON.stringify(data, null, 2);
     navigator.clipboard
       .writeText(jsonString)
-      .then(() => toast.success("Project JSON copied to clipboard"))
+      .then(() => toast.success(_(msg`Project JSON copied to clipboard`)))
       .catch((err) => {
         console.error("Failed to copy:", err);
-        toast.error("Failed to copy project JSON");
+        toast.error(_(msg`Failed to copy project JSON`));
       });
   }, [nodes, edges]);
 
@@ -461,7 +463,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="max-w-sm border-none bg-transparent px-2 focus-visible:ring-0 focus-visible:ring-offset-0 font-semibold"
-            placeholder="项目名称"
+            placeholder={_(msg`Project name`)}
           />
           <div className="ml-auto flex items-center gap-2">
             <input
@@ -504,7 +506,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                title="文本节点"
+                title={_(msg`Text Node`)}
                 onClick={() => addNode("text")}
               >
                 <FileText className="h-4 w-4" />
@@ -512,7 +514,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                title="图片节点"
+                title={_(msg`Image Node`)}
                 onClick={() => addNode("image")}
               >
                 <Image className="h-4 w-4" />
@@ -520,7 +522,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                title="视频节点"
+                title={_(msg`Video Node`)}
                 onClick={() => addNode("video")}
               >
                 <Video className="h-4 w-4" />
@@ -528,7 +530,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                title="音频节点"
+                title={_(msg`Audio Node`)}
                 onClick={() => addNode("audio")}
               >
                 <Music className="h-4 w-4" />
@@ -586,7 +588,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
         {isChatOpen && (
           <div className="w-96 bg-background border-l flex flex-col pt-14 shadow-xl">
             <div className="flex items-center justify-between border-b p-4">
-              <h3 className="font-semibold">AI 助手</h3>
+              <h3 className="font-semibold"><Trans>AI Assistant</Trans></h3>
               <Button
                 variant="ghost"
                 size="icon"
@@ -597,7 +599,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               <div className="text-sm text-muted-foreground">
-                这里是 AI 聊天界面...
+                <Trans>This is the AI chat interface...</Trans>
               </div>
             </div>
             <div className="border-t p-4">
@@ -605,7 +607,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
                 <Textarea
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="输入消息..."
+                  placeholder={_(msg`Enter message...`)}
                   className="min-h-15"
                 />
                 <Button size="icon">

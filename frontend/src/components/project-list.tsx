@@ -9,12 +9,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Trash2, Plus } from "lucide-react";
+import { Trans } from "@lingui/react/macro";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 
 interface ProjectListProps {
   onProjectClick: (project: database.Project) => void;
 }
 
 export function ProjectList({ onProjectClick }: ProjectListProps) {
+  const { _ } = useLingui();
   const [projects, setProjects] = useState<database.Project[]>([]);
 
   const fetchProjects = async () => {
@@ -35,7 +39,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
   const handleCreateProject = async () => {
     try {
       const newProject = new database.Project({
-        name: "Untitled Project",
+        name: _(msg`Untitled Project`),
       });
       const savedProject = await SaveProject(newProject);
       onProjectClick(savedProject);
@@ -49,8 +53,8 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">项目</h1>
-        <p className="text-muted-foreground mt-2">管理和访问您的所有项目</p>
+        <h1 className="text-3xl font-bold"><Trans>Projects</Trans></h1>
+        <p className="text-muted-foreground mt-2"><Trans>Manage and access all your projects</Trans></p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -65,7 +69,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
                 <Plus className="h-8 w-8 text-primary" />
               </div>
               <span className="font-medium text-muted-foreground">
-                新建项目
+                <Trans>New Project</Trans>
               </span>
             </div>
           </div>
@@ -93,7 +97,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
                       DeleteProject(project.id).then(() => fetchProjects());
                     }}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" /> 删除
+                    <Trash2 className="mr-2 h-4 w-4" /> <Trans>Delete</Trans>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -108,7 +112,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-secondary/30 text-muted-foreground">
-                  <span className="text-sm">无封面</span>
+                  <span className="text-sm"><Trans>No Cover</Trans></span>
                 </div>
               )}
             </div>
@@ -120,7 +124,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
                 </p>
               )}
               <div className="mt-auto pt-2 text-xs text-muted-foreground">
-                更新于 {new Date(project.updatedAt).toLocaleDateString()}
+                <Trans>Updated on</Trans> {new Date(project.updatedAt).toLocaleDateString()}
               </div>
             </div>
           </div>

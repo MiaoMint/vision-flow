@@ -53,6 +53,13 @@ func InitDB() error {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY(project_id) REFERENCES projects(id)
 	);
+
+	CREATE TABLE IF NOT EXISTS user_preferences (
+		key TEXT PRIMARY KEY,
+		value TEXT NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
 	`
 	_, err = DB.Exec(schema)
 	if err != nil {

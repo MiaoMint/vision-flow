@@ -11,6 +11,7 @@ import { GeneralSettings } from "./general-settings";
 import { AboutSettings } from "./about-settings";
 import { DebugSettings } from "./debug-settings";
 import { Settings, Sparkles, Info, Bug, List } from "lucide-react";
+import { Trans } from "@lingui/react/macro";
 
 interface SettingsDialogProps {
     open: boolean;
@@ -28,7 +29,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     {/* Sidebar */}
                     <div className="w-60 bg-muted/30 border-r h-full flex flex-col shrink-0">
                         <div className="p-6 pb-4">
-                            <h2 className="text-lg font-semibold tracking-tight">设置</h2>
+                            <h2 className="text-lg font-semibold tracking-tight"><Trans>Settings</Trans></h2>
                             <p className="text-sm text-muted-foreground">VisionFlow Preferences</p>
                         </div>
 
@@ -38,28 +39,28 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                                 className="w-full justify-start px-3 py-2 h-9  data-[state=active]:bg-background data-[state=active]:shadow-sm  transition-all cursor-pointer"
                             >
                                 <Settings className="w-4 h-4 mr-2" />
-                                通用
+                                <Trans>General</Trans>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="models"
                                 className="w-full justify-start px-3 py-2 h-9  data-[state=active]:bg-background data-[state=active]:shadow-sm  transition-all cursor-pointer"
                             >
                                 <Sparkles className="w-4 h-4 mr-2" />
-                                模型提供商
+                                <Trans>Model Providers</Trans>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="models-list"
                                 className="w-full justify-start px-3 py-2 h-9  data-[state=active]:bg-background data-[state=active]:shadow-sm  transition-all cursor-pointer"
                             >
                                 <List className="w-4 h-4 mr-2" />
-                                可用模型
+                                <Trans>Available Models</Trans>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="about"
                                 className="w-full justify-start px-3 py-2 h-9  data-[state=active]:bg-background data-[state=active]:shadow-sm  transition-all cursor-pointer"
                             >
                                 <Info className="w-4 h-4 mr-2" />
-                                关于
+                                <Trans>About</Trans>
                             </TabsTrigger>
                             {isDev && (
                                 <TabsTrigger
@@ -67,7 +68,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                                     className="w-full justify-start px-3 py-2 h-9  data-[state=active]:bg-background data-[state=active]:shadow-sm  transition-all cursor-pointer"
                                 >
                                     <Bug className="w-4 h-4 mr-2" />
-                                    调试
+                                    <Trans>Debug</Trans>
                                 </TabsTrigger>
                             )}
                         </TabsList>

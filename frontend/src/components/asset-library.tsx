@@ -5,6 +5,9 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, FileImage, FileVideo, FileAudio } from "lucide-react";
 import { toast } from "sonner";
+import { msg } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
 import {
     Dialog,
     DialogContent,
@@ -14,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 
 export function AssetLibrary() {
+    const { _ } = useLingui();
     const [assets, setAssets] = useState<database.Asset[]>([]);
     const [loading, setLoading] = useState(true);
     const [previewAsset, setPreviewAsset] = useState<database.Asset | null>(null);
@@ -24,7 +28,7 @@ export function AssetLibrary() {
             setAssets(result || []);
         } catch (err) {
             console.error("Failed to fetch assets:", err);
-            toast.error("加载素材失败");
+            toast.error(_(msg`Failed to load assets`));
         } finally {
             setLoading(false);
         }
@@ -39,13 +43,13 @@ export function AssetLibrary() {
         try {
             await DeleteAsset(id);
             setAssets(assets.filter((a) => a.id !== id));
-            toast.success("素材已删除");
+            toast.success(_(msg`Asset deleted`));
             if (previewAsset?.id === id) {
                 setPreviewAsset(null);
             }
         } catch (err) {
             console.error("Failed to delete asset:", err);
-            toast.error("删除失败");
+            toast.error(_(msg`Failed to delete`));
         }
     };
 
@@ -54,9 +58,9 @@ export function AssetLibrary() {
     return (
         <div className="p-6 h-full overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold tracking-tight">素材库</h2>
+                <h2 className="text-2xl font-bold tracking-tight"><Trans>Assets</Trans></h2>
                 <span className="text-muted-foreground text-sm">
-                    共 {assets.length} 个素材
+                    <Trans>Total {assets.length} assets</Trans>
                 </span>
             </div>
 
@@ -72,7 +76,7 @@ export function AssetLibrary() {
             ) : assets.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-[60vh] text-muted-foreground gap-4">
                     <FileImage className="w-16 h-16 opacity-20" />
-                    <p>暂无素材，在工作流中生成内容后会显示在这里</p>
+                    <p><Trans>No assets yet. Generated content in workflows will appear here</Trans></p>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-20">
@@ -109,7 +113,7 @@ export function AssetLibrary() {
             >
                 <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden bg-background/95 backdrop-blur-sm">
                     <DialogHeader className="p-4 border-b">
-                        <DialogTitle>素材预览</DialogTitle>
+                        <DialogTitle><Trans>Asset Preview</Trans></DialogTitle>
                         <DialogDescription>
                             {previewAsset?.type} - {previewAsset?.path}
                         </DialogDescription>
@@ -149,12 +153,12 @@ export function AssetLibrary() {
                         )}
                     </div>
                     <div className="p-4 border-t flex justify-end gap-2 bg-muted/30">
-                        <Button variant="outline" onClick={() => setPreviewAsset(null)}>关闭</Button>
+                        <Button variant="outline" onClick={() => setPreviewAsset(null)}><Trans>Close</Trans></Button>
                         <Button variant="destructive" onClick={(e) => {
                             if (previewAsset) {
                                 handleDelete(e as any, previewAsset.id);
                             }
-                        }}>删除</Button>
+                        }}><Trans>Delete</Trans></Button>
                     </div>
                 </DialogContent>
             </Dialog>
