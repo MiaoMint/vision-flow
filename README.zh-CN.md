@@ -81,8 +81,8 @@ wails dev
 
 应用将启动并包含：
 - 带有 React 应用的主窗口
-- 开发服务器 http://localhost:34115（用于浏览器测试 Go 方法）
-- 本地文件服务器 http://localhost:34116（用于生成的资源）
+- 开发服务器 http://127.0.0.1:34115（用于浏览器测试 Go 方法）
+- 本地文件服务器 http://127.0.0.1:34116（用于生成的资源）
 
 ### 构建
 
@@ -176,7 +176,7 @@ visionflow/
 - **服务层优先**：先在 `service/` 中实现逻辑，再通过 `binding/` 暴露
 - **Wails 绑定**：永远不要手动编辑 `frontend/wailsjs/go/` - 它们是自动生成的
 - **节点执行**：使用 `useNodeRun` Hook，通过 `runTrigger` UUID 管理状态
-- **资源访问**：前端使用 `http://localhost:34116/{filename}` 访问生成的文件
+- **资源访问**：前端使用 `http://127.0.0.1:34116/{filename}` 访问生成的文件
 
 ## 🤝 贡献
 

@@ -316,5 +316,5 @@ func (s *Service) processContent(projectID int, data []byte, b64 string, url str
 		}
 	}
 
-	return fmt.Sprintf("http://localhost:34116/%s", filename), nil
+	return fmt.Sprintf("http://127.0.0.1:34116/%s", filename), nil
 }

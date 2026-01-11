@@ -58,7 +58,7 @@ func (s *Service) ListAssets(projectID int) ([]db.Asset, error) {
 		return nil, err
 	}
 	for i := range assets {
-		assets[i].URL = fmt.Sprintf("http://localhost:34116/%s", assets[i].Path)
+		assets[i].URL = fmt.Sprintf("http://127.0.0.1:34116/%s", assets[i].Path)
 	}
 	return assets, nil
 }

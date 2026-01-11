@@ -81,8 +81,8 @@ wails dev
 
 The application will start with:
 - Main window with React app
-- Development server at http://localhost:34115 (for testing Go methods in browser)
-- Local file server at http://localhost:34116 (for generated assets)
+- Development server at http://127.0.0.1:34115 (for testing Go methods in browser)
+- Local file server at http://127.0.0.1:34116 (for generated assets)
 
 ### Build
 
@@ -176,7 +176,7 @@ visionflow/
 - **Service Layer First**: Implement logic in `service/` first, then expose through `binding/`
 - **Wails Bindings**: Never manually edit `frontend/wailsjs/go/` - they are auto-generated
 - **Node Execution**: Use `useNodeRun` Hook with `runTrigger` UUID to manage state
-- **Asset Access**: Frontend accesses generated files via `http://localhost:34116/{filename}`
+- **Asset Access**: Frontend accesses generated files via `http://127.0.0.1:34116/{filename}`
 
 ## 🤝 Contributing
 
