@@ -182,7 +182,9 @@ Contributions are welcome! Feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the Creative Commons Attribution 4.0 International License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the PolyForm Noncommercial License 1.0.0 - see the [LICENSE](LICENSE) file for details.
+
+This is a noncommercial license that allows personal use, research, and use by noncommercial organizations, but does not permit commercial use.
 
 ## 🙏 Acknowledgments
 

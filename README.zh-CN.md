@@ -182,7 +182,9 @@ visionflow/
 
 ## 📄 许可证
 
-本项目采用 Creative Commons Attribution 4.0 International License 许可 - 详见 [LICENSE](LICENSE) 文件。
+本项目采用 PolyForm Noncommercial License 1.0.0 许可 - 详见 [LICENSE](LICENSE) 文件。
+
+这是一个非商业许可证，允许个人使用、研究和非商业组织使用，但不允许商业用途。
 
 ## 🙏 致谢
 
