@@ -16,6 +16,7 @@
 - **Multiple AI Providers**: Integrated with OpenAI, Claude, and Gemini
 - **Local Asset Management**: Built-in asset library with local file storage
 - **Project Management**: Save, load, and manage multiple workflow projects
+- **Multilingual Interface**: Built-in internationalization support 
 - **Cross-Platform**: Native desktop app for macOS, Windows, and Linux
 
 ## 📸 Screenshots
@@ -47,6 +48,7 @@
 - ReactFlow (@xyflow/react) - Visual Canvas
 - Tailwind CSS 4 - Styling
 - shadcn/ui - UI Component Library
+- Lingui - Internationalization (i18n)
 
 ## 🚀 Quick Start
 

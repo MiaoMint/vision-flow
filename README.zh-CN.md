@@ -16,6 +16,7 @@
 - **多 AI 提供商**：集成 OpenAI、Claude 和 Gemini
 - **本地资源管理**：内置资源库，本地文件存储
 - **项目管理**：保存、加载和管理多个工作流项目
+- **多语言界面**：内置国际化支持
 - **跨平台**：支持 macOS、Windows 和 Linux 的原生桌面应用
 
 ## 📸 截图
@@ -47,6 +48,7 @@
 - ReactFlow（@xyflow/react）- 可视化画布
 - Tailwind CSS 4 - 样式
 - shadcn/ui - UI 组件库
+- Lingui - 国际化（i18n）
 
 ## 🚀 快速开始
 

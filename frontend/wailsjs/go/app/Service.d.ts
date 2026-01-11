@@ -4,4 +4,8 @@ import {app} from '../models';
 
 export function CheckUpdate():Promise<app.UpdateInfo>;
 
+export function GetUserPreference(arg1:string):Promise<string>;
+
 export function GetWailsJSON():Promise<string>;
+
+export function SetUserPreference(arg1:string,arg2:string):Promise<void>;

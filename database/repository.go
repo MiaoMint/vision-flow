@@ -197,3 +197,45 @@ func DeleteAsset(id int) error {
 
 	return nil
 }
+
+// GetUserPreference retrieves a user preference by key
+func GetUserPreference(key string) (string, error) {
+	var pref UserPreference
+	err := DB.Get(&pref, "SELECT * FROM user_preferences WHERE key = ?", key)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", nil // Not found, return empty string
+		}
+		return "", err
+	}
+	return pref.Value, nil
+}
+
+// SetUserPreference sets or updates a user preference
+func SetUserPreference(key, value string) error {
+	// Try to update first
+	result, err := DB.Exec(`
+		UPDATE user_preferences 
+		SET value = ?, updated_at = CURRENT_TIMESTAMP 
+		WHERE key = ?
+	`, value, key)
+	if err != nil {
+		return err
+	}
+
+	// If no rows affected, insert
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		_, err = DB.Exec(`
+			INSERT INTO user_preferences (key, value, created_at, updated_at)
+			VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		`, key, value)
+		return err
+	}
+
+	return nil
+}

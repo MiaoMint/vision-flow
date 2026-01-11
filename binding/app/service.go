@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"visionflow/database"
 )
 
 type Service struct {
@@ -69,7 +70,7 @@ func (s *Service) CheckUpdate() UpdateInfo {
 	if err != nil {
 		return UpdateInfo{CurrentVersion: currentVersion, Error: "Failed to create request: " + err.Error()}
 	}
-	
+
 	// Add User-Agent header which is often required by GitHub API
 	req.Header.Set("User-Agent", "VisionFlow-Updater")
 
@@ -115,7 +116,7 @@ func (s *Service) CheckUpdate() UpdateInfo {
 
 	// 3. Compare versions
 	latestVersionTag := strings.TrimPrefix(latestRelease.TagName, "v")
-	
+
 	hasUpdate := compareVersions(latestVersionTag, currentVersion) > 0
 
 	return UpdateInfo{
@@ -158,4 +159,14 @@ func compareVersions(v1, v2 string) int {
 		}
 	}
 	return 0
+}
+
+// GetUserPreference retrieves a user preference value by key
+func (s *Service) GetUserPreference(key string) (string, error) {
+	return database.GetUserPreference(key)
+}
+
+// SetUserPreference sets or updates a user preference
+func (s *Service) SetUserPreference(key, value string) error {
+	return database.SetUserPreference(key, value)
 }
