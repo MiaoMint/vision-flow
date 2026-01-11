@@ -92,7 +92,8 @@ func main() {
 			aiService,
 			appService,
 		},
-		OnStartup: aiService.SetContext,
+		HideWindowOnClose: true,
+		OnStartup:         aiService.SetContext,
 		Mac: &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),
 		},
