@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { Trans } from "@lingui/react/macro";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
+import { useSystemInfo } from "@/hooks/use-system-info";
+import { cn } from "@/lib/utils";
 
 export type AppView = "projects" | "assets";
 
@@ -29,7 +31,8 @@ export function AppSidebar({
   onSettingsClick: () => void;
 }) {
   const { _ } = useLingui();
-  
+  const { systemInfo } = useSystemInfo();
+
   function wip() {
     toast(_(msg`👷 Work in progress`));
   }
@@ -37,7 +40,7 @@ export function AppSidebar({
   return (
     <Sidebar className="border-none">
       <SidebarHeader>
-        <div className="px-2 mt-10">
+        <div className={cn("px-2", systemInfo?.isMac && "mt-10")}>
           <h2 className="text-xl font-bold">VisionFlow</h2>
         </div>
       </SidebarHeader>

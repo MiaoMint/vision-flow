@@ -50,6 +50,8 @@ import {
   type NodeType,
 } from "./nodes";
 import { database } from "../../wailsjs/go/models";
+import { useSystemInfo } from "@/hooks/use-system-info";
+import { cn } from "@/lib/utils";
 
 interface CanvasViewProps {
   project: database.Project;
@@ -61,6 +63,7 @@ const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 function CanvasEditor({ project, onBack }: CanvasViewProps) {
   const { _ } = useLingui();
+  const { systemInfo } = useSystemInfo();
   const [name, setName] = useState(project.name);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
@@ -246,7 +249,7 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
         image: _(msg`Image`),
         video: _(msg`Video`),
         audio: _(msg`Audio`),
-        group: _(msg`Group`)
+        group: _(msg`Group`),
       };
       const newNode: Node = {
         id: `node-${nodeIdCounter}`,
@@ -453,7 +456,10 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
       <div className="flex flex-1 relative overflow-hidden w-full h-full">
         {/* 顶部工具栏 - 悬浮毛玻璃效果 */}
         <div
-          className="absolute top-0 left-0 right-0 z-20 flex items-center gap-4 p-2 pl-24 backdrop-blur-md bg-background/80 border-b border-border/50"
+          className={cn(
+            "absolute top-0 left-0 right-0 z-20 flex items-center gap-4 p-2 backdrop-blur-md bg-background/80 border-b border-border/50",
+            systemInfo?.isMac && "pl-24"
+          )}
           style={{ "--wails-draggable": "drag" } as React.CSSProperties}
         >
           <Button variant="ghost" size="icon" onClick={handleBack}>
@@ -588,7 +594,9 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
         {isChatOpen && (
           <div className="w-96 bg-background border-l flex flex-col pt-14 shadow-xl">
             <div className="flex items-center justify-between border-b p-4">
-              <h3 className="font-semibold"><Trans>AI Assistant</Trans></h3>
+              <h3 className="font-semibold">
+                <Trans>AI Assistant</Trans>
+              </h3>
               <Button
                 variant="ghost"
                 size="icon"

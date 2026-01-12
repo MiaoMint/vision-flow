@@ -139,3 +139,10 @@
     scrollbar-width: none;
 }
  */
+
+ * {
+  user-select: none;
+  -webkit-user-select: none;
+ }
+
+ 
