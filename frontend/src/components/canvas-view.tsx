@@ -52,7 +52,7 @@ import {
 import { database } from "../../wailsjs/go/models";
 import { useSystemInfo } from "@/hooks/use-system-info";
 import { cn } from "@/lib/utils";
-import { useTheme } from "./theme-provider";
+import { useIsDarkTheme } from "@/hooks/use-is-dark-theme";
 
 interface CanvasViewProps {
   project: database.Project;
@@ -65,8 +65,7 @@ const initialEdges: Edge[] = [];
 function CanvasEditor({ project, onBack }: CanvasViewProps) {
   const { _ } = useLingui();
   const { systemInfo } = useSystemInfo();
-  const { theme } = useTheme();
-  const isDarkMode = theme === "dark";
+  const isDarkMode = useIsDarkTheme();
   const [name, setName] = useState(project.name);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
