@@ -52,6 +52,7 @@ import {
 import { database } from "../../wailsjs/go/models";
 import { useSystemInfo } from "@/hooks/use-system-info";
 import { cn } from "@/lib/utils";
+import { useTheme } from "./theme-provider";
 
 interface CanvasViewProps {
   project: database.Project;
@@ -64,6 +65,8 @@ const initialEdges: Edge[] = [];
 function CanvasEditor({ project, onBack }: CanvasViewProps) {
   const { _ } = useLingui();
   const { systemInfo } = useSystemInfo();
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
   const [name, setName] = useState(project.name);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
@@ -580,7 +583,15 @@ function CanvasEditor({ project, onBack }: CanvasViewProps) {
             maxZoom={2}
             proOptions={{ hideAttribution: true }}
           >
-            <MiniMap pannable zoomable />
+            <MiniMap
+              pannable
+              zoomable
+              bgColor={isDarkMode ? "#18181b" : "#ffffff"}
+              maskColor={
+                isDarkMode ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 0, 0, 0.1)"
+              }
+              nodeColor={isDarkMode ? "#52525b" : "#e4e4e7"}
+            />
             <Background
               className="dark:opacity-30"
               variant={BackgroundVariant.Dots}
