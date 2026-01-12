@@ -60,6 +60,14 @@ function DialogContent({
           className
         )}
         {...props}
+        onPointerDownOutside={(e) => {
+          if (
+            e.target instanceof Element &&
+            e.target.closest("[data-sonner-toast]")
+          ) {
+            e.preventDefault();
+          }
+        }}
       >
         {children}
         {showCloseButton && (
