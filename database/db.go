@@ -66,11 +66,6 @@ func InitDB() error {
 		return err
 	}
 
-	// Auto-migrate for existing tables
-	// Ignore errors if columns already exist
-	DB.Exec("ALTER TABLE projects ADD COLUMN workflow TEXT DEFAULT ''")
-	DB.Exec("ALTER TABLE projects ADD COLUMN cover_image TEXT DEFAULT ''")
-
 	log.Println("Database initialized successfully")
 	return nil
 }

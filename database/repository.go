@@ -46,7 +46,7 @@ func SaveModelProvider(config ModelProvider) error {
 
 	// Update
 	_, err := DB.NamedExec(`
-		UPDATE projects 
+		UPDATE model_providers 
 		SET name = :name, type = :type, api_key = :api_key, base_url = :base_url, updated_at = CURRENT_TIMESTAMP
 		WHERE id = :id
 	`, config)
