@@ -1,35 +1,37 @@
-import { useState, useCallback } from "react";
-import { type Node } from "@xyflow/react";
+import { useCallback } from "react";
+import { type Node, useReactFlow } from "@xyflow/react";
+import { useCanvasStore } from "@/stores/use-canvas-store";
 
-interface UseCanvasSelectionProps {
-  nodes: Node[];
-  nodeIdCounter: number;
-  setNodes: (nodes: Node[] | ((nodes: Node[]) => Node[])) => void;
-  setNodeIdCounter: (counter: number | ((counter: number) => number)) => void;
-}
+export function useCanvasSelection() {
+  const { getNodes } = useReactFlow();
 
-export function useCanvasSelection({
-  nodes,
-  nodeIdCounter,
-  setNodes,
-  setNodeIdCounter,
-}: UseCanvasSelectionProps) {
-  const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
+  const nodes = useCanvasStore((state) => state.nodes);
+  const setNodes = useCanvasStore((state) => state.setNodes);
+  const nodeIdCounter = useCanvasStore((state) => state.nodeIdCounter);
+  const setNodeIdCounter = useCanvasStore((state) => state.setNodeIdCounter);
+  const selectedNodes = useCanvasStore((state) => state.selectedNodes);
+  const setSelectedNodes = useCanvasStore((state) => state.setSelectedNodes);
+  const recordState = useCanvasStore((state) => state.recordState);
 
   const onSelectionChange = useCallback(
-    ({ nodes: selectedNodes }: { nodes: Node[] }) => {
-      if (selectedNodes.some((node) => node.type === "group")) {
+    ({ nodes: selection }: { nodes: Node[] }) => {
+      // Filter out groups from selection if needed or keep logic
+      // Original logic: if (selectedNodes.some((node) => node.type === "group")) return;
+      if (selection.some((node) => node.type === "group")) {
         return;
       }
-      setSelectedNodes(selectedNodes.map((node) => node.id));
+      setSelectedNodes(selection.map((node) => node.id));
     },
-    []
+    [setSelectedNodes]
   );
 
   const createGroup = useCallback(() => {
     if (selectedNodes.length === 0) return;
 
-    const selectedNodeObjects = nodes.filter(
+    // We can use store nodes or getNodes() from ReactFlow.
+    // getNodes() is often better for position data if it's being updated by drag
+    const currentNodes = getNodes();
+    const selectedNodeObjects = currentNodes.filter(
       (n) => selectedNodes.includes(n.id) && n.type !== "group"
     );
     if (selectedNodeObjects.length === 0) return;
@@ -43,7 +45,6 @@ export function useCanvasSelection({
     selectedNodeObjects.forEach((node) => {
       minX = Math.min(minX, node.position.x);
       minY = Math.min(minY, node.position.y);
-      // Rough sizing if width/height missing (which happens if not measured yet)
       const width = node.measured?.width ?? 200;
       const height = node.measured?.height ?? 200;
       maxX = Math.max(maxX, node.position.x + width);
@@ -61,26 +62,35 @@ export function useCanvasSelection({
       style: {
         width: maxX - minX + padding * 2,
         height: maxY - minY + padding * 2,
-        zIndex: -1, // Ensure group is behind
+        zIndex: -1,
         border: "none",
         background: "transparent",
         padding: 0,
       },
-      selectable: false, // Prevent box selection
+      selectable: false,
       data: { label: "New Group" },
     };
 
-    setNodes((nds) => [...nds, groupNode]);
+    setNodes([...currentNodes, groupNode]);
     setNodeIdCounter((c) => c + 1);
-    setSelectedNodes([]); // Clear selection/hide button
-  }, [selectedNodes, nodes, nodeIdCounter, setNodes, setNodeIdCounter]);
+    setSelectedNodes([]);
+    recordState();
+  }, [
+    selectedNodes,
+    getNodes,
+    nodeIdCounter,
+    setNodes,
+    setNodeIdCounter,
+    setSelectedNodes,
+    recordState,
+  ]);
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       if (node.type === "group") {
-        // Manual selection toggle for group nodes since they are not selectable by box
-        setNodes((nds) =>
-          nds.map((n) => {
+        const currentNodes = getNodes();
+        setNodes(
+          currentNodes.map((n) => {
             if (n.id === node.id) {
               return { ...n, selected: !n.selected };
             }
@@ -89,7 +99,7 @@ export function useCanvasSelection({
         );
       }
     },
-    [setNodes]
+    [setNodes, getNodes]
   );
 
   return {

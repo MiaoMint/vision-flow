@@ -1,51 +1,45 @@
 import { useCallback } from "react";
-import { type Node, type Edge } from "@xyflow/react";
+import { useReactFlow } from "@xyflow/react";
 import { SaveProject } from "../../../wailsjs/go/database/Service";
 import { database } from "../../../wailsjs/go/models";
+import { useCanvasStore } from "@/stores/use-canvas-store";
 
-interface UseCanvasSaveProps {
-  project: database.Project;
-  nodes: Node[];
-  edges: Edge[];
-  name: string;
-}
+export function useCanvasSave() {
+    const { getNodes, getEdges } = useReactFlow();
+    const project = useCanvasStore((state) => state.project);
 
-export function useCanvasSave({
-  project,
-  nodes,
-  edges,
-  name,
-}: UseCanvasSaveProps) {
-  const saveProject = useCallback(async () => {
-    if (!project.id) return;
+    const saveProject = useCallback(async () => {
+        if (!project?.id) return;
 
-    const nodesToSave = nodes.map((n: any) => ({
-      ...n,
-      data: {
-        ...n.data,
-        processing: false,
-        error: undefined,
-        runTrigger: undefined,
-      },
-    }));
+        const nodes = getNodes();
+        const edges = getEdges();
+        const nodesToSave = nodes.map((n: any) => ({
+            ...n,
+            data: {
+                ...n.data,
+                processing: false,
+                error: undefined,
+                runTrigger: undefined,
+            },
+        }));
 
-    const workflow = JSON.stringify({
-      nodes: nodesToSave,
-      edges,
-    });
+        const workflow = JSON.stringify({
+            nodes: nodesToSave,
+            edges,
+        });
 
-    try {
-      await SaveProject(
-        new database.Project({
-          ...project,
-          name: name,
-          workflow,
-        })
-      );
-    } catch (err) {
-      console.error("Auto-save failed:", err);
-    }
-  }, [nodes, edges, name, project]);
+        try {
+            // Use the project from store which should have the updated name
+            await SaveProject(
+                new database.Project({
+                    ...project,
+                    workflow,
+                })
+            );
+        } catch (err) {
+            console.error("Auto-save failed:", err);
+        }
+    }, [getNodes, getEdges, project]);
 
-  return { saveProject };
+    return { saveProject };
 }
