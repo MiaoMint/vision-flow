@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"io"
@@ -22,6 +23,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 //go:embed all:frontend/dist
@@ -29,6 +31,8 @@ var assets embed.FS
 
 //go:embed wails.json
 var wailsJSON string
+
+var wailsContext *context.Context
 
 // startFileServer starts a local HTTP server to serve generated files with CORS enabled.
 func startFileServer() {
@@ -144,7 +148,20 @@ func main() {
 			appService,
 		},
 		HideWindowOnClose: true,
-		OnStartup:         aiService.SetContext,
+		OnStartup: func(ctx context.Context) {
+			wailsContext = &ctx
+		},
+		SingleInstanceLock: &options.SingleInstanceLock{
+			UniqueId: "3e347bce-745e-4dd3-a6de-c6e6e2a44c86",
+			OnSecondInstanceLaunch: func(secondInstanceData options.SecondInstanceData) {
+				secondInstanceArgs := secondInstanceData.Args
+				println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
+				println("user opened second from", secondInstanceData.WorkingDirectory)
+				runtime.WindowUnminimise(*wailsContext)
+				runtime.Show(*wailsContext)
+				go runtime.EventsEmit(*wailsContext, "launchArgs", secondInstanceArgs)
+			},
+		},
 		Mac: &mac.Options{
 			TitleBar: mac.TitleBarHiddenInset(),
 		},
