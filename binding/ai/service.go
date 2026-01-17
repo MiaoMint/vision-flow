@@ -6,6 +6,7 @@ import (
 
 	"visionflow/database"
 	aiservice "visionflow/service/ai"
+	"visionflow/service/fileserver"
 	"visionflow/storage"
 )
 
@@ -314,5 +315,5 @@ func (s *Service) processContent(projectID int, data []byte, b64 string, url str
 		}
 	}
 
-	return fmt.Sprintf("http://127.0.0.1:34116/%s", filename), nil
+	return fileserver.GetFileUrl(filename), nil
 }

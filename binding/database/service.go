@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 	db "visionflow/database"
+	"visionflow/service/fileserver"
 	"visionflow/storage"
 )
 
@@ -65,7 +66,7 @@ func (s *Service) ListAssets(projectID int) ([]db.Asset, error) {
 		return nil, err
 	}
 	for i := range assets {
-		assets[i].URL = fmt.Sprintf("http://127.0.0.1:34116/%s", assets[i].Path)
+		assets[i].URL = fileserver.GetFileUrl(assets[i].Path)
 	}
 	return assets, nil
 }
@@ -88,7 +89,7 @@ func (s *Service) CreateAssetFromFile(name string, data []byte) (*db.Asset, erro
 	}
 	if existingAsset != nil {
 		// Return existing asset with URL
-		existingAsset.URL = fmt.Sprintf("http://127.0.0.1:34116/%s", existingAsset.Path)
+		existingAsset.URL = fileserver.GetFileUrl(existingAsset.Path)
 		return existingAsset, nil
 	}
 
@@ -138,6 +139,6 @@ func (s *Service) CreateAssetFromFile(name string, data []byte) (*db.Asset, erro
 	}
 
 	// Add URL for immediate use
-	createdAsset.URL = fmt.Sprintf("http://127.0.0.1:34116/%s", createdAsset.Path)
+	createdAsset.URL = fileserver.GetFileUrl(createdAsset.Path)
 	return createdAsset, nil
 }
