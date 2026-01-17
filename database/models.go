@@ -42,13 +42,15 @@ const (
 
 // Asset represents a stored item (image/video/audio) associated with a project/workflow
 type Asset struct {
-	ID        int       `db:"id" json:"id"`
-	ProjectID int       `db:"project_id" json:"projectId"`
-	Type      AssetType `db:"type" json:"type"`
-	Path      string    `db:"path" json:"path"`
-	URL       string    `db:"-" json:"url"`
-	CreatedAt time.Time `db:"created_at" json:"createdAt"`
-	UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
+	ID             int       `db:"id" json:"id"`
+	ProjectID      int       `db:"project_id" json:"projectId"`
+	Type           AssetType `db:"type" json:"type"`
+	Path           string    `db:"path" json:"path"`
+	URL            string    `db:"-" json:"url"`
+	IsUserProvided bool      `db:"is_user_provided" json:"isUserProvided"`
+	MD5            string    `db:"md5" json:"md5"`
+	CreatedAt      time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt      time.Time `db:"updated_at" json:"updatedAt"`
 }
 
 // UserPreference represents a user preference key-value pair

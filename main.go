@@ -32,13 +32,13 @@ var assets embed.FS
 //go:embed wails.json
 var wailsJSON string
 
-var wailsContext *context.Context
+var WailsContext *context.Context
 
-// startFileServer starts a local HTTP server to serve generated files with CORS enabled.
+// startFileServer starts a local HTTP server to serve asset files with CORS enabled.
 func startFileServer() {
-	genDir, err := storage.GetGeneratedDir()
+	assetsDir, err := storage.GetAssetsDir()
 	if err != nil {
-		fmt.Println("Error getting generated dir for file server:", err)
+		fmt.Println("Error getting assets dir for file server:", err)
 		return
 	}
 
@@ -51,7 +51,7 @@ func startFileServer() {
 			return
 		}
 
-		filePath := filepath.Join(genDir, r.URL.Path)
+		filePath := filepath.Join(assetsDir, r.URL.Path)
 		file, err := os.Open(filePath)
 		if err != nil {
 			http.NotFound(w, r)
@@ -106,7 +106,7 @@ func startFileServer() {
 		}
 	})
 
-	fmt.Println("Starting local file server on 127.0.0.1:34116 serving", genDir)
+	fmt.Println("Starting local file server on 127.0.0.1:34116 serving", assetsDir)
 	http.ListenAndServe("127.0.0.1:34116", handler)
 }
 
@@ -149,7 +149,7 @@ func main() {
 		},
 		HideWindowOnClose: true,
 		OnStartup: func(ctx context.Context) {
-			wailsContext = &ctx
+			WailsContext = &ctx
 		},
 		SingleInstanceLock: &options.SingleInstanceLock{
 			UniqueId: "3e347bce-745e-4dd3-a6de-c6e6e2a44c86",
@@ -157,9 +157,9 @@ func main() {
 				secondInstanceArgs := secondInstanceData.Args
 				println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
 				println("user opened second from", secondInstanceData.WorkingDirectory)
-				runtime.WindowUnminimise(*wailsContext)
-				runtime.Show(*wailsContext)
-				go runtime.EventsEmit(*wailsContext, "launchArgs", secondInstanceArgs)
+				runtime.WindowUnminimise(*WailsContext)
+				runtime.Show(*WailsContext)
+				go runtime.EventsEmit(*WailsContext, "launchArgs", secondInstanceArgs)
 			},
 		},
 		Mac: &mac.Options{

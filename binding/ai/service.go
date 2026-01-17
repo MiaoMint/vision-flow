@@ -285,7 +285,7 @@ func (s *Service) processContent(projectID int, data []byte, b64 string, url str
 	var err error
 
 	if len(data) > 0 {
-		filename, err = storage.SaveGeneratedContent(data, prefix, ext)
+		filename, err = storage.SaveAssetContent(data, prefix, ext)
 	} else if b64 != "" {
 		filename, err = storage.SaveBase64Content(b64, prefix, ext)
 	} else if url != "" {

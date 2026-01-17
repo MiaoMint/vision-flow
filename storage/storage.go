@@ -36,29 +36,16 @@ func GetDatabasePath() (string, error) {
 	return filepath.Join(appDir, "visionflow.db"), nil
 }
 
-// GetGeneratedDir returns the directory where generated content is saved.
-func GetGeneratedDir() (string, error) {
-	appDir, err := GetAppConfigDir()
-	if err != nil {
-		return "", err
-	}
-	genDir := filepath.Join(appDir, "generated")
-	if err := os.MkdirAll(genDir, 0755); err != nil {
-		return "", err
-	}
-	return genDir, nil
-}
-
-// SaveGeneratedContent saves the data to the generated directory with the given prefix and extension.
+// SaveAssetContent saves the data to the assets directory with the given prefix and extension.
 // It returns the filename (not full path) of the saved file.
-func SaveGeneratedContent(data []byte, prefix string, ext string) (string, error) {
-	genDir, err := GetGeneratedDir()
+func SaveAssetContent(data []byte, prefix string, ext string) (string, error) {
+	assetsDir, err := GetAssetsDir()
 	if err != nil {
 		return "", err
 	}
 
 	filename := fmt.Sprintf("%s_%d%s", prefix, time.Now().UnixNano(), ext)
-	fullPath := filepath.Join(genDir, filename)
+	fullPath := filepath.Join(assetsDir, filename)
 
 	if err := os.WriteFile(fullPath, data, 0644); err != nil {
 		return "", err
@@ -67,16 +54,16 @@ func SaveGeneratedContent(data []byte, prefix string, ext string) (string, error
 	return filename, nil
 }
 
-// SaveBase64Content decodes a base64 string and saves it to the generated directory.
+// SaveBase64Content decodes a base64 string and saves it to the assets directory.
 func SaveBase64Content(b64Data string, prefix string, ext string) (string, error) {
 	data, err := base64.StdEncoding.DecodeString(b64Data)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode base64 content: %w", err)
 	}
-	return SaveGeneratedContent(data, prefix, ext)
+	return SaveAssetContent(data, prefix, ext)
 }
 
-// SaveURLContent downloads content from a URL and saves it to the generated directory.
+// SaveURLContent downloads content from a URL and saves it to the assets directory.
 func SaveURLContent(url string, prefix string, ext string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -89,18 +76,18 @@ func SaveURLContent(url string, prefix string, ext string) (string, error) {
 		return "", fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	return SaveGeneratedContent(data, prefix, ext)
+	return SaveAssetContent(data, prefix, ext)
 }
 
-// DeleteGeneratedContent deletes a file from the generated directory.
+// DeleteAssetContent deletes a file from the assets directory.
 // filename should be just the filename, not a full path.
-func DeleteGeneratedContent(filename string) error {
-	genDir, err := GetGeneratedDir()
+func DeleteAssetContent(filename string) error {
+	assetsDir, err := GetAssetsDir()
 	if err != nil {
 		return err
 	}
 
-	fullPath := filepath.Join(genDir, filename)
+	fullPath := filepath.Join(assetsDir, filename)
 
 	// Check if file exists
 	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
@@ -108,4 +95,17 @@ func DeleteGeneratedContent(filename string) error {
 	}
 
 	return os.Remove(fullPath)
+}
+
+// GetAssetsDir returns the directory where asset files (images, videos, audio) are stored.
+func GetAssetsDir() (string, error) {
+	appDir, err := GetAppConfigDir()
+	if err != nil {
+		return "", err
+	}
+	assetsDir := filepath.Join(appDir, "assets")
+	if err := os.MkdirAll(assetsDir, 0755); err != nil {
+		return "", err
+	}
+	return assetsDir, nil
 }
