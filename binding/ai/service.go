@@ -10,18 +10,11 @@ import (
 )
 
 // Service provides AI methods for the frontend
-type Service struct {
-	ctx context.Context
-}
+type Service struct{}
 
 // NewService creates a new AI Service
 func NewService() *Service {
 	return &Service{}
-}
-
-// SetContext sets the context for the service
-func (s *Service) SetContext(ctx context.Context) {
-	s.ctx = ctx
 }
 
 // TextRequest defines the parameters for text generation
@@ -102,6 +95,7 @@ func (s *Service) getClient(providerID int) (aiservice.AIClient, error) {
 
 // GenerateText generates text based on the prompt
 func (s *Service) GenerateText(req TextRequest) (*AIResponse, error) {
+	ctx := context.Background()
 	client, err := s.getClient(req.ProviderID)
 	if err != nil {
 		return nil, err
@@ -119,7 +113,7 @@ func (s *Service) GenerateText(req TextRequest) (*AIResponse, error) {
 		Options:     req.Options,
 	}
 
-	resp, err := client.GenerateText(s.ctx, aiReq)
+	resp, err := client.GenerateText(ctx, aiReq)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +131,7 @@ func (s *Service) GenerateText(req TextRequest) (*AIResponse, error) {
 
 // GenerateImage generates an image based on the prompt
 func (s *Service) GenerateImage(req ImageRequest) (*AIResponse, error) {
+	ctx := context.Background()
 	client, err := s.getClient(req.ProviderID)
 	if err != nil {
 		return nil, err
@@ -154,7 +149,7 @@ func (s *Service) GenerateImage(req ImageRequest) (*AIResponse, error) {
 		Options: req.Options,
 	}
 
-	resp, err := client.GenerateImage(s.ctx, aiReq)
+	resp, err := client.GenerateImage(ctx, aiReq)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +167,7 @@ func (s *Service) GenerateImage(req ImageRequest) (*AIResponse, error) {
 
 // GenerateVideo generates a video based on the prompt
 func (s *Service) GenerateVideo(req VideoRequest) (*AIResponse, error) {
+	ctx := context.Background()
 	client, err := s.getClient(req.ProviderID)
 	if err != nil {
 		return nil, err
@@ -188,7 +184,7 @@ func (s *Service) GenerateVideo(req VideoRequest) (*AIResponse, error) {
 		Options:    req.Options,
 	}
 
-	resp, err := client.GenerateVideo(s.ctx, aiReq)
+	resp, err := client.GenerateVideo(ctx, aiReq)
 	if err != nil {
 		return nil, err
 	}
@@ -206,6 +202,7 @@ func (s *Service) GenerateVideo(req VideoRequest) (*AIResponse, error) {
 
 // GenerateAudio generates audio based on the prompt
 func (s *Service) GenerateAudio(req AudioRequest) (*AIResponse, error) {
+	ctx := context.Background()
 	client, err := s.getClient(req.ProviderID)
 	if err != nil {
 		return nil, err
@@ -222,7 +219,7 @@ func (s *Service) GenerateAudio(req AudioRequest) (*AIResponse, error) {
 		Options: req.Options,
 	}
 
-	resp, err := client.GenerateAudio(s.ctx, aiReq)
+	resp, err := client.GenerateAudio(ctx, aiReq)
 	if err != nil {
 		return nil, err
 	}
@@ -243,6 +240,7 @@ func (s *Service) GenerateAudio(req AudioRequest) (*AIResponse, error) {
 
 // ListModels lists available models for a given provider ID. If providerId is nil, lists from all providers.
 func (s *Service) ListModels(providerId *int) ([]aiservice.Model, error) {
+	ctx := context.Background()
 	if providerId == nil {
 		configs, err := database.ListModelProviders()
 		if err != nil {
@@ -256,7 +254,7 @@ func (s *Service) ListModels(providerId *int) ([]aiservice.Model, error) {
 				fmt.Printf("failed to create client for %s: %v\n", config.Name, err)
 				continue
 			}
-			models, err := client.ListModels(s.ctx)
+			models, err := client.ListModels(ctx)
 			if err != nil {
 				fmt.Printf("failed to list models for %s: %v\n", config.Name, err)
 				continue
@@ -279,7 +277,7 @@ func (s *Service) ListModels(providerId *int) ([]aiservice.Model, error) {
 		return nil, fmt.Errorf("failed to create client for provider id %d: %w", *providerId, err)
 	}
 
-	return client.ListModels(s.ctx)
+	return client.ListModels(ctx)
 }
 
 func (s *Service) processContent(projectID int, data []byte, b64 string, url string, prefix string, ext string, assetType database.AssetType) (string, error) {
