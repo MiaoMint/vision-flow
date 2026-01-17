@@ -5,6 +5,7 @@ import { useCanvasStore } from "@/stores/use-canvas-store";
 import { ClipboardSetText } from "../../../wailsjs/runtime/runtime";
 import type { NodeType, TextNodeData, WorkflowNodeData } from "@/components/nodes/types";
 import { CreateAssetFromFile } from "../../../wailsjs/go/database/Service"; // Moved import to top
+import { toast } from "sonner";
 
 interface UseCanvasCopyPasteProps {
   mousePositionRef: React.RefObject<{ x: number; y: number }>;
@@ -36,7 +37,7 @@ export function useCanvasCopyPaste({
   const nodeIdCounter = useCanvasStore((state) => state.nodeIdCounter);
   const setNodeIdCounter = useCanvasStore((state) => state.setNodeIdCounter);
   const recordState = useCanvasStore((state) => state.recordState);
-  const project = useCanvasStore((state) => state.project); // project is not used, but kept as per original
+  const createNode = useCanvasStore((state) => state.createNode);
 
   const copiedNodesRef = useRef<Node[]>([]);
 
@@ -66,12 +67,18 @@ export function useCanvasCopyPaste({
             }
 
             // Upload via Wails
-            const asset = await CreateAssetFromFile(file.name, bytes);
+            const uploadPromise = CreateAssetFromFile(file.name, bytes);
+            toast.promise(uploadPromise, {
+              loading: `Uploading ${file.name}...`,
+              success: `Asset ${file.name} uploaded successfully`,
+              error: `Failed to upload ${file.name}`,
+            });
+
+            const asset = await uploadPromise;
 
             if (asset) {
               const targetX = mousePositionRef.current?.x ?? 0;
               const targetY = mousePositionRef.current?.y ?? 0;
-              const newId = `node-${crypto.randomUUID()}`;
 
               // Construct node data based on type
               let nodeData: WorkflowNodeData | TextNodeData;
@@ -93,18 +100,11 @@ export function useCanvasCopyPaste({
                 nodeData = { ...commonData, content: "Unsupported Media" };
               }
 
-              const newNode: Node = {
-                id: newId,
+              createNode({
                 type: nodeType,
-                position: {
-                  x: targetX,
-                  y: targetY,
-                },
+                position: { x: targetX, y: targetY },
                 data: nodeData as unknown as Record<string, unknown>,
-              };
-
-              setNodes((nds) => [...nds, newNode]);
-              recordState();
+              });
             }
             resolve();
           } catch (e) {
@@ -115,7 +115,7 @@ export function useCanvasCopyPaste({
         reader.onerror = reject;
       });
     },
-    [mousePositionRef, setNodes, recordState]
+    [mousePositionRef, createNode]
   );
 
   // Copy selected nodes
@@ -150,8 +150,8 @@ export function useCanvasCopyPaste({
     const newNodes: Node[] = [];
     const oldToNewIdMap = new Map<string, string>();
 
-    nodesToPaste.forEach((copiedNode) => {
-      const newId = `node-${crypto.randomUUID()}`; // Use UUID for internal paste too
+    nodesToPaste.forEach((copiedNode, i) => {
+      const newId = `node-${nodeIdCounter + i}`;
       oldToNewIdMap.set(copiedNode.id, newId);
 
       const offsetX = copiedNode.position.x - centerX;
@@ -187,73 +187,9 @@ export function useCanvasCopyPaste({
 
     setNodes((nds) => [...nds, ...newNodes]);
     setEdges((eds) => [...eds, ...newEdges]);
-    setNodeIdCounter((c) => c + newNodes.length); // Still increment counter for consistency, though UUIDs are used
+    setNodeIdCounter((c: number) => c + newNodes.length); // Still increment counter for consistency, though UUIDs are used
     recordState();
-  }, [copiedNodesRef, mousePositionRef, getEdges, setNodes, setEdges, setNodeIdCounter, recordState]);
-
-
-  // Paste via Button/Programmatic (using Clipboard API)
-  const pasteNodes = useCallback(async () => {
-    // 1. Try files from system clipboard
-    try {
-      if (navigator.clipboard && navigator.clipboard.read) {
-        const clipboardItems = await navigator.clipboard.read();
-        for (const item of clipboardItems) {
-          // Find supported type
-          const type = item.types.find((t) =>
-            t.startsWith("image/") || t.startsWith("video/") || t.startsWith("audio/")
-          );
-
-          if (type) {
-            const blob = await item.getType(type);
-            // Convert blob to File object
-            const ext = type.split("/")[1] || "dat";
-            const filename = `pasted_file_${Date.now()}.${ext}`;
-            const file = new File([blob], filename, { type });
-
-            await processFile(file);
-            return; // Stop after first file for programmatic paste (optional choice)
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("Clipboard read failed or permission denied:", err);
-    }
-
-    // 2. Try text from system clipboard
-    try {
-      const clipboardText = await navigator.clipboard.readText();
-      if (clipboardText && clipboardText.trim()) {
-        const targetX = mousePositionRef.current?.x ?? 0;
-        const targetY = mousePositionRef.current?.y ?? 0;
-        const newId = `node-${crypto.randomUUID()}`; // Use UUID for text nodes too
-
-        const newNode: Node = {
-          id: newId,
-          type: "text",
-          position: { x: targetX, y: targetY },
-          data: {
-            label: "Text",
-            type: "text",
-            content: clipboardText,
-            isUserProvided: true,
-          } as unknown as Record<string, unknown>,
-        };
-        setNodes((nds) => [...nds, newNode]);
-        setNodeIdCounter((c) => c + 1);
-        recordState();
-        return;
-      }
-    } catch (error) {
-      // Ignore text error if clipboard access fails
-    }
-
-    // 3. Fallback to Internal Copy/Paste (if no external content found)
-    if (copiedNodesRef.current.length > 0) {
-      pasteInternalNodes();
-    }
-
-  }, [processFile, mousePositionRef, setNodes, setNodeIdCounter, recordState, copiedNodesRef, pasteInternalNodes]);
+  }, [copiedNodesRef, mousePositionRef, getEdges, setNodes, setEdges, setNodeIdCounter, recordState, nodeIdCounter]);
 
 
   // Native Paste Event Listener (Ctrl+V / Cmd+V)
@@ -284,10 +220,8 @@ export function useCanvasCopyPaste({
       if (text && text.trim()) {
         const targetX = mousePositionRef.current?.x ?? 0;
         const targetY = mousePositionRef.current?.y ?? 0;
-        const newId = `node-${crypto.randomUUID()}`; // Use UUID for text nodes too
 
-        const newNode: Node = {
-          id: newId,
+        createNode({
           type: "text",
           position: { x: targetX, y: targetY },
           data: {
@@ -296,10 +230,7 @@ export function useCanvasCopyPaste({
             content: text,
             isUserProvided: true,
           } as unknown as Record<string, unknown>,
-        };
-        setNodes((nds) => [...nds, newNode]);
-        setNodeIdCounter((c) => c + 1);
-        recordState();
+        });
         return;
       }
 
@@ -334,5 +265,5 @@ export function useCanvasCopyPaste({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [copyNodes]);
 
-  return { copyNodes, pasteNodes };
+  return { copyNodes };
 }
