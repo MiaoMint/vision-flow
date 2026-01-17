@@ -25,8 +25,6 @@ var assets embed.FS
 //go:embed wails.json
 var wailsJSON string
 
-var WailsContext *context.Context
-
 func main() {
 	// Initialize database
 	if err := database.InitDB(); err != nil {
@@ -66,7 +64,7 @@ func main() {
 		},
 		HideWindowOnClose: true,
 		OnStartup: func(ctx context.Context) {
-			WailsContext = &ctx
+			bindingApp.WailsContext = &ctx
 		},
 		SingleInstanceLock: &options.SingleInstanceLock{
 			UniqueId: "3e347bce-745e-4dd3-a6de-c6e6e2a44c86",
@@ -74,9 +72,9 @@ func main() {
 				secondInstanceArgs := secondInstanceData.Args
 				println("user opened second instance", strings.Join(secondInstanceData.Args, ","))
 				println("user opened second from", secondInstanceData.WorkingDirectory)
-				runtime.WindowUnminimise(*WailsContext)
-				runtime.Show(*WailsContext)
-				go runtime.EventsEmit(*WailsContext, "launchArgs", secondInstanceArgs)
+				runtime.WindowUnminimise(*bindingApp.WailsContext)
+				runtime.Show(*bindingApp.WailsContext)
+				go runtime.EventsEmit(*bindingApp.WailsContext, "launchArgs", secondInstanceArgs)
 			},
 		},
 		Mac: &mac.Options{
