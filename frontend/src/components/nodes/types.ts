@@ -11,6 +11,7 @@ export interface BaseNodeData {
   prompt?: string;
   runTrigger?: string;
   projectId?: number;
+  isUserProvided?: boolean;
 }
 
 export interface TextNodeData extends BaseNodeData {
@@ -37,4 +38,9 @@ export interface GroupNodeData extends BaseNodeData {
   type: "group";
 }
 
-export type WorkflowNodeData = TextNodeData | ImageNodeData | VideoNodeData | AudioNodeData | GroupNodeData;
+export type WorkflowNodeData =
+  | TextNodeData
+  | ImageNodeData
+  | VideoNodeData
+  | AudioNodeData
+  | GroupNodeData;

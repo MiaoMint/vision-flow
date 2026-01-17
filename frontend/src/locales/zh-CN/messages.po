@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/app-sidebar.tsx:34
+#: src/components/app-sidebar.tsx:37
 msgid "👷 Work in progress"
 msgstr "👷 工作中"
 
@@ -35,7 +35,7 @@ msgstr "添加供应商"
 msgid "Add Service"
 msgstr "添加服务"
 
-#: src/components/canvas-view.tsx:591
+#: src/components/canvas/canvas-chat-panel.tsx:22
 msgid "AI Assistant"
 msgstr "AI 助手"
 
@@ -51,17 +51,17 @@ msgstr "素材已删除"
 msgid "Asset Preview"
 msgstr "素材预览"
 
-#: src/components/app-sidebar.tsx:66
+#: src/components/app-sidebar.tsx:69
 #: src/components/asset-library.tsx:61
 msgid "Assets"
 msgstr "素材库"
 
-#: src/components/canvas-view.tsx:248
+#: src/components/canvas/canvas-left-panel.tsx:21
 #: src/components/settings/debug-settings.tsx:172
 msgid "Audio"
 msgstr "音频"
 
-#: src/components/canvas-view.tsx:533
+#: src/components/canvas/canvas-left-panel.tsx:73
 msgid "Audio Node"
 msgstr "音频节点"
 
@@ -145,7 +145,7 @@ msgstr "下载更新"
 msgid "Edit Service"
 msgstr "编辑服务"
 
-#: src/components/nodes/text-node.tsx:36
+#: src/components/nodes/text-node.tsx:52
 msgid "Enter AI processing prompt..."
 msgstr "输入 AI 处理提示词..."
 
@@ -157,7 +157,7 @@ msgstr "输入音频处理提示词..."
 msgid "Enter image processing prompt..."
 msgstr "输入图片处理提示词..."
 
-#: src/components/canvas-view.tsx:610
+#: src/components/canvas/canvas-chat-panel.tsx:38
 msgid "Enter message..."
 msgstr "输入消息..."
 
@@ -173,7 +173,7 @@ msgstr "输入视频处理提示词..."
 msgid "Environment Info"
 msgstr "环境信息"
 
-#: src/components/app-sidebar.tsx:74
+#: src/components/app-sidebar.tsx:77
 msgid "Explore"
 msgstr "浏览"
 
@@ -182,7 +182,7 @@ msgstr "浏览"
 msgid "Failed to check for updates"
 msgstr "检查更新失败"
 
-#: src/components/canvas-view.tsx:405
+#: src/hooks/canvas/use-canvas-import-export.ts:27
 msgid "Failed to copy project JSON"
 msgstr "复制项目 JSON 失败"
 
@@ -206,7 +206,7 @@ msgstr "通用设置"
 msgid "Generation Type"
 msgstr "生成类型"
 
-#: src/components/canvas-view.tsx:249
+#: src/components/canvas/canvas-left-panel.tsx:22
 msgid "Group"
 msgstr "分组"
 
@@ -218,12 +218,12 @@ msgstr "组执行失败"
 msgid "Hardware Concurrency:"
 msgstr "硬件并发:"
 
-#: src/components/canvas-view.tsx:246
+#: src/components/canvas/canvas-left-panel.tsx:19
 #: src/components/settings/debug-settings.tsx:170
 msgid "Image"
 msgstr "图像"
 
-#: src/components/canvas-view.tsx:517
+#: src/components/canvas/canvas-left-panel.tsx:57
 msgid "Image Node"
 msgstr "图片节点"
 
@@ -294,8 +294,13 @@ msgid "No audio yet"
 msgstr "暂无音频"
 
 #: src/components/nodes/text-node.tsx:54
-msgid "No content yet"
-msgstr "暂无内容"
+#~ msgid "No content yet"
+#~ msgstr "暂无内容"
+
+#: src/components/nodes/text-node.tsx:66
+#: src/components/nodes/text-node.tsx:77
+msgid "No content yet, double-click to edit"
+msgstr "暂无内容，双击开始编辑"
 
 #: src/components/project-list.tsx:115
 msgid "No Cover"
@@ -317,7 +322,7 @@ msgstr "没有更新日志"
 msgid "No video yet"
 msgstr "暂无视频"
 
-#: src/components/canvas-view.tsx:259
+#: src/components/canvas/canvas-left-panel.tsx:33
 msgid "Node"
 msgstr "节点"
 
@@ -333,15 +338,15 @@ msgstr "请先在\"模型提供商\"中配置 API Key"
 msgid "Please select a provider first"
 msgstr "请先选择提供商"
 
-#: src/components/canvas-view.tsx:402
+#: src/hooks/canvas/use-canvas-import-export.ts:24
 msgid "Project JSON copied to clipboard"
 msgstr "项目 JSON 已复制到剪贴板"
 
-#: src/components/canvas-view.tsx:466
+#: src/components/canvas/canvas-toolbar.tsx:55
 msgid "Project name"
 msgstr "项目名称"
 
-#: src/components/app-sidebar.tsx:55
+#: src/components/app-sidebar.tsx:58
 #: src/components/project-list.tsx:56
 msgid "Projects"
 msgstr "项目"
@@ -353,6 +358,10 @@ msgstr "提供商"
 #: src/components/settings/model-providers-settings.tsx:239
 msgid "Provider Type"
 msgstr "提供商类型"
+
+#: src/components/canvas/canvas-toolbar.tsx:70
+msgid "Redo (⌘⇧Z)"
+msgstr "重做"
 
 #: src/components/settings/models-list-settings.tsx:41
 msgid "Refresh"
@@ -390,7 +399,7 @@ msgstr "选择主题"
 msgid "Select type"
 msgstr "选择类型"
 
-#: src/components/app-sidebar.tsx:88
+#: src/components/app-sidebar.tsx:91
 #: src/components/settings/settings-dialog.tsx:32
 msgid "Settings"
 msgstr "设置"
@@ -419,12 +428,12 @@ msgstr "测试提示词"
 msgid "Testing..."
 msgstr "测试中..."
 
-#: src/components/canvas-view.tsx:245
+#: src/components/canvas/canvas-left-panel.tsx:18
 #: src/components/settings/debug-settings.tsx:169
 msgid "Text"
 msgstr "文本"
 
-#: src/components/canvas-view.tsx:509
+#: src/components/canvas/canvas-left-panel.tsx:49
 msgid "Text Node"
 msgstr "文本节点"
 
@@ -436,7 +445,7 @@ msgstr "主题"
 msgid "This action cannot be undone. This will permanently delete the model provider configuration."
 msgstr "此操作无法撤销。这将永久删除该模型提供商配置。"
 
-#: src/components/canvas-view.tsx:602
+#: src/components/canvas/canvas-chat-panel.tsx:30
 msgid "This is the AI chat interface..."
 msgstr "这里是 AI 聊天界面..."
 
@@ -444,6 +453,10 @@ msgstr "这里是 AI 聊天界面..."
 #: src/components/asset-library.tsx:63
 msgid "Total {0} assets"
 msgstr "共 {0} 个素材"
+
+#: src/components/canvas/canvas-toolbar.tsx:61
+msgid "Undo (⌘Z)"
+msgstr "撤销"
 
 #: src/components/project-list.tsx:42
 msgid "Untitled Project"
@@ -453,12 +466,12 @@ msgstr "未命名项目"
 msgid "Updated on"
 msgstr "更新于"
 
-#: src/components/canvas-view.tsx:247
+#: src/components/canvas/canvas-left-panel.tsx:20
 #: src/components/settings/debug-settings.tsx:171
 msgid "Video"
 msgstr "视频"
 
-#: src/components/canvas-view.tsx:525
+#: src/components/canvas/canvas-left-panel.tsx:65
 msgid "Video Node"
 msgstr "视频节点"
 
