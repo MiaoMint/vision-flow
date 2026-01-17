@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,8 @@ import (
 	"strings"
 	"visionflow/database"
 )
+
+var WailsContext *context.Context
 
 type Service struct {
 	WailsJSON string

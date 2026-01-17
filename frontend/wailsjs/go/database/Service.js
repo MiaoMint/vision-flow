@@ -18,6 +18,10 @@ export function DeleteProject(arg1) {
   return window['go']['database']['Service']['DeleteProject'](arg1);
 }
 
+export function DownloadAssetFile(arg1) {
+  return window['go']['database']['Service']['DownloadAssetFile'](arg1);
+}
+
 export function GetModelProvider(arg1) {
   return window['go']['database']['Service']['GetModelProvider'](arg1);
 }

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { database } from "../../wailsjs/go/models";
-import { ListAssets, DeleteAsset } from "../../wailsjs/go/database/Service";
+import { ListAssets, DeleteAsset, DownloadAssetFile } from "../../wailsjs/go/database/Service";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, FileImage, FileVideo, FileAudio } from "lucide-react";
+import { Trash2, FileImage, FileVideo, FileAudio, Download } from "lucide-react";
 import { toast } from "sonner";
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -53,7 +53,16 @@ export function AssetLibrary() {
         }
     };
 
-
+    const handleSave = async (e: React.MouseEvent, asset: database.Asset) => {
+        e.stopPropagation();
+        try {
+            await DownloadAssetFile(asset.path);
+            toast.success(_(msg`Asset saved`));
+        } catch (err) {
+            console.error("Failed to save asset:", err);
+            toast.error(_(msg`Failed to save`));
+        }
+    };
 
     return (
         <div className="p-6 h-full overflow-y-auto">
@@ -89,6 +98,14 @@ export function AssetLibrary() {
                             <CardContent className="p-0 relative">
                                 <AssetPreview asset={asset} />
                                 <div className="absolute bottom-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6 hover:text-primary hover:bg-primary/10 bg-background/50 backdrop-blur-sm"
+                                        onClick={(e) => handleSave(e, asset)}
+                                    >
+                                        <Download className="h-4 w-4" />
+                                    </Button>
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -153,6 +170,11 @@ export function AssetLibrary() {
                         )}
                     </div>
                     <div className="p-4 border-t flex justify-end gap-2 bg-muted/30">
+                        <Button variant="outline" onClick={(e) => {
+                            if (previewAsset) {
+                                handleSave(e as any, previewAsset);
+                            }
+                        }}><Trans>Save</Trans></Button>
                         <Button variant="outline" onClick={() => setPreviewAsset(null)}><Trans>Close</Trans></Button>
                         <Button variant="destructive" onClick={(e) => {
                             if (previewAsset) {

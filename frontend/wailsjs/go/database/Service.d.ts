@@ -10,6 +10,8 @@ export function DeleteModelProvider(arg1:number):Promise<void>;
 
 export function DeleteProject(arg1:number):Promise<void>;
 
+export function DownloadAssetFile(arg1:string):Promise<void>;
+
 export function GetModelProvider(arg1:number):Promise<database.ModelProvider>;
 
 export function GetProject(arg1:number):Promise<database.Project>;

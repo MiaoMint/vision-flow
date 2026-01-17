@@ -4,12 +4,16 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
+	"visionflow/binding/app"
 	db "visionflow/database"
 	"visionflow/service/fileserver"
 	"visionflow/storage"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type Service struct {
@@ -141,4 +145,52 @@ func (s *Service) CreateAssetFromFile(name string, data []byte) (*db.Asset, erro
 	// Add URL for immediate use
 	createdAsset.URL = fileserver.GetFileUrl(createdAsset.Path)
 	return createdAsset, nil
+}
+
+func (s *Service) DownloadAssetFile(filename string) error {
+	// 1. Resolve source path
+	assetsDir, err := storage.GetAssetsDir()
+	if err != nil {
+		return fmt.Errorf("failed to get assets directory: %w", err)
+	}
+	sourcePath := filepath.Join(assetsDir, filename)
+
+	// Check if source file exists
+	if _, err := os.Stat(sourcePath); os.IsNotExist(err) {
+		return fmt.Errorf("source file does not exist: %s", filename)
+	}
+
+	// 2. Open Save Dialog
+	destPath, err := runtime.SaveFileDialog(*app.WailsContext, runtime.SaveDialogOptions{
+		DefaultFilename: filename,
+		Title:           "Save Asset File",
+	})
+	if err != nil {
+		return err
+	}
+
+	// User cancelled
+	if destPath == "" {
+		return nil
+	}
+
+	// 3. Copy File efficiently
+	source, err := os.Open(sourcePath)
+	if err != nil {
+		return fmt.Errorf("failed to open source file: %w", err)
+	}
+	defer source.Close()
+
+	destination, err := os.Create(destPath)
+	if err != nil {
+		return fmt.Errorf("failed to create destination file: %w", err)
+	}
+	defer destination.Close()
+
+	_, err = io.Copy(destination, source)
+	if err != nil {
+		return fmt.Errorf("failed to save file: %w", err)
+	}
+
+	return nil
 }
