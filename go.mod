@@ -8,7 +8,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.33
 	github.com/sashabaranov/go-openai v1.41.2
 	github.com/wailsapp/wails/v2 v2.11.0
-	golang.design/x/clipboard v0.7.1
 	google.golang.org/genai v1.40.0
 )
 
@@ -49,9 +48,6 @@ require (
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
-	golang.org/x/exp/shiny v0.0.0-20250606033433-dcc06ee1d476 // indirect
-	golang.org/x/image v0.28.0 // indirect
-	golang.org/x/mobile v0.0.0-20250606033058-a2a15c67f36f // indirect
 	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
@@ -59,7 +55,3 @@ require (
 	google.golang.org/grpc v1.66.2 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )
-
-// replace github.com/wailsapp/wails/v2 v2.11.0 => /Users/miaomint/Projects
-
-exclude golang.org/x/exp v0.0.0-20190121172915-509febef88a4

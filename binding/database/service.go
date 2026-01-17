@@ -9,19 +9,12 @@ import (
 	"time"
 	db "visionflow/database"
 	"visionflow/storage"
-
-	"golang.design/x/clipboard"
 )
 
 type Service struct {
 }
 
 func NewService() *Service {
-	// Initialize clipboard
-	err := clipboard.Init()
-	if err != nil {
-		fmt.Printf("Failed to initialize clipboard: %v\n", err)
-	}
 	return &Service{}
 }
 
