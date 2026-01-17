@@ -1,6 +1,11 @@
 import { memo, useRef, useState } from "react";
-import { type NodeProps, useReactFlow } from "@xyflow/react";
-import { Video, Play, Pause } from "lucide-react";
+import {
+  type NodeProps,
+  NodeToolbar,
+  Position,
+  useReactFlow,
+} from "@xyflow/react";
+import { Video, Play, Pause, Download } from "lucide-react";
 import type { VideoNodeData } from "./types";
 import { GenerateVideo } from "../../../wailsjs/go/ai/Service";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,9 +15,13 @@ import { useNodeRun } from "../../hooks/use-node-run";
 import { useLingui } from "@lingui/react";
 import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
+import { ButtonGroup } from "../ui/button-group";
+import { toast } from "sonner";
+import { DownloadAssetFile } from "../../../wailsjs/go/database/Service";
 
 export const VideoNode = memo((props: NodeProps) => {
   const { id, data } = props;
+  const isSelected = props.selected;
   const nodeData = data as unknown as VideoNodeData;
   const { updateNodeData } = useReactFlow();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -47,6 +56,20 @@ export const VideoNode = memo((props: NodeProps) => {
     setIsPlaying(false);
   };
 
+  const handleSave = async () => {
+    if (nodeData.videoUrl == null) {
+      toast.error(_(msg`No video to save`));
+      return;
+    }
+    try {
+      await DownloadAssetFile(nodeData.videoUrl.split("/").pop() || "");
+      toast.success(_(msg`Asset saved`));
+    } catch (err) {
+      console.error("Failed to save asset:", err);
+      toast.error(_(msg`Failed to save`));
+    }
+  };
+
   return (
     <BaseNode
       {...props}
@@ -57,6 +80,24 @@ export const VideoNode = memo((props: NodeProps) => {
       minWidth={200}
       minHeight={200}
     >
+      <NodeToolbar
+        isVisible={isSelected}
+        position={Position.Top}
+        align="center"
+        offset={30}
+      >
+        <ButtonGroup>
+          <Button
+            onClick={handleSave}
+            title="Download"
+            size={"icon"}
+            variant={"outline"}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        </ButtonGroup>
+      </NodeToolbar>
+
       <div className="p-0 overflow-hidden bg-muted/20 w-full flex-1 flex items-center justify-center relative group">
         {nodeData.processing ? (
           <div className="w-full h-full p-4 space-y-2 flex flex-col justify-center">
@@ -71,7 +112,9 @@ export const VideoNode = memo((props: NodeProps) => {
               onEnded={onVideoEnded}
               onClick={togglePlay}
             />
-            <div className={`absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-200 ${isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}>
+            <div
+              className={`absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-200 ${isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}
+            >
               <Button
                 variant="secondary"
                 size="icon"
@@ -90,7 +133,9 @@ export const VideoNode = memo((props: NodeProps) => {
             </div>
           </>
         ) : (
-          <div className="text-xs text-muted-foreground italic p-4"><Trans>No video yet</Trans></div>
+          <div className="text-xs text-muted-foreground italic p-4">
+            <Trans>No video yet</Trans>
+          </div>
         )}
       </div>
     </BaseNode>
