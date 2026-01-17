@@ -69,9 +69,9 @@ export function useCanvasCopyPaste({
             // Upload via Wails
             const uploadPromise = CreateAssetFromFile(file.name, bytes);
             toast.promise(uploadPromise, {
-              loading: `Uploading ${file.name}...`,
-              success: `Asset ${file.name} uploaded successfully`,
-              error: `Failed to upload ${file.name}`,
+              loading: `Pasting ${file.name}...`,
+              success: `Asset ${file.name} pasted successfully`,
+              error: `Failed to paste ${file.name}`,
             });
 
             const asset = await uploadPromise;
