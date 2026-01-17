@@ -6,21 +6,84 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"visionflow/database"
+	"visionflow/storage"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 var WailsContext *context.Context
 
 type Service struct {
 	WailsJSON string
+	InitError string
 }
 
-func NewService(wailsJSON string) *Service {
+func NewService(wailsJSON string, initError string) *Service {
 	return &Service{
 		WailsJSON: wailsJSON,
+		InitError: initError,
 	}
+}
+
+func (s *Service) GetInitError() string {
+	return s.InitError
+}
+
+func (s *Service) BackupData() error {
+	destination, err := runtime.SaveFileDialog(*WailsContext, runtime.SaveDialogOptions{
+		Title:           "Save Backup",
+		DefaultFilename: "vision-flow-backup.zip",
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "Zip Files (*.zip)",
+				Pattern:     "*.zip",
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	if destination == "" {
+		return nil
+	}
+
+	return storage.ZipAppConfigDir(destination)
+}
+
+func (s *Service) ResetDatabase() error {
+	// Close database connection if open
+	if database.DB != nil {
+		if err := database.DB.Close(); err != nil {
+			return fmt.Errorf("failed to close database connection: %w", err)
+		}
+	}
+
+	dbPath, err := storage.GetDatabasePath()
+	if err != nil {
+		return err
+	}
+
+	// Create backup before delete
+	backupPath := dbPath + ".bak"
+	// If a backup already exists, remove it first
+	os.Remove(backupPath)
+	if err := os.Rename(dbPath, backupPath); err != nil {
+		return fmt.Errorf("failed to backup database: %w", err)
+	}
+
+	// Re-initialize the database
+	if err := database.InitDB(); err != nil {
+		// If initialization fails, try to restore backup
+		os.Rename(backupPath, dbPath)
+		return fmt.Errorf("failed to re-initialize database: %w", err)
+	}
+
+	return nil
 }
 
 func (s *Service) GetWailsJSON() string {

@@ -27,9 +27,10 @@ var wailsJSON string
 
 func main() {
 	// Initialize database
+	var initErr string
 	if err := database.InitDB(); err != nil {
 		println("Error initializing database:", err.Error())
-		return
+		initErr = err.Error()
 	}
 
 	// Initialize AI capabilities (model data)
@@ -41,7 +42,7 @@ func main() {
 	// Create an instance of the app structure
 	dbService := bindingDB.NewService()
 	aiService := bindingAI.NewService()
-	appService := bindingApp.NewService(wailsJSON)
+	appService := bindingApp.NewService(wailsJSON, initErr)
 
 	// Start the local file server
 	go fileserver.Start()
