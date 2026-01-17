@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import { type NodeProps, useReactFlow } from "@xyflow/react";
 import { FileText } from "lucide-react";
 import type { TextNodeData } from "./types";
@@ -17,6 +17,26 @@ export const TextNode = memo((props: NodeProps) => {
   const { updateNodeData } = useReactFlow();
   const { _ } = useLingui();
   const [isEditing, setIsEditing] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  // Prevent wheel events when hovering over text node
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation();
+    };
+
+    const node = nodeRef.current;
+    if (node && isHovering) {
+      node.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    return () => {
+      if (node) {
+        node.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, [isHovering]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateNodeData(id, {
@@ -30,6 +50,14 @@ export const TextNode = memo((props: NodeProps) => {
 
   const handleBlur = () => {
     setIsEditing(false);
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
   };
 
   const { handleRun } = useNodeRun({
@@ -53,7 +81,12 @@ export const TextNode = memo((props: NodeProps) => {
       minWidth={200}
       minHeight={200}
     >
-      <div className={cn("p-2 w-full flex-1 flex overflow-auto", isEditing && "nodrag")}>
+      <div 
+        ref={nodeRef}
+        className={cn("p-2 w-full flex-1 flex overflow-auto", isEditing && "nodrag")}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         {nodeData.processing ? (
           <div className="w-full space-y-2">
             <Skeleton className="h-4 w-full" />
@@ -71,7 +104,7 @@ export const TextNode = memo((props: NodeProps) => {
           />
         ) : (
           <div
-            className={cn("flex-1 text-sm whitespace-pre-wrap", !nodeData.content && "text-muted-foreground")}
+            className={cn("flex-1 text-sm wrap-anywhere", !nodeData.content && "text-muted-foreground")}
             onDoubleClick={handleDoubleClick}
           >
             {nodeData.content || _(msg`No content yet, double-click to edit`)}
