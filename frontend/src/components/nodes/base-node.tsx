@@ -88,11 +88,13 @@ export function BaseNode({
           className="font-semibold text-sm bg-transparent border-none outline-none focus:ring-0 p-0 w-full"
         />
       </div>
-      <Handle
-        type="target"
-        className="opacity-0 group-hover:opacity-100 transition-all"
-        position={Position.Left}
-      />
+      {!nodeData.isUserProvided && (
+        <Handle
+          type="target"
+          className="opacity-0 group-hover:opacity-100 transition-all"
+          position={Position.Left}
+        />
+      )}
       <Handle
         type="source"
         className="opacity-0 group-hover:opacity-100 transition-all"
@@ -117,7 +119,6 @@ export function BaseNode({
       >
         {children}
       </Card>
-
       {!nodeData.isUserProvided && !nodeData.processing && (
         <NodeToolbar
           isVisible={isSelected}

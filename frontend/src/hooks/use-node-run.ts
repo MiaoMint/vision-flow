@@ -37,6 +37,10 @@ export function useNodeRun({ id, nodeData, apiFunction, onSuccess, onStart }: Us
     };
 
     const handleRun = async () => {
+        if (nodeData.isUserProvided) {
+            return;
+        }
+
         if (!nodeData.providerId || !nodeData.modelId) {
             updateNodeData(id, { error: "Please select a provider and model" });
             return;

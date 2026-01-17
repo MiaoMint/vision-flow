@@ -81,7 +81,7 @@ export const TextNode = memo((props: NodeProps) => {
       minWidth={200}
       minHeight={200}
     >
-      <div 
+      <div
         ref={nodeRef}
         className={cn("p-2 w-full flex-1 flex overflow-auto", isEditing && "nodrag")}
         onMouseEnter={handleMouseEnter}
@@ -104,7 +104,7 @@ export const TextNode = memo((props: NodeProps) => {
           />
         ) : (
           <div
-            className={cn("flex-1 text-sm wrap-anywhere", !nodeData.content && "text-muted-foreground")}
+            className={cn("flex-1 text-sm wrap-anywhere whitespace-pre-wrap", !nodeData.content && "text-muted-foreground")}
             onDoubleClick={handleDoubleClick}
           >
             {nodeData.content || _(msg`No content yet, double-click to edit`)}
