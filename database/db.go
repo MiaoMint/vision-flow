@@ -46,13 +46,18 @@ func InitDB() error {
 
 	CREATE TABLE IF NOT EXISTS assets (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		project_id INTEGER NOT NULL,
+		project_id INTEGER,
 		type TEXT NOT NULL,
 		path TEXT NOT NULL,
+		is_user_provided BOOLEAN DEFAULT 0,
+		md5 TEXT DEFAULT '',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY(project_id) REFERENCES projects(id)
 	);
+	
+
+	CREATE INDEX IF NOT EXISTS idx_assets_md5 ON assets(md5);
 
 	CREATE TABLE IF NOT EXISTS user_preferences (
 		key TEXT PRIMARY KEY,

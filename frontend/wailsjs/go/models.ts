@@ -202,6 +202,8 @@ export namespace database {
 	    type: string;
 	    path: string;
 	    url: string;
+	    isUserProvided: boolean;
+	    md5: string;
 	    // Go type: time
 	    createdAt: any;
 	    // Go type: time
@@ -218,6 +220,8 @@ export namespace database {
 	        this.type = source["type"];
 	        this.path = source["path"];
 	        this.url = source["url"];
+	        this.isUserProvided = source["isUserProvided"];
+	        this.md5 = source["md5"];
 	        this.createdAt = this.convertValues(source["createdAt"], null);
 	        this.updatedAt = this.convertValues(source["updatedAt"], null);
 	    }

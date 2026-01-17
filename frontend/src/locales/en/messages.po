@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/app-sidebar.tsx:34
+#: src/components/app-sidebar.tsx:37
 msgid "👷 Work in progress"
 msgstr "👷 Work in progress"
 
@@ -35,7 +35,7 @@ msgstr "Add Provider"
 msgid "Add Service"
 msgstr "Add Service"
 
-#: src/components/canvas-view.tsx:591
+#: src/components/canvas/canvas-chat-panel.tsx:22
 msgid "AI Assistant"
 msgstr "AI Assistant"
 
@@ -51,17 +51,17 @@ msgstr "Asset deleted"
 msgid "Asset Preview"
 msgstr "Asset Preview"
 
-#: src/components/app-sidebar.tsx:66
+#: src/components/app-sidebar.tsx:69
 #: src/components/asset-library.tsx:61
 msgid "Assets"
 msgstr "Assets"
 
-#: src/components/canvas-view.tsx:248
+#: src/components/canvas/canvas-left-panel.tsx:21
 #: src/components/settings/debug-settings.tsx:172
 msgid "Audio"
 msgstr "Audio"
 
-#: src/components/canvas-view.tsx:533
+#: src/components/canvas/canvas-left-panel.tsx:73
 msgid "Audio Node"
 msgstr "Audio Node"
 
@@ -145,7 +145,7 @@ msgstr "Download Update"
 msgid "Edit Service"
 msgstr "Edit Service"
 
-#: src/components/nodes/text-node.tsx:36
+#: src/components/nodes/text-node.tsx:52
 msgid "Enter AI processing prompt..."
 msgstr "Enter AI processing prompt..."
 
@@ -157,7 +157,7 @@ msgstr "Enter audio processing prompt..."
 msgid "Enter image processing prompt..."
 msgstr "Enter image processing prompt..."
 
-#: src/components/canvas-view.tsx:610
+#: src/components/canvas/canvas-chat-panel.tsx:38
 msgid "Enter message..."
 msgstr "Enter message..."
 
@@ -173,7 +173,7 @@ msgstr "Enter video processing prompt..."
 msgid "Environment Info"
 msgstr "Environment Info"
 
-#: src/components/app-sidebar.tsx:74
+#: src/components/app-sidebar.tsx:77
 msgid "Explore"
 msgstr "Explore"
 
@@ -182,7 +182,7 @@ msgstr "Explore"
 msgid "Failed to check for updates"
 msgstr "Failed to check for updates"
 
-#: src/components/canvas-view.tsx:405
+#: src/hooks/canvas/use-canvas-import-export.ts:27
 msgid "Failed to copy project JSON"
 msgstr "Failed to copy project JSON"
 
@@ -206,7 +206,7 @@ msgstr "General Settings"
 msgid "Generation Type"
 msgstr "Generation Type"
 
-#: src/components/canvas-view.tsx:249
+#: src/components/canvas/canvas-left-panel.tsx:22
 msgid "Group"
 msgstr "Group"
 
@@ -218,12 +218,12 @@ msgstr "Group execution failed"
 msgid "Hardware Concurrency:"
 msgstr "Hardware Concurrency:"
 
-#: src/components/canvas-view.tsx:246
+#: src/components/canvas/canvas-left-panel.tsx:19
 #: src/components/settings/debug-settings.tsx:170
 msgid "Image"
 msgstr "Image"
 
-#: src/components/canvas-view.tsx:517
+#: src/components/canvas/canvas-left-panel.tsx:57
 msgid "Image Node"
 msgstr "Image Node"
 
@@ -294,8 +294,13 @@ msgid "No audio yet"
 msgstr "No audio yet"
 
 #: src/components/nodes/text-node.tsx:54
-msgid "No content yet"
-msgstr "No content yet"
+#~ msgid "No content yet"
+#~ msgstr "No content yet"
+
+#: src/components/nodes/text-node.tsx:66
+#: src/components/nodes/text-node.tsx:77
+msgid "No content yet, double-click to edit"
+msgstr "No content yet, double-click to edit"
 
 #: src/components/project-list.tsx:115
 msgid "No Cover"
@@ -317,7 +322,7 @@ msgstr "No release notes available."
 msgid "No video yet"
 msgstr "No video yet"
 
-#: src/components/canvas-view.tsx:259
+#: src/components/canvas/canvas-left-panel.tsx:33
 msgid "Node"
 msgstr "Node"
 
@@ -333,15 +338,15 @@ msgstr "Please configure API Key in \"Model Providers\" first"
 msgid "Please select a provider first"
 msgstr "Please select a provider first"
 
-#: src/components/canvas-view.tsx:402
+#: src/hooks/canvas/use-canvas-import-export.ts:24
 msgid "Project JSON copied to clipboard"
 msgstr "Project JSON copied to clipboard"
 
-#: src/components/canvas-view.tsx:466
+#: src/components/canvas/canvas-toolbar.tsx:55
 msgid "Project name"
 msgstr "Project name"
 
-#: src/components/app-sidebar.tsx:55
+#: src/components/app-sidebar.tsx:58
 #: src/components/project-list.tsx:56
 msgid "Projects"
 msgstr "Projects"
@@ -353,6 +358,10 @@ msgstr "Provider"
 #: src/components/settings/model-providers-settings.tsx:239
 msgid "Provider Type"
 msgstr "Provider Type"
+
+#: src/components/canvas/canvas-toolbar.tsx:70
+msgid "Redo (⌘⇧Z)"
+msgstr "Redo (⌘⇧Z)"
 
 #: src/components/settings/models-list-settings.tsx:41
 msgid "Refresh"
@@ -390,7 +399,7 @@ msgstr "Select theme"
 msgid "Select type"
 msgstr "Select type"
 
-#: src/components/app-sidebar.tsx:88
+#: src/components/app-sidebar.tsx:91
 #: src/components/settings/settings-dialog.tsx:32
 msgid "Settings"
 msgstr "Settings"
@@ -419,12 +428,12 @@ msgstr "Test Prompt"
 msgid "Testing..."
 msgstr "Testing..."
 
-#: src/components/canvas-view.tsx:245
+#: src/components/canvas/canvas-left-panel.tsx:18
 #: src/components/settings/debug-settings.tsx:169
 msgid "Text"
 msgstr "Text"
 
-#: src/components/canvas-view.tsx:509
+#: src/components/canvas/canvas-left-panel.tsx:49
 msgid "Text Node"
 msgstr "Text Node"
 
@@ -436,7 +445,7 @@ msgstr "Theme"
 msgid "This action cannot be undone. This will permanently delete the model provider configuration."
 msgstr "This action cannot be undone. This will permanently delete the model provider configuration."
 
-#: src/components/canvas-view.tsx:602
+#: src/components/canvas/canvas-chat-panel.tsx:30
 msgid "This is the AI chat interface..."
 msgstr "This is the AI chat interface..."
 
@@ -444,6 +453,10 @@ msgstr "This is the AI chat interface..."
 #: src/components/asset-library.tsx:63
 msgid "Total {0} assets"
 msgstr "Total {0} assets"
+
+#: src/components/canvas/canvas-toolbar.tsx:61
+msgid "Undo (⌘Z)"
+msgstr "Undo (⌘Z)"
 
 #: src/components/project-list.tsx:42
 msgid "Untitled Project"
@@ -453,12 +466,12 @@ msgstr "Untitled Project"
 msgid "Updated on"
 msgstr "Updated on"
 
-#: src/components/canvas-view.tsx:247
+#: src/components/canvas/canvas-left-panel.tsx:20
 #: src/components/settings/debug-settings.tsx:171
 msgid "Video"
 msgstr "Video"
 
-#: src/components/canvas-view.tsx:525
+#: src/components/canvas/canvas-left-panel.tsx:65
 msgid "Video Node"
 msgstr "Video Node"
 

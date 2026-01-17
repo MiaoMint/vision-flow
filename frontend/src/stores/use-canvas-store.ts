@@ -5,6 +5,7 @@ import {
     type OnNodesChange,
     type OnEdgesChange,
     type Connection,
+    type XYPosition,
     applyNodeChanges,
     applyEdgeChanges,
     addEdge,
@@ -45,6 +46,7 @@ interface CanvasState {
     onEdgesChange: OnEdgesChange;
     onConnect: (connection: Connection) => void;
     addNode: (node: Node) => void;
+    createNode: (options: { type: string; position: XYPosition; data: Record<string, unknown> }) => void;
 
     setNodeIdCounter: (counter: number | ((c: number) => number)) => void;
 
@@ -162,6 +164,22 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
             nodes: [...state.nodes, node],
             nodeIdCounter: state.nodeIdCounter + 1,
         }));
+        get().recordState();
+    },
+
+    createNode: (options) => {
+        const state = get();
+        const newId = `node-${state.nodeIdCounter}`;
+        const newNode: Node = {
+            id: newId,
+            type: options.type,
+            position: options.position,
+            data: options.data,
+        };
+        set({
+            nodes: [...state.nodes, newNode],
+            nodeIdCounter: state.nodeIdCounter + 1,
+        });
         get().recordState();
     },
 

@@ -134,8 +134,8 @@ func ListProjects() ([]Project, error) {
 func CreateAsset(asset Asset) (*Asset, error) {
 	// Insert
 	result, err := DB.NamedExec(`
-        INSERT INTO assets (project_id, type, path, created_at, updated_at)
-        VALUES (:project_id, :type, :path, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO assets (project_id, type, path, is_user_provided, md5, created_at, updated_at)
+        VALUES (:project_id, :type, :path, :is_user_provided, :md5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `, asset)
 	if err != nil {
 		return nil, err
@@ -146,6 +146,22 @@ func CreateAsset(asset Asset) (*Asset, error) {
 	}
 	asset.ID = int(id)
 	return GetAsset(asset.ID)
+}
+
+// GetAssetByMD5 retrieves an asset by its MD5 hash
+func GetAssetByMD5(md5 string) (*Asset, error) {
+	if md5 == "" {
+		return nil, nil
+	}
+	var asset Asset
+	err := DB.Get(&asset, "SELECT * FROM assets WHERE md5 = ? LIMIT 1", md5)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // Not found
+		}
+		return nil, err
+	}
+	return &asset, nil
 }
 
 // GetAsset retrieves an asset by ID
@@ -193,7 +209,7 @@ func DeleteAsset(id int) error {
 		return err
 	}
 
-	_ = storage.DeleteGeneratedContent(asset.Path)
+	_ = storage.DeleteAssetContent(asset.Path)
 
 	return nil
 }
