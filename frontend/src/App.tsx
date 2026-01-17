@@ -8,17 +8,25 @@ import { useState, useEffect } from "react";
 import { database } from "../wailsjs/go/models";
 import { CheckUpdate } from "../wailsjs/go/app/Service";
 import { UpdateDialog } from "@/components/update-dialog";
+import { GetInitError } from "../wailsjs/go/app/Service";
+import { StartupErrorScreen } from "@/components/startup/startup-error-screen";
 
 export default function App() {
-  const [selectedProject, setSelectedProject] = useState<database.Project | null>(
-    null
-  );
+  const [selectedProject, setSelectedProject] =
+    useState<database.Project | null>(null);
   const [activeView, setActiveView] = useState<AppView>("projects");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<any>(null);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
+    GetInitError().then((err) => {
+      if (err) {
+        setInitError(err);
+      }
+    });
+
     CheckUpdate()
       .then((info) => {
         if (info.hasUpdate) {
@@ -31,6 +39,10 @@ export default function App() {
       });
   }, []);
 
+  if (initError) {
+    return <StartupErrorScreen error={initError} />;
+  }
+
   const handleProjectClick = (project: database.Project) => {
     setSelectedProject(project);
   };
@@ -42,10 +54,7 @@ export default function App() {
   if (selectedProject) {
     return (
       <div className="h-screen">
-        <CanvasView
-          project={selectedProject}
-          onBack={handleBackToProjects}
-        />
+        <CanvasView project={selectedProject} onBack={handleBackToProjects} />
       </div>
     );
   }
@@ -79,4 +88,3 @@ export default function App() {
     </div>
   );
 }
-

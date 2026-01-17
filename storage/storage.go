@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"archive/zip"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -108,4 +109,64 @@ func GetAssetsDir() (string, error) {
 		return "", err
 	}
 	return assetsDir, nil
+}
+
+// ZipAppConfigDir zips the entire application configuration directory to the destination path.
+func ZipAppConfigDir(destPath string) error {
+	sourceDir, err := GetAppConfigDir()
+	if err != nil {
+		return err
+	}
+
+	zipFile, err := os.Create(destPath)
+	if err != nil {
+		return err
+	}
+	defer zipFile.Close()
+
+	archive := zip.NewWriter(zipFile)
+	defer archive.Close()
+
+	return filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Calculate relative path for zip header
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		relPath, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			return err
+		}
+
+		header.Name = relPath
+
+		if info.IsDir() {
+			header.Name += "/"
+		} else {
+			header.Method = zip.Deflate
+		}
+
+		writer, err := archive.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		_, err = io.Copy(writer, file)
+		return err
+	})
 }
