@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"visionflow/database"
+	"visionflow/service/ai/agent"
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
@@ -156,4 +157,15 @@ func (c *ClaudeClient) ListModels(ctx context.Context) ([]Model, error) {
 	}
 
 	return models, nil
+}
+
+// CanvasAgent implements the streaming canvas editing for Claude
+func (c *ClaudeClient) CanvasAgent(ctx context.Context, req CanvasEditRequest, onEvent func(string, interface{})) error {
+	return agent.Run(ctx, agent.ExecutionRequest{
+		Prompt:       req.Prompt,
+		Model:        req.Model,
+		History:      req.History,
+		CurrentNodes: req.CurrentNodes,
+		CurrentEdges: req.CurrentEdges,
+	}, &c.config, "claude-3-5-sonnet-20241022", onEvent)
 }

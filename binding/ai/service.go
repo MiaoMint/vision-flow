@@ -4,10 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	bindingApp "visionflow/binding/app"
 	"visionflow/database"
 	aiservice "visionflow/service/ai"
 	"visionflow/service/fileserver"
 	"visionflow/storage"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // Service provides AI methods for the frontend
@@ -316,4 +319,50 @@ func (s *Service) processContent(projectID int, data []byte, b64 string, url str
 	}
 
 	return fileserver.GetFileUrl(filename), nil
+}
+
+// CanvasAgentRequest defines the parameters for streaming canvas editing
+type CanvasAgentRequest struct {
+	Prompt       string                   `json:"prompt"`
+	CurrentNodes []map[string]interface{} `json:"currentNodes"`
+	CurrentEdges []map[string]interface{} `json:"currentEdges"`
+	Model        string                   `json:"model"`
+	ProviderID   int                      `json:"providerId"`
+	History      []map[string]string      `json:"history,omitempty"`
+}
+
+// CanvasAgent initiates a streaming canvas editing session
+func (s *Service) CanvasAgent(req CanvasAgentRequest) error {
+	ctx := context.Background()
+	client, err := s.getClient(req.ProviderID)
+	if err != nil {
+		return err
+	}
+
+	aiReq := aiservice.CanvasEditRequest{
+		Prompt:       req.Prompt,
+		CurrentNodes: req.CurrentNodes,
+		CurrentEdges: req.CurrentEdges,
+		Model:        req.Model,
+		History:      req.History,
+	}
+
+	// We need access to Wails context to emit events
+	if bindingApp.WailsContext == nil {
+		return fmt.Errorf("app context is not initialized")
+	}
+
+	go func() {
+		err := client.CanvasAgent(ctx, aiReq, func(eventType string, data any) {
+			runtime.EventsEmit(*bindingApp.WailsContext, "ai:stream:"+eventType, data)
+		})
+
+		if err != nil {
+			runtime.EventsEmit(*bindingApp.WailsContext, "ai:stream:error", err.Error())
+		} else {
+			runtime.EventsEmit(*bindingApp.WailsContext, "ai:stream:done", nil)
+		}
+	}()
+
+	return nil
 }

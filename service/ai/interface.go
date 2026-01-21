@@ -105,7 +105,17 @@ type AIClient interface {
 	GenerateImage(ctx context.Context, req ImageGenerateRequest) (*ImageGenerateResponse, error)
 	GenerateAudio(ctx context.Context, req AudioGenerateRequest) (*AudioGenerateResponse, error)
 	GenerateVideo(ctx context.Context, req VideoGenerateRequest) (*VideoGenerateResponse, error)
+	CanvasAgent(ctx context.Context, req CanvasEditRequest, onEvent func(string, interface{})) error
 	ListModels(ctx context.Context) ([]Model, error)
+}
+
+// CanvasEditRequest defines the parameters for canvas editing
+type CanvasEditRequest struct {
+	Prompt       string                   `json:"prompt"`
+	CurrentNodes []map[string]interface{} `json:"currentNodes"` // Simplified for JSON
+	CurrentEdges []map[string]interface{} `json:"currentEdges"` // Simplified for JSON
+	Model        string                   `json:"model"`
+	History      []map[string]string      `json:"history,omitempty"` // Chat history
 }
 
 // NewClient creates a new AI client based on the configuration

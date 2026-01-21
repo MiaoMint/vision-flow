@@ -50,7 +50,7 @@ export function useCanvasDrag() {
 
                 // Find intersecting nodes
                 const intersectingNodes = getIntersectingNodes(node).filter(
-                    (n) => n.parentId !== node.id
+                    (n) => n.type !== "group" && n.parentId !== node.id
                 );
 
                 if (intersectingNodes.length > 0) {
