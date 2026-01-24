@@ -8,15 +8,15 @@ import (
 
 // TextGenerateRequest defines the parameters for text generation
 type TextGenerateRequest struct {
-	Prompt      string                 `json:"prompt"`
-	Images      []string               `json:"images,omitempty"`
-	Videos      []string               `json:"videos,omitempty"`
-	Audios      []string               `json:"audios,omitempty"`
-	Documents   []string               `json:"documents,omitempty"`
-	Model       string                 `json:"model"`
-	Temperature *float64               `json:"temperature,omitempty"`
-	MaxTokens   *int                   `json:"maxTokens,omitempty"`
-	Options     map[string]interface{} `json:"options,omitempty"`
+	Prompt      string         `json:"prompt"`
+	Images      []string       `json:"images,omitempty"`
+	Videos      []string       `json:"videos,omitempty"`
+	Audios      []string       `json:"audios,omitempty"`
+	Documents   []string       `json:"documents,omitempty"`
+	Model       string         `json:"model"`
+	Temperature *float64       `json:"temperature,omitempty"`
+	MaxTokens   *int           `json:"maxTokens,omitempty"`
+	Options     map[string]any `json:"options,omitempty"`
 }
 
 // TextGenerateResponse defines the response for text generation
@@ -30,15 +30,15 @@ type TextGenerateResponse struct {
 
 // ImageGenerateRequest defines the parameters for image generation
 type ImageGenerateRequest struct {
-	Prompt  string                 `json:"prompt"`
-	Images  []string               `json:"images,omitempty"`
-	Videos  []string               `json:"videos,omitempty"`
-	Audios  []string               `json:"audios,omitempty"`
-	Model   string                 `json:"model"`
-	Size    string                 `json:"size,omitempty"`
-	Quality string                 `json:"quality,omitempty"`
-	Style   string                 `json:"style,omitempty"`
-	Options map[string]interface{} `json:"options,omitempty"`
+	Prompt  string         `json:"prompt"`
+	Images  []string       `json:"images,omitempty"`
+	Videos  []string       `json:"videos,omitempty"`
+	Audios  []string       `json:"audios,omitempty"`
+	Model   string         `json:"model"`
+	Size    string         `json:"size,omitempty"`
+	Quality string         `json:"quality,omitempty"`
+	Style   string         `json:"style,omitempty"`
+	Options map[string]any `json:"options,omitempty"`
 }
 
 // ImageGenerateResponse defines the response for image generation
@@ -52,14 +52,14 @@ type ImageGenerateResponse struct {
 
 // AudioGenerateRequest defines the parameters for audio generation
 type AudioGenerateRequest struct {
-	Prompt  string                 `json:"prompt"`
-	Images  []string               `json:"images,omitempty"`
-	Videos  []string               `json:"videos,omitempty"`
-	Audios  []string               `json:"audios,omitempty"`
-	Model   string                 `json:"model"`
-	Voice   string                 `json:"voice,omitempty"`
-	Speed   *float64               `json:"speed,omitempty"`
-	Options map[string]interface{} `json:"options,omitempty"`
+	Prompt  string         `json:"prompt"`
+	Images  []string       `json:"images,omitempty"`
+	Videos  []string       `json:"videos,omitempty"`
+	Audios  []string       `json:"audios,omitempty"`
+	Model   string         `json:"model"`
+	Voice   string         `json:"voice,omitempty"`
+	Speed   *float64       `json:"speed,omitempty"`
+	Options map[string]any `json:"options,omitempty"`
 }
 
 // AudioGenerateResponse defines the response for audio generation
@@ -70,14 +70,14 @@ type AudioGenerateResponse struct {
 
 // VideoGenerateRequest defines the parameters for video generation
 type VideoGenerateRequest struct {
-	Prompt     string                 `json:"prompt"`
-	Images     []string               `json:"images,omitempty"`
-	Videos     []string               `json:"videos,omitempty"`
-	Audios     []string               `json:"audios,omitempty"`
-	Model      string                 `json:"model"`
-	Duration   string                 `json:"duration,omitempty"`
-	Resolution string                 `json:"resolution,omitempty"`
-	Options    map[string]interface{} `json:"options,omitempty"`
+	Prompt     string         `json:"prompt"`
+	Images     []string       `json:"images,omitempty"`
+	Videos     []string       `json:"videos,omitempty"`
+	Audios     []string       `json:"audios,omitempty"`
+	Model      string         `json:"model"`
+	Duration   string         `json:"duration,omitempty"`
+	Resolution string         `json:"resolution,omitempty"`
+	Options    map[string]any `json:"options,omitempty"`
 }
 
 // VideoGenerateResponse defines the response for video generation
@@ -105,7 +105,16 @@ type AIClient interface {
 	GenerateImage(ctx context.Context, req ImageGenerateRequest) (*ImageGenerateResponse, error)
 	GenerateAudio(ctx context.Context, req AudioGenerateRequest) (*AudioGenerateResponse, error)
 	GenerateVideo(ctx context.Context, req VideoGenerateRequest) (*VideoGenerateResponse, error)
+	CanvasAgent(ctx context.Context, req CanvasEditRequest, onEvent func(string, any)) error
 	ListModels(ctx context.Context) ([]Model, error)
+}
+
+// CanvasEditRequest defines the parameters for canvas editing
+type CanvasEditRequest struct {
+	SessionID string              `json:"sessionId"` // Add session ID for state tracking
+	Prompt    string              `json:"prompt"`
+	Model     string              `json:"model"`
+	History   []map[string]string `json:"history,omitempty"` // Chat history
 }
 
 // NewClient creates a new AI client based on the configuration

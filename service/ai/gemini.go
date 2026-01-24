@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"visionflow/database"
+	"visionflow/service/ai/agent"
 
 	"mime"
 	"net/http"
@@ -311,4 +312,17 @@ func (c *GeminiClient) ListModels(ctx context.Context) ([]Model, error) {
 	}
 
 	return models, nil
+}
+
+// CanvasAgent implements the streaming canvas editing for Gemini
+func (c *GeminiClient) CanvasAgent(ctx context.Context, req CanvasEditRequest, onEvent func(string, any)) error {
+	// Register state update channel for this session
+	stateUpdateChan := agent.RegisterChannel(req.SessionID)
+	defer agent.UnregisterChannel(req.SessionID)
+
+	return agent.Run(ctx, agent.ExecutionRequest{
+		Prompt:  req.Prompt,
+		Model:   req.Model,
+		History: req.History,
+	}, &c.config, "gemini-2.0-flash-exp", onEvent, stateUpdateChan)
 }

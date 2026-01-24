@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"visionflow/database"
+	"visionflow/service/ai/agent"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -406,4 +407,17 @@ func (c *OpenAIClient) ListModels(ctx context.Context) ([]Model, error) {
 	}
 
 	return models, nil
+}
+
+// CanvasAgent implements the streaming canvas editing for OpenAI
+func (c *OpenAIClient) CanvasAgent(ctx context.Context, req CanvasEditRequest, onEvent func(string, any)) error {
+	// Register state update channel for this session
+	stateUpdateChan := agent.RegisterChannel(req.SessionID)
+	defer agent.UnregisterChannel(req.SessionID)
+
+	return agent.Run(ctx, agent.ExecutionRequest{
+		Prompt:  req.Prompt,
+		Model:   req.Model,
+		History: req.History,
+	}, &c.config, openai.GPT4o, onEvent, stateUpdateChan)
 }

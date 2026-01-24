@@ -65,6 +65,24 @@ func InitDB() error {
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
+
+	CREATE TABLE IF NOT EXISTS chat_sessions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		project_id INTEGER NOT NULL,
+		title TEXT NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+	);
+
+	CREATE TABLE IF NOT EXISTS chat_messages (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		session_id INTEGER NOT NULL,
+		role TEXT NOT NULL,
+		content TEXT NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY(session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
+	);
 	`
 	_, err = DB.Exec(schema)
 	if err != nil {

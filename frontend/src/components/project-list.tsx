@@ -57,10 +57,10 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
         <p className="text-muted-foreground mt-2"><Trans>Manage and access all your projects</Trans></p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {/* 新建项目卡片 */}
         <div
-          className="group cursor-pointer overflow-hidden rounded-xl border-2 border-dashed transition-all hover:shadow-lg hover:border-primary/50"
+          className="aspect-square group cursor-pointer overflow-hidden rounded-xl border-2 border-dashed transition-all hover:shadow-lg hover:border-primary/50"
           onClick={handleCreateProject}
         >
           <div className="h-full flex items-center justify-center bg-linear-to-br from-muted to-muted/50 min-h-50">
@@ -79,7 +79,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
         {projects?.map((project) => (
           <div
             key={project.id}
-            className="group cursor-pointer overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:border-primary/50 flex flex-col relative"
+            className="aspect-square group cursor-pointer overflow-hidden rounded-xl border bg-card transition-all hover:shadow-lg hover:border-primary/50 flex flex-col relative"
             onClick={() => onProjectClick(project)}
           >
             <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -103,7 +103,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
               </DropdownMenu>
             </div>
 
-            <div className="aspect-video overflow-hidden bg-muted relative">
+            <div className="flex-1 overflow-hidden bg-muted relative">
               {project.coverImage ? (
                 <img
                   src={project.coverImage}
@@ -116,7 +116,7 @@ export function ProjectList({ onProjectClick }: ProjectListProps) {
                 </div>
               )}
             </div>
-            <div className="p-4 flex flex-col flex-1">
+            <div className="p-4 flex flex-col">
               <h3 className="font-medium truncate text-lg">{project.name}</h3>
               {project.description && (
                 <p className="text-sm text-muted-foreground line-clamp-2 mt-1">

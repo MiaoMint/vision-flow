@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
@@ -141,4 +142,10 @@
 * {
   user-select: none;
   -webkit-user-select: none;
+}
+
+
+.selectable {
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }

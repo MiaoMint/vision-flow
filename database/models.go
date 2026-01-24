@@ -60,3 +60,21 @@ type UserPreference struct {
 	CreatedAt time.Time `db:"created_at" json:"createdAt"`
 	UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
 }
+
+// ChatSession represents a chat session associated with a project
+type ChatSession struct {
+	ID        int       `db:"id" json:"id"`
+	ProjectID int       `db:"project_id" json:"projectId"`
+	Title     string    `db:"title" json:"title"`
+	CreatedAt time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt time.Time `db:"updated_at" json:"updatedAt"`
+}
+
+// ChatMessage represents a single message in a chat session
+type ChatMessage struct {
+	ID        int       `db:"id" json:"id"`
+	SessionID int       `db:"session_id" json:"sessionId"`
+	Role      string    `db:"role" json:"role"`
+	Content   string    `db:"content" json:"content"`
+	CreatedAt time.Time `db:"created_at" json:"createdAt"`
+}

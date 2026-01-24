@@ -46,6 +46,24 @@ export namespace ai {
 	        this.options = source["options"];
 	    }
 	}
+	export class CanvasAgentRequest {
+	    prompt: string;
+	    model: string;
+	    providerId: number;
+	    history?: any[];
+	
+	    static createFrom(source: any = {}) {
+	        return new CanvasAgentRequest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.prompt = source["prompt"];
+	        this.model = source["model"];
+	        this.providerId = source["providerId"];
+	        this.history = source["history"];
+	    }
+	}
 	export class ImageRequest {
 	    projectId?: number;
 	    prompt: string;
