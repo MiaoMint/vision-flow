@@ -3,10 +3,12 @@ package ai
 import (
 	"context"
 	"fmt"
+	"time"
 
 	bindingApp "visionflow/binding/app"
 	"visionflow/database"
 	aiservice "visionflow/service/ai"
+	"visionflow/service/ai/agent"
 	"visionflow/service/fileserver"
 	"visionflow/storage"
 
@@ -23,66 +25,66 @@ func NewService() *Service {
 
 // TextRequest defines the parameters for text generation
 type TextRequest struct {
-	Prompt      string                 `json:"prompt"`
-	Images      []string               `json:"images,omitempty"`
-	Videos      []string               `json:"videos,omitempty"`
-	Audios      []string               `json:"audios,omitempty"`
-	Documents   []string               `json:"documents,omitempty"`
-	Model       string                 `json:"model"`
-	ProviderID  int                    `json:"providerId"`
-	Temperature *float64               `json:"temperature,omitempty"`
-	MaxTokens   *int                   `json:"maxTokens,omitempty"`
-	Options     map[string]interface{} `json:"options,omitempty"`
+	Prompt      string         `json:"prompt"`
+	Images      []string       `json:"images,omitempty"`
+	Videos      []string       `json:"videos,omitempty"`
+	Audios      []string       `json:"audios,omitempty"`
+	Documents   []string       `json:"documents,omitempty"`
+	Model       string         `json:"model"`
+	ProviderID  int            `json:"providerId"`
+	Temperature *float64       `json:"temperature,omitempty"`
+	MaxTokens   *int           `json:"maxTokens,omitempty"`
+	Options     map[string]any `json:"options,omitempty"`
 }
 
 // ImageRequest defines the parameters for image generation
 type ImageRequest struct {
-	ProjectID  int                    `json:"projectId,omitempty"`
-	Prompt     string                 `json:"prompt"`
-	Images     []string               `json:"images,omitempty"`
-	Videos     []string               `json:"videos,omitempty"`
-	Audios     []string               `json:"audios,omitempty"`
-	Model      string                 `json:"model"`
-	ProviderID int                    `json:"providerId"`
-	Size       string                 `json:"size,omitempty"`
-	Quality    string                 `json:"quality,omitempty"`
-	Style      string                 `json:"style,omitempty"`
-	Options    map[string]interface{} `json:"options,omitempty"`
+	ProjectID  int            `json:"projectId,omitempty"`
+	Prompt     string         `json:"prompt"`
+	Images     []string       `json:"images,omitempty"`
+	Videos     []string       `json:"videos,omitempty"`
+	Audios     []string       `json:"audios,omitempty"`
+	Model      string         `json:"model"`
+	ProviderID int            `json:"providerId"`
+	Size       string         `json:"size,omitempty"`
+	Quality    string         `json:"quality,omitempty"`
+	Style      string         `json:"style,omitempty"`
+	Options    map[string]any `json:"options,omitempty"`
 }
 
 // VideoRequest defines the parameters for video generation
 type VideoRequest struct {
-	ProjectID  int                    `json:"projectId,omitempty"`
-	Prompt     string                 `json:"prompt"`
-	Images     []string               `json:"images,omitempty"`
-	Videos     []string               `json:"videos,omitempty"`
-	Audios     []string               `json:"audios,omitempty"`
-	Model      string                 `json:"model"`
-	ProviderID int                    `json:"providerId"`
-	Duration   string                 `json:"duration,omitempty"`
-	Resolution string                 `json:"resolution,omitempty"`
-	Options    map[string]interface{} `json:"options,omitempty"`
+	ProjectID  int            `json:"projectId,omitempty"`
+	Prompt     string         `json:"prompt"`
+	Images     []string       `json:"images,omitempty"`
+	Videos     []string       `json:"videos,omitempty"`
+	Audios     []string       `json:"audios,omitempty"`
+	Model      string         `json:"model"`
+	ProviderID int            `json:"providerId"`
+	Duration   string         `json:"duration,omitempty"`
+	Resolution string         `json:"resolution,omitempty"`
+	Options    map[string]any `json:"options,omitempty"`
 }
 
 // AudioRequest defines the parameters for audio generation
 type AudioRequest struct {
-	ProjectID  int                    `json:"projectId,omitempty"`
-	Prompt     string                 `json:"prompt"`
-	Images     []string               `json:"images,omitempty"`
-	Videos     []string               `json:"videos,omitempty"`
-	Audios     []string               `json:"audios,omitempty"`
-	Model      string                 `json:"model"`
-	ProviderID int                    `json:"providerId"`
-	Voice      string                 `json:"voice,omitempty"`
-	Speed      *float64               `json:"speed,omitempty"`
-	Options    map[string]interface{} `json:"options,omitempty"`
+	ProjectID  int            `json:"projectId,omitempty"`
+	Prompt     string         `json:"prompt"`
+	Images     []string       `json:"images,omitempty"`
+	Videos     []string       `json:"videos,omitempty"`
+	Audios     []string       `json:"audios,omitempty"`
+	Model      string         `json:"model"`
+	ProviderID int            `json:"providerId"`
+	Voice      string         `json:"voice,omitempty"`
+	Speed      *float64       `json:"speed,omitempty"`
+	Options    map[string]any `json:"options,omitempty"`
 }
 
 // AIResponse defines the common response structure for AI requests
 type AIResponse struct {
-	Content string                 `json:"content"`
-	Usage   map[string]interface{} `json:"usage,omitempty"`
-	Raw     interface{}            `json:"raw,omitempty"`
+	Content string         `json:"content"`
+	Usage   map[string]any `json:"usage,omitempty"`
+	Raw     any            `json:"raw,omitempty"`
 }
 
 func (s *Service) getClient(providerID int) (aiservice.AIClient, error) {
@@ -124,7 +126,7 @@ func (s *Service) GenerateText(req TextRequest) (*AIResponse, error) {
 
 	return &AIResponse{
 		Content: resp.Content,
-		Usage: map[string]interface{}{
+		Usage: map[string]any{
 			"promptTokens": resp.PromptTokens,
 			"outputTokens": resp.OutputTokens,
 			"totalTokens":  resp.TotalTokens,
@@ -323,12 +325,10 @@ func (s *Service) processContent(projectID int, data []byte, b64 string, url str
 
 // CanvasAgentRequest defines the parameters for streaming canvas editing
 type CanvasAgentRequest struct {
-	Prompt       string                   `json:"prompt"`
-	CurrentNodes []map[string]interface{} `json:"currentNodes"`
-	CurrentEdges []map[string]interface{} `json:"currentEdges"`
-	Model        string                   `json:"model"`
-	ProviderID   int                      `json:"providerId"`
-	History      []map[string]string      `json:"history,omitempty"`
+	Prompt     string              `json:"prompt"`
+	Model      string              `json:"model"`
+	ProviderID int                 `json:"providerId"`
+	History    []map[string]string `json:"history,omitempty"`
 }
 
 // CanvasAgent initiates a streaming canvas editing session
@@ -339,18 +339,23 @@ func (s *Service) CanvasAgent(req CanvasAgentRequest) error {
 		return err
 	}
 
+	// Generate session ID on backend
+	sessionID := fmt.Sprintf("session-%d", time.Now().UnixNano())
+
 	aiReq := aiservice.CanvasEditRequest{
-		Prompt:       req.Prompt,
-		CurrentNodes: req.CurrentNodes,
-		CurrentEdges: req.CurrentEdges,
-		Model:        req.Model,
-		History:      req.History,
+		SessionID: sessionID,
+		Prompt:    req.Prompt,
+		Model:     req.Model,
+		History:   req.History,
 	}
 
 	// We need access to Wails context to emit events
 	if bindingApp.WailsContext == nil {
 		return fmt.Errorf("app context is not initialized")
 	}
+
+	// Send session ID to frontend immediately
+	runtime.EventsEmit(*bindingApp.WailsContext, "ai:stream:session", sessionID)
 
 	go func() {
 		err := client.CanvasAgent(ctx, aiReq, func(eventType string, data any) {
@@ -363,6 +368,20 @@ func (s *Service) CanvasAgent(req CanvasAgentRequest) error {
 			runtime.EventsEmit(*bindingApp.WailsContext, "ai:stream:done", nil)
 		}
 	}()
+
+	return nil
+}
+
+// UpdateCanvasState updates the canvas state for an active agent session
+func (s *Service) UpdateCanvasState(sessionID string, nodes []map[string]any, edges []map[string]any) error {
+	success := agent.SendStateUpdate(sessionID, agent.StateUpdate{
+		Nodes: nodes,
+		Edges: edges,
+	})
+
+	if !success {
+		return fmt.Errorf("failed to send state update: session not found or channel full")
+	}
 
 	return nil
 }

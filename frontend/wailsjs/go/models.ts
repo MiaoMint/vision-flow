@@ -48,8 +48,6 @@ export namespace ai {
 	}
 	export class CanvasAgentRequest {
 	    prompt: string;
-	    currentNodes: any[];
-	    currentEdges: any[];
 	    model: string;
 	    providerId: number;
 	    history?: any[];
@@ -61,8 +59,6 @@ export namespace ai {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.prompt = source["prompt"];
-	        this.currentNodes = source["currentNodes"];
-	        this.currentEdges = source["currentEdges"];
 	        this.model = source["model"];
 	        this.providerId = source["providerId"];
 	        this.history = source["history"];

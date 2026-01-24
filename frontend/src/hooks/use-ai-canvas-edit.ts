@@ -2,27 +2,26 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useCanvasStore } from "@/stores/use-canvas-store";
 import { EventsOn } from "../../wailsjs/runtime/runtime"; // Adjust import path if needed
 import type { Node, Edge } from "@xyflow/react";
-import { CanvasAgent } from "../../wailsjs/go/ai/Service";
+import { CanvasAgent, UpdateCanvasState } from "../../wailsjs/go/ai/Service";
 
 interface Message {
     role: "user" | "assistant";
     content: string;
-    toolCalls?: string[];
 }
 
 export function useAICanvasEdit() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isStreaming, setIsStreaming] = useState(false);
+    const [sessionId, setSessionId] = useState<string | null>(null);
 
     const {
         nodes,
         edges,
         project,
         addNode,
-        setNodes,
-        setEdges,
-        onConnect,
-        recordState
+        deleteNode,
+        createGroup,
+        connectNodes,
     } = useCanvasStore();
 
     // Refs for current state to be accessible in event handlers without dependency cycles
@@ -79,71 +78,24 @@ export function useAICanvasEdit() {
 
             case "create_group": {
                 const { node_ids, label } = args;
-                if (!node_ids || !Array.isArray(node_ids) || node_ids.length === 0) return;
-
-                const targetNodes = nodesRef.current.filter(n => node_ids.includes(n.id));
-                if (targetNodes.length === 0) return;
-
-                // Calculate bounding box
-                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-                targetNodes.forEach(n => {
-                    const nWidth = n.width || n.measured?.width || 200; // Default or measured
-                    const nHeight = n.height || n.measured?.height || 200;
-                    if (n.position.x < minX) minX = n.position.x;
-                    if (n.position.y < minY) minY = n.position.y;
-                    if (n.position.x + nWidth > maxX) maxX = n.position.x + nWidth;
-                    if (n.position.y + nHeight > maxY) maxY = n.position.y + nHeight;
-                });
-
-                const PADDING = 50;
-                const groupX = minX - PADDING;
-                const groupY = minY - PADDING;
-                const groupWidth = (maxX - minX) + (PADDING * 2);
-                const groupHeight = (maxY - minY) + (PADDING * 2);
-
-                const groupNode: Node = {
-                    id: generateId(),
-                    type: "group",
-                    position: { x: groupX, y: groupY },
-                    width: groupWidth,
-                    height: groupHeight,
-                    style: {
-                        width: maxX - minX + PADDING * 2,
-                        height: maxY - minY + PADDING * 2,
-                        zIndex: -1,
-                        border: "none",
-                        background: "transparent",
-                        padding: 0,
-                    },
-                    selectable: false,
-                    data: { label: label || "Group" }
-                };
-                addNode(groupNode);
-                nodesRef.current = [...nodesRef.current, groupNode];
+                createGroup(node_ids, label);
                 break;
             }
 
             case "delete_node":
                 const { id: deleteId } = args;
-                const filteredNodes = nodesRef.current.filter(n => n.id !== deleteId);
-                setNodes(filteredNodes);
-                nodesRef.current = filteredNodes;
-                recordState();
+                deleteNode(deleteId);
+                // Update ref
+                nodesRef.current = nodesRef.current.filter(n => n.id !== deleteId);
                 break;
 
             case "connect_nodes":
                 const { source, target } = args;
-                const exists = edgesRef.current.some(e => e.source === source && e.target === target);
-                if (!exists) {
-                    const newEdge = { id: `e-${source}-${target}`, source, target };
-                    onConnect({ source, target, sourceHandle: null, targetHandle: null });
-                    edgesRef.current = [...edgesRef.current, newEdge as any];
-                }
+                connectNodes(source, target);
                 break;
 
         }
-    }, [addNode, setNodes, setEdges, onConnect, recordState]);
+    }, [addNode, deleteNode, createGroup, connectNodes]);
 
     useEffect(() => {
         const stopContent = EventsOn("ai:stream:content", (content: string) => {
@@ -152,56 +104,77 @@ export function useAICanvasEdit() {
                 if (last && last.role === "assistant") {
                     return [...prev.slice(0, -1), { ...last, content: last.content + content }];
                 } else {
-                    return [...prev, { role: "assistant", content, toolCalls: [] }];
+                    return [...prev, { role: "assistant", content }];
                 }
             });
         });
 
         const stopTool = EventsOn("ai:stream:tool", (data: any) => {
             if (data && data.name) {
-                // Add visual feedback to chat (merged into current message)
-                setMessages(prev => {
-                    const last = prev[prev.length - 1];
-                    const toolName = data.name;
-
-                    if (last && last.role === "assistant") {
-                        // Append to existing toolCalls or create new array if undefined
-                        const currentTools = last.toolCalls || [];
-                        return [...prev.slice(0, -1), {
-                            ...last,
-                            toolCalls: [...currentTools, toolName]
-                        }];
-                    } else {
-                        // Should technically be attached to an assistant message, create one if not exists
-                        return [...prev, {
-                            role: "assistant",
-                            content: "",
-                            toolCalls: [toolName]
-                        }];
-                    }
-                });
-
+                // Execute tool effect only, do not update chat history
                 handleToolCall(data.name, data.args);
             }
         });
 
+        // Handle session ID from backend
+        const stopSession = EventsOn("ai:stream:session", (id: string) => {
+            console.log("Received session ID from backend:", id);
+            setSessionId(id);
+        });
+
         const stopDone = EventsOn("ai:stream:done", () => {
             setIsStreaming(false);
+            setSessionId(null); // Clear session when done
         });
 
         const stopError = EventsOn("ai:stream:error", (err: string) => {
             console.error("AI Stream Error:", err);
             setIsStreaming(false);
+            setSessionId(null); // Clear session on error
             setMessages(prev => [...prev, { role: "assistant", content: `\n[Error: ${err}]` }]);
+        });
+
+        // Handle canvas state request from agent
+        const stopStateRequest = EventsOn("ai:stream:get_canvas_state_request", async () => {
+            console.log("Agent requested canvas state");
+            
+            if (!sessionId) {
+                console.warn("No active session ID");
+                return;
+            }
+            
+            // Get the latest canvas state
+            const currentNodes = nodesRef.current.map(n => ({
+                id: n.id,
+                type: n.type,
+                position: n.position,
+                data: n.data
+            }));
+            
+            const currentEdges = edgesRef.current.map(e => ({
+                id: e.id,
+                source: e.source,
+                target: e.target
+            }));
+            
+            // Send state back to backend
+            try {
+                await UpdateCanvasState(sessionId, currentNodes, currentEdges);
+                console.log("Canvas state sent to backend");
+            } catch (err) {
+                console.error("Failed to send canvas state:", err);
+            }
         });
 
         return () => {
             if (stopContent) stopContent();
             if (stopTool) stopTool();
+            if (stopSession) stopSession();
             if (stopDone) stopDone();
             if (stopError) stopError();
+            if (stopStateRequest) stopStateRequest();
         };
-    }, [handleToolCall]);
+    }, [handleToolCall, sessionId]);
 
     const sendMessage = async (content: string, modelId: string, providerId: number) => {
         if (!content.trim()) return;
@@ -211,24 +184,9 @@ export function useAICanvasEdit() {
         setIsStreaming(true);
 
         try {
-            // Simplify CurrentNodes for the request
-            const simpleNodes = nodesRef.current.map(n => ({
-                id: n.id,
-                type: n.type,
-                position: n.position,
-                data: n.data
-            }));
-            const simpleEdges = edgesRef.current.map(e => ({
-                id: e.id,
-                source: e.source,
-                target: e.target
-            }));
-
-            // Call Backend
+            // Call Backend - session ID will be generated by backend and sent via event
             await CanvasAgent({
                 prompt: content,
-                currentNodes: simpleNodes,
-                currentEdges: simpleEdges,
                 model: modelId,
                 providerId: providerId,
                 history: messagesRef.current.map(m => ({ role: m.role, content: m.content }))
@@ -236,6 +194,7 @@ export function useAICanvasEdit() {
         } catch (err) {
             console.error(err);
             setIsStreaming(false);
+            setSessionId(null);
         }
     };
 

@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react"; // Added useState
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Bot, ChevronDown, Wrench, Play } from "lucide-react";
+import { X, Bot, Play, ChevronDown, ChevronRight, Wrench, Brain } from "lucide-react";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
@@ -23,36 +23,158 @@ function ThinkingIndicator() {
     return <span className="text-muted-foreground ml-1">Thinking{dots}</span>;
 }
 
-// Redefine CollapsibleToolLogs that takes a list of tools
-function CollapsibleToolLogs({ tools }: { tools: string[] }) {
-    const [isOpen, setIsOpen] = useState(false);
+interface ToolCallPart {
+    type: "tool_call";
+    name: string;
+    args: string;
+    content: string; // The inner text content
+}
 
-    if (!tools || tools.length === 0) return null;
+interface TextPart {
+    type: "text";
+    content: string;
+}
+
+interface ThinkingPart {
+    type: "thinking";
+    content: string;
+}
+
+type MessagePart = ToolCallPart | TextPart | ThinkingPart;
+
+function parseMessage(text: string): MessagePart[] {
+    const parts: MessagePart[] = [];
+    const regex = /(?:<tool_call name="([^"]+)" args="([^"]+)">([\s\S]*?)<\/tool_call>)|(?:<thinking>([\s\S]*?)<\/thinking>)/g;
+
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+        // Add preceding text
+        if (match.index > lastIndex) {
+            parts.push({
+                type: "text",
+                content: text.slice(lastIndex, match.index),
+            });
+        }
+
+        if (match[1]) {
+            // Tool Call match
+            parts.push({
+                type: "tool_call",
+                name: match[1],
+                args: match[2],
+                content: match[3].trim(),
+            });
+        } else if (match[4]) {
+            // Thinking match
+            parts.push({
+                type: "thinking",
+                content: match[4].trim(),
+            });
+        }
+
+        lastIndex = regex.lastIndex;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+        parts.push({
+            type: "text",
+            content: text.slice(lastIndex),
+        });
+    }
+
+    return parts;
+}
+
+function ThinkingBlock({ part }: { part: ThinkingPart }) {
+    const [isExpanded, setIsExpanded] = useState(true);
 
     return (
-        <div className="border border-border/50 rounded-md bg-muted/30 text-xs overflow-hidden my-2">
+        <div className="my-2 border rounded-md overflow-hidden bg-yellow-500/10 border-yellow-500/20">
             <div
-                onClick={() => setIsOpen(!isOpen)}
-                className="p-2 cursor-pointer flex items-center gap-2 hover:bg-muted/50 transition-colors select-none"
+                className="flex items-center gap-2 px-3 py-2 bg-yellow-500/5 cursor-pointer text-xs font-medium text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/10 transition-colors"
+                onClick={() => setIsExpanded(!isExpanded)}
             >
-                <Wrench className="h-3 w-3 text-muted-foreground" />
-                <span className="font-medium text-muted-foreground">
-                    <Trans>Tools Used</Trans> {tools.length > 1 && `(${tools.length})`}
-                </span>
-                <ChevronDown className={cn("h-3 w-3 ml-auto text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")} />
+                {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                <Brain className="h-3 w-3" />
+                <span>Thinking Process</span>
             </div>
-            {isOpen && (
-                <div className="p-2 pt-0 border-t border-transparent text-muted-foreground space-y-1 animate-in slide-in-from-top-1 duration-200">
-                    {tools.map((tool, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                            {tool}
-                        </div>
-                    ))}
+
+            {isExpanded && (
+                <div className="p-3 text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed italic">
+                    {part.content}
                 </div>
             )}
         </div>
     );
 }
+
+function ToolCallBlock({ part }: { part: ToolCallPart }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    // Parse args for better display
+    let argsObj: any = {};
+    try {
+        // Unescape HTML first
+        const unescapedArgs = part.args
+            .replace(/&quot;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&#39;/g, "'");
+
+        argsObj = JSON.parse(unescapedArgs);
+    } catch (e) {
+        argsObj = { raw: part.args };
+    }
+
+    return (
+        <div className="border rounded-md overflow-hidden bg-muted/20">
+            <div
+                className="flex items-center gap-2 px-3 py-2 bg-muted/30 cursor-pointer text-xs font-medium hover:bg-muted/40 transition-colors"
+                onClick={() => setIsExpanded(!isExpanded)}
+            >
+                {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                <Wrench className="h-3 w-3 text-primary" />
+                <span>Called: {part.name}</span>
+            </div>
+
+            {isExpanded && (
+                <div className="p-3 bg-muted/10 text-xs font-mono overflow-x-auto">
+                    <div className="mb-2 text-muted-foreground whitespace-pre-wrap">{part.content}</div>
+                    <div className="text-muted-foreground font-semibold mb-1">Arguments:</div>
+                    <pre className="whitespace-pre-wrap text-muted-foreground/80">
+                        {JSON.stringify(argsObj, null, 2)}
+                    </pre>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ParsedMessageContent({ content }: { content: string }) {
+    const parts = parseMessage(content);
+
+    return (
+        <>
+            {parts.map((part, idx) => {
+                if (part.type === "tool_call") {
+                    return <ToolCallBlock key={idx} part={part} />;
+                } else if (part.type === "thinking") {
+                    return <ThinkingBlock key={idx} part={part} />;
+                }
+                return (
+                    <div key={idx} className="text-foreground leading-relaxed whitespace-pre-wrap wrap-break-word selectable">
+                        {part.content}
+                    </div>
+                );
+            })}
+        </>
+    );
+}
+
 
 export function CanvasChatPanel() {
     const { _ } = useLingui();
@@ -62,8 +184,8 @@ export function CanvasChatPanel() {
     // Use our new hook
     const { messages, isStreaming, sendMessage } = useAICanvasEdit();
     const [input, setInput] = useState("");
-    const [providerId, setProviderId] = useState(1);
-    const [modelId, setModelId] = useState("gpt-4o");
+    const [providerId, setProviderId] = useState<number | undefined>();
+    const [modelId, setModelId] = useState<string | undefined>();
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll to bottom
@@ -75,6 +197,7 @@ export function CanvasChatPanel() {
 
     const handleSend = () => {
         if (!input.trim()) return;
+        if (!modelId || !providerId) return;
         sendMessage(input, modelId, providerId);
         setInput("");
     };
@@ -117,12 +240,14 @@ export function CanvasChatPanel() {
                         )}
                     >
                         <div className="space-y-1">
-                            {m.role === "assistant" && m.toolCalls && m.toolCalls.length > 0 && (
-                                <CollapsibleToolLogs tools={m.toolCalls} />
+                            {/* Parse and render tool calls */}
+                            {m.role === "assistant" ? (
+                                <ParsedMessageContent content={m.content} />
+                            ) : (
+                                <div className="leading-relaxed text-foreground whitespace-pre-wrap wrap-break-word selectable">
+                                    {m.content}
+                                </div>
                             )}
-                            <div className="leading-relaxed text-foreground whitespace-pre-wrap break-words selectable">
-                                {m.content}
-                            </div>
                         </div>
                     </div>
                 ))}
@@ -139,7 +264,7 @@ export function CanvasChatPanel() {
                     <Textarea
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
+                        // onKeyDown={handleKeyDown}
                         placeholder={_(msg`Enter message...`)}
                         className="min-h-15 max-h-50 w-full resize-none border-0 shadow-none focus-visible:ring-0 px-3 py-3 text-sm rounded-none"
                     />
@@ -154,7 +279,7 @@ export function CanvasChatPanel() {
                         <Button
                             size="icon"
                             onClick={handleSend}
-                            disabled={isStreaming || !input.trim()}
+                            disabled={isStreaming || !input.trim() || !modelId || !providerId}
                         >
                             <Play className="h-3.5 w-3.5" />
                         </Button>

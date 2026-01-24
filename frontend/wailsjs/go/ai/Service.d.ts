@@ -13,3 +13,5 @@ export function GenerateText(arg1:ai.TextRequest):Promise<ai.AIResponse>;
 export function GenerateVideo(arg1:ai.VideoRequest):Promise<ai.AIResponse>;
 
 export function ListModels(arg1:any):Promise<Array<ai.Model>>;
+
+export function UpdateCanvasState(arg1:string,arg2:Array<Record<string, any>>,arg3:Array<Record<string, any>>):Promise<void>;

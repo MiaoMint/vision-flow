@@ -4,43 +4,32 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
+	"strings"
+	"time"
 	"visionflow/database"
 
 	"github.com/cloudwego/eino-ext/components/model/claude"
 	"github.com/cloudwego/eino-ext/components/model/gemini"
 	"github.com/cloudwego/eino-ext/components/model/openai"
+	"github.com/cloudwego/eino/adk"
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/components/tool/utils"
 	"github.com/cloudwego/eino/compose"
-	"github.com/cloudwego/eino/flow/agent/react"
 	"github.com/cloudwego/eino/schema"
 	"google.golang.org/genai"
 )
 
 type ExecutionRequest struct {
-	Prompt       string
-	Model        string
-	History      []map[string]string
-	CurrentNodes interface{}
-	CurrentEdges interface{}
+	Prompt  string
+	Model   string
+	History []map[string]string
 }
 
-// ... existing CanvasAgent struct ...
-
-// ... existing Tool Params structs ...
-
 // Run executes the canvas agent workflow
-func Run(ctx context.Context, req ExecutionRequest, config *database.ModelProvider, defaultModel string, emit EventEmitter) error {
-	// 1. Prepare History & Context
-	var history []*schema.Message
-
-	// Add context about current canvas
-	nodesJSON, _ := json.Marshal(req.CurrentNodes)
-	edgesJSON, _ := json.Marshal(req.CurrentEdges)
-	contextMsg := fmt.Sprintf("Current Canvas State:\nNodes: %s\nEdges: %s", string(nodesJSON), string(edgesJSON))
-	history = append(history, schema.UserMessage(contextMsg))
+func Run(ctx context.Context, req ExecutionRequest, config *database.ModelProvider, defaultModel string, emit EventEmitter, stateUpdateChan chan StateUpdate) error {
+	// 1. Prepare History Messages
+	var messages []adk.Message
 
 	// Add chat history
 	for _, historyItem := range req.History {
@@ -48,13 +37,13 @@ func Run(ctx context.Context, req ExecutionRequest, config *database.ModelProvid
 		content := historyItem["content"]
 		switch role {
 		case "user":
-			history = append(history, schema.UserMessage(content))
+			messages = append(messages, schema.UserMessage(content))
 		case "assistant":
-			history = append(history, schema.AssistantMessage(content, nil))
+			messages = append(messages, schema.AssistantMessage(content, nil))
 		}
 	}
 	// Add the prompt
-	history = append(history, schema.UserMessage(req.Prompt))
+	messages = append(messages, schema.UserMessage(req.Prompt))
 
 	// 2. Create Agent
 	modelID := req.Model
@@ -62,14 +51,50 @@ func Run(ctx context.Context, req ExecutionRequest, config *database.ModelProvid
 		modelID = defaultModel
 	}
 
-	canvasAgent, err := NewCanvasAgent(ctx, config, modelID, emit)
+	canvasAgent, err := NewCanvasAgent(ctx, config, modelID, emit, stateUpdateChan)
 	if err != nil {
 		return fmt.Errorf("failed to create agent: %w", err)
 	}
 
-	// 3. Run Stream
-	if err := canvasAgent.Stream(ctx, history, emit); err != nil {
-		return fmt.Errorf("agent stream error: %w", err)
+	// 3. Run Agent using ADK Runner
+	runner := adk.NewRunner(ctx, adk.RunnerConfig{
+		Agent: canvasAgent.agent,
+	})
+
+	iter := runner.Run(ctx, messages)
+
+	// 4. Stream Events
+	for {
+		event, ok := iter.Next()
+		if !ok {
+			break
+		}
+
+		if event.Err != nil {
+			return fmt.Errorf("agent event error: %w", event.Err)
+		}
+
+		// Handle message output
+		if event.Output != nil && event.Output.MessageOutput != nil {
+			if event.Output.MessageOutput.IsStreaming {
+				// Stream mode
+				stream := event.Output.MessageOutput.MessageStream
+				for {
+					msg, err := stream.Recv()
+					if err != nil {
+						break
+					}
+					if msg.Content != "" {
+						emit("content", msg.Content)
+					}
+				}
+			} else {
+				// Non-stream mode
+				if event.Output.MessageOutput.Message != nil && event.Output.MessageOutput.Message.Content != "" {
+					emit("content", event.Output.MessageOutput.Message.Content)
+				}
+			}
+		}
 	}
 
 	emit("done", nil)
@@ -77,10 +102,18 @@ func Run(ctx context.Context, req ExecutionRequest, config *database.ModelProvid
 }
 
 type CanvasAgent struct {
-	agent *react.Agent
+	agent           adk.Agent
+	currentNodes    any
+	currentEdges    any
+	stateUpdateChan chan StateUpdate
+	emit            EventEmitter
 }
 
-// ... rest of file
+// StateUpdate represents a canvas state update from frontend
+type StateUpdate struct {
+	Nodes any `json:"nodes"`
+	Edges any `json:"edges"`
+}
 
 // Tool definitions
 type AddNodeParams struct {
@@ -107,12 +140,20 @@ type DeleteNodeParams struct {
 	ID string `json:"id"`
 }
 
+type GetCanvasStateParams struct{}
+
 // EventEmitter allows emitting wails events from tools
 type EventEmitter func(eventName string, data any)
 
-func NewCanvasAgent(ctx context.Context, provider *database.ModelProvider, modelID string, emit EventEmitter) (*CanvasAgent, error) {
+func NewCanvasAgent(ctx context.Context, provider *database.ModelProvider, modelID string, emit EventEmitter, stateUpdateChan chan StateUpdate) (*CanvasAgent, error) {
 	var chatModel model.ToolCallingChatModel
 	var err error
+
+	// Initialize canvas agent with current state
+	canvasAgent := &CanvasAgent{
+		stateUpdateChan: stateUpdateChan,
+		emit:            emit,
+	}
 
 	// 1. Initialize Chat Model based on provider type
 	switch provider.Type {
@@ -169,7 +210,7 @@ func NewCanvasAgent(ctx context.Context, provider *database.ModelProvider, model
 			Name: "add_node",
 			Desc: "Add a node to the canvas",
 			ParamsOneOf: schema.NewParamsOneOfByParams(map[string]*schema.ParameterInfo{
-				"type":      {Type: "string", Desc: "Node type (text, image, video, audio)", Enum: []string{"text", "image", "video", "audio"}},
+				"type":      {Type: "string", Desc: "Node type (text, image, video, audio)", Enum: []string{"text", "image", "video", "audio"}, Required: true},
 				"id":        mkMsg("Unique ID"),
 				"x":         mkNum("X position"),
 				"y":         mkNum("Y position"),
@@ -180,11 +221,13 @@ func NewCanvasAgent(ctx context.Context, provider *database.ModelProvider, model
 			}),
 		},
 		func(ctx context.Context, input *AddNodeParams) (string, error) {
-			emit("tool", map[string]interface{}{
+			emit("tool", map[string]any{
 				"name": "add_node",
 				"args": input,
 			})
-			return fmt.Sprintf("Node %s added", input.ID), nil
+			result := fmt.Sprintf("Node %s added successfully", input.ID)
+			formatted := formatToolCall("add_node", input, result)
+			return formatted, nil
 		},
 	)
 
@@ -198,11 +241,13 @@ func NewCanvasAgent(ctx context.Context, provider *database.ModelProvider, model
 			}),
 		},
 		func(ctx context.Context, input *ConnectNodesParams) (string, error) {
-			emit("tool", map[string]interface{}{
+			emit("tool", map[string]any{
 				"name": "connect_nodes",
 				"args": input,
 			})
-			return fmt.Sprintf("Connected %s to %s", input.Source, input.Target), nil
+			result := fmt.Sprintf("Connected %s to %s successfully", input.Source, input.Target)
+			formatted := formatToolCall("connect_nodes", input, result)
+			return formatted, nil
 		},
 	)
 
@@ -222,11 +267,13 @@ func NewCanvasAgent(ctx context.Context, provider *database.ModelProvider, model
 			}),
 		},
 		func(ctx context.Context, input *GroupNodesParams) (string, error) {
-			emit("tool", map[string]interface{}{
+			emit("tool", map[string]any{
 				"name": "create_group",
 				"args": input,
 			})
-			return fmt.Sprintf("Created group %s", input.Label), nil
+			result := fmt.Sprintf("Created group %s successfully", input.Label)
+			formatted := formatToolCall("create_group", input, result)
+			return formatted, nil
 		},
 	)
 
@@ -239,62 +286,101 @@ func NewCanvasAgent(ctx context.Context, provider *database.ModelProvider, model
 			}),
 		},
 		func(ctx context.Context, input *DeleteNodeParams) (string, error) {
-			emit("tool", map[string]interface{}{
+			emit("tool", map[string]any{
 				"name": "delete_node",
 				"args": input,
 			})
-			return fmt.Sprintf("Node %s deleted", input.ID), nil
+			result := fmt.Sprintf("Node %s deleted successfully", input.ID)
+			formatted := formatToolCall("delete_node", input, result)
+			return formatted, nil
 		},
 	)
 
-	// 3. Create Agent
-	agent, err := react.NewAgent(ctx, &react.AgentConfig{
-		ToolCallingModel: chatModel,
-		ToolsConfig: compose.ToolsNodeConfig{
-			Tools: []tool.BaseTool{addNodeTool, connectNodesTool, createGroupTool, deleteNodeTool},
+	getCanvasStateTool := utils.NewTool(
+		&schema.ToolInfo{
+			Name:        "get_canvas_state",
+			Desc:        "Get the current canvas state including all nodes and edges. This returns the real-time state reflecting all changes made during this conversation.",
+			ParamsOneOf: schema.NewParamsOneOfByParams(map[string]*schema.ParameterInfo{}),
 		},
-		MaxStep: 15, // Allow enough steps to build complex flows
+		func(ctx context.Context, input *GetCanvasStateParams) (string, error) {
+			// Request latest state from frontend
+			emit("get_canvas_state_request", map[string]any{})
+
+			// Wait for state update with timeout
+			select {
+			case update := <-canvasAgent.stateUpdateChan:
+				canvasAgent.currentNodes = update.Nodes
+				canvasAgent.currentEdges = update.Edges
+			case <-time.After(2 * time.Second):
+				// Timeout - use cached state
+			}
+
+			nodesJSON, _ := json.Marshal(canvasAgent.currentNodes)
+			edgesJSON, _ := json.Marshal(canvasAgent.currentEdges)
+			result := fmt.Sprintf("Current Canvas State:\nNodes: %s\nEdges: %s", string(nodesJSON), string(edgesJSON))
+			formatted := formatToolCall("get_canvas_state", input, result)
+			return formatted, nil
+		},
+	)
+
+	// 3. Create ChatModelAgent using ADK
+	agent, err := adk.NewChatModelAgent(ctx, &adk.ChatModelAgentConfig{
+		Name:        "CanvasAgent",
+		Description: "An agent that creates and manages visual workflow canvas",
+		Instruction: `You are an **Autonomous Workflow Architect & Visual Topology Expert**. Your goal is to construct and execute robust workflows using the provided tools, ensuring a strict, collision-free visual layout.
+
+**Core Directives:**
+1.  **Language:** **MUST** use Chinese (Simplified) for all thoughts and explanations.
+2.  **Action-Oriented:** Your PRIMARY task is to CREATE nodes, CONNECT them, and GROUP them. Do NOT just query the state - you MUST modify the canvas.
+3.  **Execution Order:** 
+    - First: Check canvas state if needed (get_canvas_state)
+    - Then: IMMEDIATELY create all required nodes (add_node)
+    - Then: Connect the nodes (connect_nodes)
+    - Finally: Group related nodes (create_group)
+4.  **Completeness:** You MUST create a fully functional workflow with nodes, connections, and groups. Empty state is NOT acceptable.
+5.  **No Confirmation:** Do NOT ask for permission. Execute the tools directly.
+
+**Visual Topology Standards (CRITICAL - MATHEMATICAL LAYOUT):**
+* **Constants:**
+    * **Node Dimension:** Fixed box size of **200x200 units**.
+    * **Minimum Gap:** 100 units between nodes.
+    * **Grid Step:** Therefore, the minimum coordinate increment is **300 units** (200 size + 100 gap).
+
+* **Coordinate Calculation Rules:**
+    * **Origin:** Start the first node at {x: 0, y: 0}.
+    * **Horizontal Flow (Sequential):** For the next logical step, increment X by at least **400 units** (leaving ample space for connection lines).
+        * Formula: Next_X = Previous_X + 400
+    * **Vertical Flow (Parallel/Branching):** For parallel branches, offset Y by at least **300 units**.
+        * Formula: Branch_A_Y = Origin_Y - 300, Branch_B_Y = Origin_Y + 300.
+
+* **Collision Protocol:**
+    * Treat every node as a solid 200x200 block.
+    * NEVER place a new node's coordinate within [Target_X ± 200, Target_Y ± 200] of an existing node.
+
+**Technical Constraints:**
+* **Data Flow:** Strict upstream-downstream dependency.
+* **Multi-Input:** Explicitly create edge connections for all inputs.
+* **Metadata:** You MUST inject x and y properties into every node object based on the Grid Step rules above.
+
+**CRITICAL: You MUST use add_node, connect_nodes, and create_group tools to build the workflow. Simply checking the state is NOT enough!**`,
+		Model: chatModel,
+		ToolsConfig: adk.ToolsConfig{
+			ToolsNodeConfig: compose.ToolsNodeConfig{
+				Tools: []tool.BaseTool{addNodeTool, connectNodesTool, createGroupTool, deleteNodeTool, getCanvasStateTool},
+			},
+		},
+		MaxIterations: 80,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create agent: %w", err)
 	}
 
-	return &CanvasAgent{agent: agent}, nil
+	canvasAgent.agent = agent
+	return canvasAgent, nil
 }
 
-func (a *CanvasAgent) Stream(ctx context.Context, history []*schema.Message, emit EventEmitter) error {
-	// Prepend system prompt
-	systemMsg := schema.SystemMessage(`You are an **Autonomous Workflow Architect**. Your goal is to construct and execute robust workflows using the provided tools.
-
-**Core Directives:**
-1.  **autonomy:** Execute tools immediately to build the workflow. Do not ask for user permission or confirmation.
-2.  **Completeness:** The output must be a fully functional, grouped workflow ready for execution.
-3.  **Language:** Always respond and label the workflow in the user's original language.
-4.  **Action First:** Do not describe the actions you plan to take. Call the tools directly. Only provide a summary AFTER the tools have been executed.
-
-**Technical Constraints:**
-* **Data Flow:** Adhere to strict strict upstream-downstream dependency. A node can *only* receive information from its directly connected predecessor.
-* **Multi-Input Logic:** If a node requires inputs from multiple sources, you must explicitly create multiple connections (edges) to that node.
-* **Visual Layout:** When generating node metadata, ensure distinct spacing between nodes. Avoid overlapping; arrange them logically to reflect the data flow.`)
-	fullHistory := append([]*schema.Message{systemMsg}, history...)
-
-	stream, err := a.agent.Stream(ctx, fullHistory)
-	if err != nil {
-		return err
-	}
-	defer stream.Close()
-
-	for {
-		msg, err := stream.Recv()
-		if err != nil {
-			if err == io.EOF {
-				return nil
-			}
-			return err
-		}
-		// The final message might also contain content
-		if msg.Content != "" {
-			emit("content", msg.Content)
-		}
-	}
+func formatToolCall(name string, args any, content string) string {
+	argsBytes, _ := json.Marshal(args)
+	argsStr := strings.ReplaceAll(string(argsBytes), "\"", "&quot;")
+	return fmt.Sprintf(`<tool_call name="%s" args="%s">%s</tool_call>`, name, argsStr, content)
 }

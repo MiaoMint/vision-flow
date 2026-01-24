@@ -64,6 +64,11 @@ interface CanvasState {
 
     // Helpers
     updateProjectName: (name: string) => void;
+
+    // AI / Advanced Actions
+    deleteNode: (id: string) => void;
+    createGroup: (nodeIds: string[], label?: string) => void;
+    connectNodes: (source: string, target: string) => void;
 }
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
@@ -253,6 +258,78 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         // Clone project to avoid mutation issues if it were deeply nested
         const newProject = new database.Project({ ...state.project, name: name });
         return { project: newProject };
-    })
+    }),
+
+    deleteNode: (id) => {
+        set((state) => ({
+            nodes: state.nodes.filter((n) => n.id !== id),
+            edges: state.edges.filter((e) => e.source !== id && e.target !== id),
+        }));
+        get().recordState();
+    },
+
+    createGroup: (nodeIds, label) => {
+        if (!nodeIds || !Array.isArray(nodeIds) || nodeIds.length === 0) return;
+        const state = get();
+        const targetNodes = state.nodes.filter((n) => nodeIds.includes(n.id));
+        if (targetNodes.length === 0) return;
+
+        // Calculate bounding box
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+        targetNodes.forEach((n) => {
+            const nWidth = n.width || n.measured?.width || 200;
+            const nHeight = n.height || n.measured?.height || 200;
+            if (n.position.x < minX) minX = n.position.x;
+            if (n.position.y < minY) minY = n.position.y;
+            if (n.position.x + nWidth > maxX) maxX = n.position.x + nWidth;
+            if (n.position.y + nHeight > maxY) maxY = n.position.y + nHeight;
+        });
+
+        const PADDING = 50;
+        const groupX = minX - PADDING;
+        const groupY = minY - PADDING;
+        const groupWidth = (maxX - minX) + (PADDING * 2);
+        const groupHeight = (maxY - minY) + (PADDING * 2);
+
+        const groupNode: Node = {
+            id: `group-${get().nodeIdCounter}`,
+            type: "group",
+            position: { x: groupX, y: groupY },
+            width: groupWidth,
+            height: groupHeight,
+            style: {
+                width: groupWidth,
+                height: groupHeight,
+                zIndex: -1,
+                border: "none",
+                background: "transparent",
+                padding: 0,
+            },
+            selectable: false,
+            data: { label: label || "Group" },
+        };
+
+        set((state) => ({
+            nodes: [...state.nodes, groupNode],
+        }));
+        get().recordState();
+    },
+
+    connectNodes: (source, target) => {
+        const state = get();
+        // Check if edge already exists
+        const exists = state.edges.some((e) => e.source === source && e.target === target);
+        if (!exists) {
+            const newEdge = { id: `e-${source}-${target}`, source, target };
+            // Use addEdge from xyflow to ensure proper handling if needed, or just append
+            // But we can just use the store's setEdges or onConnect logic if we want consistency
+            // Here simpler is better for programmatic access
+            set((state) => ({
+                edges: [...state.edges, { ...newEdge, animated: false } as Edge],
+            }));
+            get().recordState();
+        }
+    },
 
 }));

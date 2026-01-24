@@ -25,3 +25,7 @@ export function GenerateVideo(arg1) {
 export function ListModels(arg1) {
   return window['go']['ai']['Service']['ListModels'](arg1);
 }
+
+export function UpdateCanvasState(arg1, arg2, arg3) {
+  return window['go']['ai']['Service']['UpdateCanvasState'](arg1, arg2, arg3);
+}
